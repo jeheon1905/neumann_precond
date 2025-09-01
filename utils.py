@@ -10,7 +10,7 @@ import torch
 
 from ase import Atoms  # type: ignore
 from ase.io import read 
-from ase.build import bulk, molecule
+from ase.build import bulk, molecule, make_supercell
 
 
 # Exact-match prototype keys only (keep it simple)
@@ -166,3 +166,12 @@ def set_global_seed(seed: int) -> None:
 
     torch.backends.cudnn.benchmark = False  # reproducibility
     torch.backends.cudnn.deterministic = True  # reproducibility
+
+def make_atoms(cif_filename, supercell=[1, 1, 1], pbc=[True, True, True], vacuum=3.0):
+
+    atoms = read(cif_filename)
+    prim = np.diag(supercell)
+    atoms = make_supercell(atoms, prim)
+    atoms.set_pbc(pbc)
+    atoms.center(vacuum=vacuum, axis=np.arange(3)[~atoms.get_pbc()])
+    return atoms

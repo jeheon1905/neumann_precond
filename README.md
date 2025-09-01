@@ -60,5 +60,5 @@ python setup.py develop
 
 
 ```bash
-python test.py --material diamond --precond shift-and-invert --spacing 0.2 --supercell 1 1 1 --dir "./". --phase "fixed" --pp_type SG15 --use_cuda --nbands 40
+python test.py  --spacing 0.3 --supercell 2 2 2 --phase "fixed" --pp_type SG15 --use_cuda --nbands 300 --precond neumann --warmup 0  --filepath data/systems/Si_diamond.cif --pbc 1 1 1 --innerorder 3 --outerorder dynamic
 ```

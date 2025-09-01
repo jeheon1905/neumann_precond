@@ -1,0 +1,81 @@
+
+#(C) 2016 by FIZ Karlsruhe - Leibniz Institute for Information Infrastructure.  All rights reserved.
+data_291372-ICSD
+_database_code_ICSD 291372
+_audit_creation_date 2015-08-01
+_chemical_name_systematic 'Methylammonium lead iodide'
+_chemical_formula_structural '(C H3 N H3) Pb I3'
+_chemical_formula_sum 'C1 H6 I3 N1 Pb1'
+_chemical_name_mineral Perovskite
+_exptl_crystal_density_diffrn 4.32
+_publ_section_title
+
+;
+Role of hydrogen-bonding and its interplay with octahedral tilting in CH3 NH3
+Pb I3
+;
+loop_
+_citation_id
+_citation_journal_full
+_citation_year
+_citation_journal_volume
+_citation_page_first
+_citation_page_last
+_citation_journal_id_ASTM
+primary 'ChemComm - Chemical Communications' 2015 51 6434 6437 CHCOFS
+loop_
+_publ_author_name
+'Lee, Jung-Hoon'
+'Bristowe, Nicholas C.'
+'Bristowe, Paul D.'
+'Cheetham, Anthony K.'
+_cell_length_a 8.844
+_cell_length_b 12.592
+_cell_length_c 8.563
+_cell_angle_alpha 90.
+_cell_angle_beta 90.
+_cell_angle_gamma 90.
+_cell_volume 953.61
+_cell_formula_units_Z 4
+_symmetry_space_group_name_H-M 'P n m a'
+_symmetry_Int_Tables_number 62
+loop_
+_symmetry_equiv_pos_site_id
+_symmetry_equiv_pos_as_xyz
+1 'x+1/2, y, -z+1/2'
+2 'x, -y+1/2, z'
+3 '-x+1/2, y+1/2, z+1/2'
+4 '-x, -y, -z'
+5 '-x+1/2, -y, z+1/2'
+6 '-x, y+1/2, -z'
+7 'x+1/2, -y+1/2, -z+1/2'
+8 'x, y, z'
+loop_
+_atom_type_symbol
+_atom_type_oxidation_number
+Pb2+ 2
+I1- -1
+N3- -3
+C2- -2
+H1+ 1
+loop_
+_atom_site_label
+_atom_site_type_symbol
+_atom_site_symmetry_multiplicity
+_atom_site_Wyckoff_symbol
+_atom_site_fract_x
+_atom_site_fract_y
+_atom_site_fract_z
+_atom_site_B_iso_or_equiv
+_atom_site_occupancy
+_atom_site_attached_hydrogens
+Pb1 Pb2+ 4 b 0.5 0 0 . 1. 0
+I1 I1- 4 c 0.476 0.25 0.938 . 1. 0
+I2 I1- 8 d 0.176 0.017 0.172 . 1. 0
+N1 N3- 4 c 0.953 0.75 0.023 . 1. 0
+C1 C2- 4 c 0.908 0.25 0.075 . 1. 0
+H1 H1+ 4 c 0.941 0.25 0.198 . 1. 0
+H2 H1+ 8 d 0.842 0.178 0.048 . 1. 0
+H3 H1+ 8 d 0.111 0.183 0.003 . 1. 0
+H4 H1+ 4 c 0.978 0.75 0.142 . 1. 0
+#End of TTdata_291372-ICSD

@@ -17,3 +17,48 @@
     이 코드는 특정 시스템 별로 조건을 달리하여 계산하고 싶을 때 조건을 설정하고 반복적인 방법으로 구하는 것이다. 이 코드는 반복적으로 run_files.py 를 실행하는 코드이다. 이후 결과 계산 파일은 total_diagonalizatio time 순으로 정렬되어 디랙토리로 모이게 된다.,
 
     ex) python calculation_files.py  처럼 args 는 없고 파일 내부에서 설정하도록 코드 작성 
+
+
+
+
+## Env setting
+```bash
+# Create and activate a conda environment
+conda create -n neumann_precond python=3.10 -y
+conda activate neumann_precond
+
+# Install PyTorch (CUDA 11.8 version)
+pip install torch==2.2.0 torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Install dependencies
+pip install numpy==1.26.4     # Torch compatibility (numpy version pinned)
+pip install ase               # Atomic Simulation Environment
+pip install gitpython         # Git interface for Python
+pip install "spglib>=1.16.1"  # Symmetry analysis library
+
+# Install GOSPEL (local development mode)
+git clone https://gitlab.com/jhwoo15/gospel.git
+cd gospel
+python setup.py develop
+
+# Install pylibxc (for XC functionals)
+git clone https://gitlab.com/libxc/libxc.git
+cd libxc
+git checkout 6.0.0  # Switch to 6.0.0 tag
+conda install -c conda-forge cmake  # Run this if cmake is not installed
+python setup.py develop  # or: pip install -e .
+
+# If pylibxc import fails:
+# You may need to add libxc.so* to your library path.
+# Example: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/libxc
+
+# Install neumann_precond
+cd neumann_precond
+python setup.py develop
+```
+
+
+
+```bash
+python test.py --material diamond --precond shift-and-invert --spacing 0.2 --supercell 1 1 1 --dir "./". --phase "fixed" --pp_type SG15 --use_cuda --nbands 40
+```

@@ -682,8 +682,11 @@ class PreNeumann(Preconditioner):
         self.ISF_solver = ISF_solver(
                 grid = self.grid,
                 )
-        self.list_ISF_solvers = [ ISF_solver(grid=self.grid, t_sample=t_sample) for i in range(self.MAX_ORDER) ]
-        self.list_ISF_solvers = [ ISF_solver(grid=self.grid,t_sample=t_sample) ] + self.list_ISF_solvers
+        # self.list_ISF_solvers = [ ISF_solver(grid=self.grid, t_sample=t_sample) for i in range(self.MAX_ORDER) ]
+        # self.list_ISF_solvers = [ ISF_solver(grid=self.grid,t_sample=t_sample) ] + self.list_ISF_solvers
+        # NOTE: deliver the device argument to ISF_solver
+        self.list_ISF_solvers = [ ISF_solver(grid=self.grid, t_sample=t_sample, fp=fp, device=self._device) for i in range(self.MAX_ORDER) ]
+        self.list_ISF_solvers = [ ISF_solver(grid=self.grid,t_sample=t_sample, fp=fp, device=self._device) ] + self.list_ISF_solvers
         
         
 #        self.list_ISF_solvers = [ ISF_solver(grid=self.grid) for i in range(self.MAX_ORDER) ]

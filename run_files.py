@@ -9,102 +9,13 @@ Keep it minimal and explicit.
 """
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Dict, Tuple
-
-from ase import Atoms  # type: ignore
-from ase.io import read 
-from ase.build import bulk, molecule, make_supercell  # type: ignore
-
-# Exact-match prototype keys only (keep it simple)
-#   key -> (symbol, crystalstructure, a, cubic)
-DEFAULT_PROTOTYPES: Dict[str, Union[Tuple[str, str, float, bool], Tuple[str, str, float]]] = {
-    "diamond": ("C", "diamond", 3.57, True),
-    "silicon": ("Si", "diamond", 5.43, True),
-    "Fe_fcc": ("Fe", "fcc", 3.65, True),  # adjust a to your workflow if needed
-    "C60": ("molecule", "C60", 10.0)      # fullerene molecule with 10 Å vacuum 
-}
-
-def _ensure_nonzero_cell(atoms: Atoms, vacuum: float = 10.0) -> Atoms:
-    """
-    Ensure cell lengths are non-zero (needed by many calculators, ATP, GSH, Aspirin).
-    """
-    import numpy as np
-
-    a, b, c = atoms.cell.lengths()
-    if np.isclose([a, b, c], 0).any():
-        atoms.center(vacuum=vacuum)  # cubic box around molecule
-        atoms.pbc = (False, False, False)
-    return atoms
-
-
-def load_atoms(material: str, file_directory: str = "./") -> Atoms:
-    """Return ASE Atoms from file or a minimal prototype map.
-
-    Why this shape: deterministic, tiny surface area, no magic name variants.
-    """
-    base = Path(file_directory).expanduser().resolve()
-    if not base.is_dir():
-        raise FileNotFoundError(f"Directory not found: {base}")
-
-    # 1) Try files: {material}.cif -> {material}.sdf (read failures fall through)
-    last_err: Exception | None = None
-    for ext in ("cif", "sdf"):
-        p = base / f"{material}.{ext}"
-        if p.is_file():
-            try:
-                atoms = read(p.as_posix())
-                return _ensure_nonzero_cell(atoms)
-            except Exception as exc:  # noqa: BLE001
-                last_err = exc
-                continue  # try next ext
-
-    # 2) Try exact-match prototype key
-    if material in DEFAULT_PROTOTYPES:
-        proto = DEFAULT_PROTOTYPES[material]
-        if proto[0] == "molecule":
-            _, name, vacuum = proto
-            atoms = molecule(name)
-            return _ensure_nonzero_cell(atoms, vacuum=float(vacuum))
-        else:
-            sym, cs, a, cubic = proto  # type: ignore
-            atoms = bulk(sym, cs, a=a, cubic=cubic)
-            return _ensure_nonzero_cell(atoms)
-
-    hint = f" (last read error: {last_err})" if last_err else ""
-    raise ValueError(
-        "No structure source found. Provide a file or use one of the exact keys: "
-        + ", ".join(sorted(DEFAULT_PROTOTYPES.keys())) + hint
-    )
-
-import contextlib
-import builtins
-@contextlib.contextmanager
-def block_all_print():
-    original_print = builtins.print
-    original_stdout = sys.stdout
-    with open(os.devnull, "w") as fnull:
-        builtins.print = lambda *args, **kwargs: None
-        sys.stdout = fnull
-        try:
-            yield
-        finally:
-            builtins.print = original_print
-            sys.stdout = original_stdout
-
-
 # --- Optional tiny CLI ---
 if __name__ == "__main__":  # pragma: no cover
     from ase.build import make_supercell
     import numpy as np
     import torch
     from gospel import GOSPEL
-    import gospel.Hamiltonian
-    from ase.build import bulk
     import argparse
-    from ase import Atoms
-    import datetime
-    import os
     import sys
     from gospel.ParallelHelper import ParallelHelper as PH
     # from gospel.Eigensolver.precondition import create_preconditioner

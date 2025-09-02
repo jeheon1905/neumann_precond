@@ -654,20 +654,21 @@ e   :type H: torch.Tensor or LinearOperator
 
 class PreNeumann(Preconditioner):
     def __init__(
-                 self, 
-                 grid, 
-                 use_cuda=False, 
-                 order=3, 
-                 t_sample=None, 
-                 correction_scale=0.1,
-                 no_shift_thr=10.0,
-                 fp = "DP",
-                 MAX_ORDER = 20,
-                 error_cutoff = - 0.4
-
-                 ):
+        self,
+        grid,
+        use_cuda=False,
+        order=3,
+        t_sample=None,
+        correction_scale=0.1,
+        no_shift_thr=10.0,
+        fp="DP",
+        MAX_ORDER=20,
+        error_cutoff=-0.4,
+        verbosity=True,
+    ):
         super().__init__("Neumann", use_cuda)
         self._precond_type = "Neumann"
+        assert order == "dynamic" or (type(order)==int and order>=0), "order should be int >=0 or 'dynamic'"
         self.order = order
         print("order = ", order) #### added
         #assert type(order)==int
@@ -678,21 +679,10 @@ class PreNeumann(Preconditioner):
         self.MAX_ORDER = int(MAX_ORDER)
         self.error_cutoff = error_cutoff
         print("using cutoff =", error_cutoff)
-        #ISF_solver 초기화
-        self.ISF_solver = ISF_solver(
-                grid = self.grid,
-                )
-        # self.list_ISF_solvers = [ ISF_solver(grid=self.grid, t_sample=t_sample) for i in range(self.MAX_ORDER) ]
-        # self.list_ISF_solvers = [ ISF_solver(grid=self.grid,t_sample=t_sample) ] + self.list_ISF_solvers
-        # NOTE: deliver the device argument to ISF_solver
-        self.list_ISF_solvers = [ ISF_solver(grid=self.grid, t_sample=t_sample, fp=fp, device=self._device) for i in range(self.MAX_ORDER) ]
-        self.list_ISF_solvers = [ ISF_solver(grid=self.grid,t_sample=t_sample, fp=fp, device=self._device) ] + self.list_ISF_solvers
-        
-        
-#        self.list_ISF_solvers = [ ISF_solver(grid=self.grid) for i in range(self.MAX_ORDER) ]
-#        self.list_ISF_solvers = [ ISF_solver(grid=self.grid) ] + self.list_ISF_solvers
-        
-        #self.list_ISF_solvers = [ISF_solver(grid=self.grid), ISF_solver(grid=self.grid, t_sample=t_sample) ]
+        self.verbosity = verbosity
+
+        self.ISF_solver = ISF_solver(grid=self.grid, t_sample=t_sample, fp=fp, device=self._device)
+
     def __str__(self):
         s = str()
         s += "\n========================= [ Preconditioner ] ========================"
@@ -702,106 +692,97 @@ class PreNeumann(Preconditioner):
          
         return str(s)
 
-################################################kinetic = H-eI approx
-    def call(self, residue, H, eigval, 
-             #eigvec  ## eigvec added  
-             #,correction_scale, no_shift_thr):
-            ):             
+    def call(self, residue, H, eigval):
         correction_scale = self.correction_scale
-        no_shift_thr=self.no_shift_thr
-        residue_norm = residue.norm(dim=0, keepdim=True)
-        print("eigval : ", eigval) ##added
-        # Modify shift values
-        perturb = -(residue_norm * residue_norm)
-        eigval = eigval + correction_scale * perturb
-        eigval[abs(perturb) > no_shift_thr] = 0.0  # no shift to states with large residues
+        no_shift_thr = self.no_shift_thr
         error_cutoff = self.error_cutoff
-        self.H = H
-        print("hamiltonian shape = ", H.shape)
-        # 차원 맞추기
+        gapp = self.ISF_solver.batch_compute_potential2
+        TWO_PI = 2 * np.pi
+
+        # Modify shift values
+        residue_norm = residue.norm(dim=0)
+        perturb = -(residue_norm.conj() * residue_norm)
+        eigval += correction_scale * perturb
+        eigval[abs(perturb) > no_shift_thr] = 0.0  # no shift to states with large residues
+
+        # keep the original residue shape
         if residue.ndim == 1:
             residue = residue.unsqueeze(0)
 
-        print("residue :",residue)
-        #residue = torch.real(residue)
-        #print(f"residue dtype ={residue.dtype}, pi dtype = {torch_pi.dtype}")
-        preconditioned_result = self.list_ISF_solvers[0].batch_compute_potential2(residue)/(2*np.pi)
-        #preconditioned_result = self.ISF_solver.batch_compute_potential2(residue)/(2*np.pi)
+        preconditioned_result = gapp(residue).div_(TWO_PI)
 
-        #cutoff setting and dynamic order 
+        # cutoff setting and dynamic order
         if self.order != 0:
             neumann_term = preconditioned_result.clone()
+
             if self.order == "dynamic":
                 # check accuracy ## 이전 계산이 아니라 나머지 일때 키기 cutoff 만 보려면 꺼야함
-                diff = (H @ preconditioned_result - preconditioned_result * eigval.reshape(1,-1)) - residue
-                pre_error = torch.norm(diff, dim=0)/torch.norm(residue, dim=0)
-                pre_result   = preconditioned_result.clone() ######## cutoff 만 계산할 때 켜야함
-                error_log = torch.log10(pre_error)
-#               print("test_error (using order = 0) = ", error_log )
-                
+                H_minus_eigval_vec = H @ preconditioned_result
+                H_minus_eigval_vec -= eigval * preconditioned_result
+                pre_error = torch.norm(H_minus_eigval_vec - residue, dim=0) / residue_norm
+
+                if self.verbosity:
+                    print("test_error (using order = 0) = ", torch.log10(pre_error))
 
                 for order in range(1, self.MAX_ORDER + 1): ##########정확도 평가가 들어가는 것만 이렇게 표현
-#               for order in range(self.order):
-                    #Compute the next Neumann series 
-                    #neumann_term = neumann_term - self.ISF_solver.batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-     
-#                   neumann_term = neumann_term - self.list_ISF_solvers[1 + order].batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-                    neumann_term = neumann_term - self.list_ISF_solvers[order].batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-            
-                    # Accumulate the result(always)
+                    # Compute the next Neumann series and accumulate the result
+                    if order == 1:
+                        # here we can save one H operation
+                        neumann_term -= gapp(H_minus_eigval_vec).div_(TWO_PI)
+                    else:
+                        H_minus_eigval_vec = H @ neumann_term
+                        H_minus_eigval_vec -= eigval * neumann_term
+                        neumann_term -= gapp(H_minus_eigval_vec).div_(TWO_PI)
                     preconditioned_result += neumann_term
-                    diff = (H @ preconditioned_result - preconditioned_result * eigval.reshape(1,-1)) - residue
-                    error = torch.norm(diff, dim=0)/torch.norm(residue, dim=0)
-                    error_log = torch.log10(error)
+
+                    # Error calculation
+                    H_minus_eigval_vec = H @ preconditioned_result
+                    H_minus_eigval_vec -= eigval * preconditioned_result
+                    error = torch.norm(H_minus_eigval_vec.sub_(residue), dim=0) / residue_norm
+
                     if pre_error.sum() > error.sum():
-                        if error_cutoff >= torch.max(error_log):
-                            pre_result = preconditioned_result.clone()
-                            print("Preconditioned diagonalization error(log10) =", error_log, "(","using order(low_order_cutoff) = ", order,")")
+                        error_log = torch.log10(error)
+                        if order == self.MAX_ORDER:
+                            if self.verbosity:
+                                print(f"Preconditioned diagonalization error(log10) = {error_log} "
+                                      f"(using order(high_error_cutoff) = {order})")
                             break
-
-                        elif error_cutoff < torch.max(error_log) and order == self.MAX_ORDER:
-                            pre_result = preconditioned_result.clone()
-                            print("Preconditioned diagonalization error(log10) =", error_log, "(","using order(high_error_cutoff) = ", order,")")
+                        elif error_cutoff >= torch.max(error_log):
+                            if self.verbosity:
+                                print(f"Preconditioned diagonalization error(log10) = {error_log} "
+                                    f"(using order(low_order_cutoff) = {order})")
                             break
-
                         else:
                             pre_error = error
-                            pre_result = preconditioned_result.clone()
                             continue
                     else:
                         preconditioned_result -= neumann_term
-                        pre_result = preconditioned_result.clone()
-                        print("Preconditioned diagonalization error(log10)=", torch.log10(pre_error), "(","using order(pre<now_break) = ", order - 1,")")
+                        if self.verbosity:
+                            print(f"Preconditioned diagonalization error(log10)= {torch.log10(pre_error)} "
+                                f"(using order(pre<now_break) = {order - 1})")
                         break
             else: 
-                order = int(self.order)
-                for order in range(1, order + 1): 
-                    #Compute the next Neumann series 
-                    #neumann_term = neumann_term - self.ISF_solver.batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-     
-#                   neumann_term = neumann_term - self.list_ISF_solvers[1 + order].batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-                    neumann_term = neumann_term - self.list_ISF_solvers[order].batch_compute_potential2(H @ neumann_term - eigval.reshape(1,-1) * neumann_term)/(2*np.pi)
-            
-                    # Accumulate the result
+                for order in range(1, self.order + 1): 
+                    # Compute the next Neumann series and accumulate the result
+                    neumann_term -= gapp(
+                        H @ neumann_term - eigval * neumann_term
+                    ).div_(TWO_PI)
                     preconditioned_result += neumann_term
 
-                diff = (H @ preconditioned_result - preconditioned_result * eigval.reshape(1,-1)) - residue   #### 이거부터 아래 3줄은 테스트를 위한 것 
-                error = torch.norm(diff, dim=0)/torch.norm(residue, dim=0)
-                error_log = torch.log10(error)
-                print(f"error (using order = {order}) = ", error_log)
+                if self.verbosity:
+                    diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
+                    error = torch.norm(diff, dim=0) / residue_norm
+                    print(f"error (using order = {order}) = ", torch.log10(error))
 
-            #inversion accuracy
-#            print("Neumann result:", torch.linalg.norm(preconditioned_result, axis=0))
-#            print("(H-eI)@precond result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
-#            print("(H-eI)@precond - residue result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result - residue , axis=0))
-            print ("res norm (Neumann): ", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
-            
-            #return pre_result 
-        #print ("res norm (Neumann): ", torch.linalg.norm( (H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result)@eigvec - eigvec , axis=0) )### eigvec added
-            #return pre_result
-            return preconditioned_result 
-        else:
-            return preconditioned_result
+            if self.verbosity:
+                # inversion accuracy
+                # print("Neumann result:", torch.linalg.norm(preconditioned_result, axis=0))
+                # print("(H-eI)@precond result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
+                # print("(H-eI)@precond - residue result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result - residue , axis=0))
+                print("res norm (Neumann): ", torch.linalg.norm(H @ preconditioned_result - eigval * preconditioned_result, axis=0))
+
+        return preconditioned_result
+
 
 if __name__ == "__main__":
     from ase import Atoms

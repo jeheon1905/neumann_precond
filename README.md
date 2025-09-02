@@ -1,27 +1,10 @@
-1. run_files.py
+# Preconditioner development using Neumann expansion
 
-    이 코드는 cif 랑 sdf 파일이 존재하는 경로와 계산 material 을 넣으면 일치하는 파일을 찾아 시스템 구축 후 계산을 진행하는 코드이다. 
-    cif, sdf 파일의 이름은 {material}_sdf, {material}_cif 로 존재하여야 한다.
-    파일 내부에 존재하는 여러 인자들을 주면, 그에 맞는 시스템을 구축하여 계산을 수행한다. 
+This repository provides implementations and examples for developing preconditioners based on the Neumann series expansion, applied to iterative diagonalization problems in electronic structure calculations.
 
-    --phase 옵션은 phase = "scf" 이면, 일반적인 scf 계산을 수행, phase = "fixed" 이면 밀도 파일을 사용한다. 또한 --density_filename 은 scf 이후 나타난 밀도 파일을 저장하는 파일 이름을 설정 하는 것이다.
+## Environment setting
+We recommend using conda to manage dependencies.
 
-        phase = "scf", density_filename = None  이면 density 파일을 저장하지 않고 scf 과정을 수행
-        phase = "scf", density_filename = "results" 이면  density 파일을 results 에 저장
-        phase - "fixed", density_filename = "results" 이면 scf 에서 구했던 density 파일을이용하는 것  
-
-    ex) python run_files.py --material diamond --precond shift-and-invert --spacing 0.2 --supercell 3 3 3 --dir "./". --phase "scf" --density_filename "density_diamond", 
-
-
-2. calculation_files.py
-    이 코드는 특정 시스템 별로 조건을 달리하여 계산하고 싶을 때 조건을 설정하고 반복적인 방법으로 구하는 것이다. 이 코드는 반복적으로 run_files.py 를 실행하는 코드이다. 이후 결과 계산 파일은 total_diagonalizatio time 순으로 정렬되어 디랙토리로 모이게 된다.,
-
-    ex) python calculation_files.py  처럼 args 는 없고 파일 내부에서 설정하도록 코드 작성 
-
-
-
-
-## Env setting
 ```bash
 # Create and activate a conda environment
 conda create -n neumann_precond python=3.10 -y
@@ -52,13 +35,57 @@ python setup.py develop  # or: pip install -e .
 # You may need to add libxc.so* to your library path.
 # Example: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/libxc
 
-# Install neumann_precond
+# Install neumann_precond (this repo)
 cd neumann_precond
 python setup.py develop
 ```
 
 
-
+## Usage example: ...
 ```bash
-python test.py  --spacing 0.3 --supercell 2 2 2 --phase "fixed" --pp_type SG15 --use_cuda --nbands 300 --precond neumann --warmup 0  --filepath data/systems/Si_diamond.cif --pbc 1 1 1 --innerorder 3 --outerorder dynamic
+# 1. Neumann Preconditioner
+python test.py \
+    --filepath data/systems/Si_diamond.cif \
+    --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
+    --phase fixed --pp_type NNLP \
+    --use_cuda --warmup 0 \
+    --precond neumann --innerorder 3 --outerorder dynamic \
+    --diag_iter 50 \
+    --retHistory History.neumann.pt
+
+# 2. GAPP
+python test.py \
+    --filepath data/systems/Si_diamond.cif \
+    --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
+    --phase fixed --pp_type NNLP \
+    --use_cuda --warmup 0 \
+    --precond gapp \
+    --diag_iter 50 \
+    --retHistory History.gapp.pt
+
+# 3. Shift-and-invert Preconditioner
+python test.py \
+    --filepath data/systems/Si_diamond.cif \
+    --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
+    --phase fixed --pp_type NNLP \
+    --use_cuda --warmup 0 \
+    --precond shift-and-invert --inner gapp \
+    --diag_iter 50 \
+    --retHistory History.isi.pt
+
+# Plot the convergence history
+python plot_convg_history.py  --filepath History.neumann.pt --plot residual \
+    --convg_tol 1e-7 --num_eig 16 --save History.neumann.residual.png
+python plot_convg_history.py  --filepath History.neumann.pt --plot eigval \
+    --convg_tol 1e-14 --num_eig 16 --save History.neumann.eigval.png
+
+python plot_convg_history.py  --filepath History.gapp.pt --plot residual \
+    --convg_tol 1e-7 --num_eig 16 --save History.gapp.residual.png
+python plot_convg_history.py  --filepath History.gapp.pt --plot eigval \
+    --convg_tol 1e-14 --num_eig 16 --save History.gapp.eigval.png
+
+python plot_convg_history.py  --filepath History.isi.pt --plot residual \
+    --convg_tol 1e-7 --num_eig 16 --save History.isi.residual.png
+python plot_convg_history.py  --filepath History.isi.pt --plot eigval \
+    --convg_tol 1e-14 --num_eig 16 --save History.isi.eigval.png
 ```

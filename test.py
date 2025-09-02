@@ -94,14 +94,20 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
 
     def _innerorder_value(v: Union[int, str]) -> Union[int, str]:
         # Keep 'dynamic' string as-is, else cast to int
-        if isinstance(v, str) and v == "dynamic":
+        # if isinstance(v, str) and v == "dynamic":
+        #     return v
+        if v == "dynamic":
             return v
-        return int(v)
+        else:
+            return int(v)
 
     def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
-        if isinstance(v, str) and v == "dynamic":
+        # if isinstance(v, str) and v == "dynamic":
+        #     return v
+        if v == "dynamic":
             return v
-        return int(v)
+        else:
+            return int(v)
 
     innerorder = _innerorder_value(args.innerorder)
     outerorder = _outerorder_value(args.outerorder)
@@ -116,8 +122,10 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
             "options": {
                 "fp": "DP",
                 "no_shift_thr": 10,
-                "order": f"{outerorder}",
+                "order": outerorder,
                 "error_cutoff": error_cutoff,
+                "verbosity": args.verbosity,
+                # "MAX_ORDER": 20,
             },
         }
     elif precond_type == "shift-and-invert" and args.inner == "gapp":
@@ -143,6 +151,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "no_shift_thr": 10,
                 "order": innerorder,
                 "max_iter": int(args.pcg_iter),
+                "verbosity": args.verbosity,
             },
         }
     else:
@@ -372,6 +381,24 @@ def build_argparser() -> argparse.ArgumentParser:
         default=None,
         help="charge density filename to save (or for initialization)",
     )
+    p.add_argument(
+        "--temperature",
+        type=float,
+        default=1160.45,
+        help="temperature for smearing (default: 1160.45 K = 0.1 eV)",
+    )
+    p.add_argument(
+        "--scf_energy_tol",
+        type=float,
+        default=1e-4,
+        help="SCF energy tolerance (Hartree/electron); only energy is checked",
+    )
+    p.add_argument(
+        "--virtual_factor",
+        type=float,
+        default=1.2,
+        help="when nbands is not set, use this factor * occupied bands (default 1.2)",
+    )
 
     # Pseudopotential
     p.add_argument(
@@ -411,11 +438,11 @@ def build_argparser() -> argparse.ArgumentParser:
         action="store_true",
         help="use fill_block in Davidson/eigensolver",
     )
+
+    # Logging / output
     p.add_argument(
         "--verbosity", type=int, default=1, help="eigensolver/davidson verbosity level"
     )
-
-    # NEW: seed / retHistory / temperature / scf energy tol
     p.add_argument(
         "--seed", type=int, default=1, help="random seed (worker-safe with PH)"
     )
@@ -424,24 +451,6 @@ def build_argparser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="filename to save (eigHistory, resHistory)",
-    )
-    p.add_argument(
-        "--temperature",
-        type=float,
-        default=1160.45,
-        help="temperature for smearing (default: 1160.45 K = 0.1 eV)",
-    )
-    p.add_argument(
-        "--scf_energy_tol",
-        type=float,
-        default=1e-4,
-        help="SCF energy tolerance (Hartree/electron); only energy is checked",
-    )
-    p.add_argument(
-        "--virtual_factor",
-        type=float,
-        default=1.2,
-        help="when nbands is not set, use this factor * occupied bands (default 1.2)",
     )
     return p
 

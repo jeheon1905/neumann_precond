@@ -145,7 +145,7 @@ for precond_type, (precond_list, innerprecond_list) in preconditioner_solve.item
             base_combos = itertools.product(nbands_list, spacing_list, (precond,), supercell_factors_list)  
             if precond == "Neumann":
                 combos = (
-                (nbands, spacing, precond, supercell, outerorder, error_cutoff, None, None) for nbands, spacing, precond, supercell, outerorder, error_cutoff in itertools.product(nbands_list, spacing_list, precond, supercell_factors_list, outerorder_list, error_cutoff_list)
+                (nbands, spacing, precond, supercell, outerorder, error_cutoff, None, None) for nbands, spacing, precond, supercell, outerorder, error_cutoff in itertools.product(nbands_list, spacing_list, (precond,), supercell_factors_list, outerorder_list, error_cutoff_list)
                 )
                 gapp_pcg_num = None
                 Neumann_pcg_num = None

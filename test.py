@@ -10,14 +10,14 @@ from typing import Optional, Union
 import numpy as np
 import torch
 
-from ase.build import make_supercell
 from gospel import GOSPEL
 from gospel.ParallelHelper import ParallelHelper as PH
 
 # Prefer local preconditioner; fall back to gospel's if not present.
 try:
-    from precondition import create_preconditioner  # local
-except Exception:  # noqa: BLE001
+    # from precondition import create_preconditioner  # local
+    from precondition_new import create_preconditioner  # local
+except Exception:
     print("Warning: using gospel's preconditioner instead of local neumann_precond")
     from gospel.Eigensolver.precondition import create_preconditioner  # fallback
 
@@ -116,7 +116,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
 
     if precond_type == "neumann":
         precond_options = {
-            "precond_type": "Neumann",
+            "precond_type": "neumann",
             "grid": calc.grid,
             "use_cuda": bool(args.use_cuda),
             "options": {
@@ -134,10 +134,12 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
             "grid": calc.grid,
             "use_cuda": bool(args.use_cuda),
             "options": {
-                "inner_precond": "gapp",
                 "fp": "DP",
                 "no_shift_thr": 10,
                 "max_iter": int(args.pcg_iter),
+                "verbosityLevel": args.verbosity,
+                "inner_precond": "gapp",
+                "correction_scale": 0.1,
             },
         }
     elif precond_type == "shift-and-invert" and args.inner == "neumann":
@@ -146,12 +148,17 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
             "grid": calc.grid,
             "use_cuda": bool(args.use_cuda),
             "options": {
-                "inner_precond": "Neumann",
                 "fp": "DP",
                 "no_shift_thr": 10,
-                "order": innerorder,
                 "max_iter": int(args.pcg_iter),
-                "verbosity": args.verbosity,
+                "verbosityLevel": args.verbosity,
+                "inner_precond": "neumann",
+                "correction_scale": 0.1,
+                "options": {
+                    "order": innerorder,
+                    "verbosity": args.verbosity,
+                    "correction_scale": 0.0,  # to avoid double shift
+                },
             },
         }
     else:
@@ -165,6 +172,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
         }
 
     calc.eigensolver.preconditioner = create_preconditioner(**precond_options)
+    print("preconditioner:\n", calc.eigensolver.preconditioner)
 
 
 def compute_nbands(atoms, upf_files, args):
@@ -246,9 +254,8 @@ def run_once(args: argparse.Namespace) -> None:
 
         # Initialize density
         if args.density_filename is not None:
-            device = PH.get_device(calc.parameters["use_cuda"])
             density = torch.load(args.density_filename)
-            density = density.reshape(1, -1).to(device)
+            density = density.reshape(1, -1).to(PH.get_device())
         else:
             print("Initializing the density...")
             density = calc.density.init_density()
@@ -264,14 +271,14 @@ def run_once(args: argparse.Namespace) -> None:
             calc.xc_functional,
             calc.eigensolver,
             use_dense_kinetic=calc.parameters["use_dense_kinetic"],
-            use_cuda=calc.parameters["use_cuda"],
+            # use_cuda=calc.parameters["use_cuda"],
+            device=PH.get_device(),
         )
         calc.hamiltonian.update(calc.density)
-        calc.eigensolver._initialize_guess(calc.hamiltonian)
-        # Free components as in original
         del density, calc.density, calc.kpoint, calc.poisson_solver, calc.xc_functional
 
         # Diagonalization
+        calc.eigensolver._initialize_guess(calc.hamiltonian)
         results = davidson(
             A=calc.hamiltonian[0, 0],
             X=calc.eigensolver._starting_vector[0, 0],
@@ -282,7 +289,7 @@ def run_once(args: argparse.Namespace) -> None:
             nblock=int(args.nblock),
             locking=bool(args.locking),
             fill_block=bool(args.fill_block),
-            verbosityLevel=int(args.verbosity),
+            verbosity=int(args.verbosity),
             retHistory=(args.retHistory is not None),
         )
         del calc

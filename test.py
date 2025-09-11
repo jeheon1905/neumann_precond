@@ -12,6 +12,7 @@ import torch
 
 from gospel import GOSPEL
 from gospel.ParallelHelper import ParallelHelper as PH
+from gospel.util import Timer, set_global_seed
 
 # Prefer local preconditioner; fall back to gospel's if not present.
 try:
@@ -21,7 +22,7 @@ except Exception:
     print("Warning: using gospel's preconditioner instead of local neumann_precond")
     from gospel.Eigensolver.precondition import create_preconditioner  # fallback
 
-from utils import block_all_print, get_git_commit, set_global_seed, make_atoms
+from utils import block_all_print, get_git_commit, make_atoms
 
 
 # ------------------------------
@@ -125,7 +126,8 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "order": outerorder,
                 "error_cutoff": error_cutoff,
                 "verbosity": args.verbosity,
-                # "MAX_ORDER": 20,
+                "max_order": 20,
+                "timing": True,
             },
         }
     elif precond_type == "shift-and-invert" and args.inner == "gapp":
@@ -140,6 +142,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "verbosityLevel": args.verbosity,
                 "inner_precond": "gapp",
                 "correction_scale": 0.1,
+                "timing": True,
             },
         }
     elif precond_type == "shift-and-invert" and args.inner == "neumann":
@@ -154,10 +157,12 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "verbosityLevel": args.verbosity,
                 "inner_precond": "neumann",
                 "correction_scale": 0.1,
+                "timing": True,
                 "options": {
                     "order": innerorder,
                     "verbosity": args.verbosity,
                     "correction_scale": 0.0,  # to avoid double shift
+                    "timing": True,
                 },
             },
         }
@@ -271,7 +276,6 @@ def run_once(args: argparse.Namespace) -> None:
             calc.xc_functional,
             calc.eigensolver,
             use_dense_kinetic=calc.parameters["use_dense_kinetic"],
-            # use_cuda=calc.parameters["use_cuda"],
             device=PH.get_device(),
         )
         calc.hamiltonian.update(calc.density)
@@ -279,6 +283,7 @@ def run_once(args: argparse.Namespace) -> None:
 
         # Diagonalization
         calc.eigensolver._initialize_guess(calc.hamiltonian)
+        Timer.reset()
         results = davidson(
             A=calc.hamiltonian[0, 0],
             X=calc.eigensolver._starting_vector[0, 0],
@@ -291,6 +296,7 @@ def run_once(args: argparse.Namespace) -> None:
             fill_block=bool(args.fill_block),
             verbosity=int(args.verbosity),
             retHistory=(args.retHistory is not None),
+            timing=True,
         )
         del calc
 
@@ -307,10 +313,6 @@ def run_once(args: argparse.Namespace) -> None:
 
 
 def main(args: argparse.Namespace) -> None:
-    # Init parallel helper & seed
-    # PH.init_from_env(args.use_cuda)
-    set_global_seed(args.seed)
-
     # Warm-up (optional)
     if int(args.warmup):
         with block_all_print():
@@ -318,7 +320,9 @@ def main(args: argparse.Namespace) -> None:
         print("Warm-up finished")
 
     # Actual timed run
+    Timer.reset()
     run_once(args)
+    Timer.print_summary()
 
 
 # ------------------------------
@@ -416,6 +420,12 @@ def build_argparser() -> argparse.ArgumentParser:
     )
 
     # Misc / system
+    p.add_argument(
+        "--threads",
+        type=int,
+        default=None,
+        help="number of threads (default: all available)",
+    )
     p.add_argument("--use_cuda", action="store_true", help="use GPU (CUDA)")
     p.add_argument(
         "--warmup", type=int, default=1, help="whether to warm up the GPU (0/1)"
@@ -471,8 +481,12 @@ if __name__ == "__main__":
     print(f"neumann_precond git commit: {get_git_commit('neumann_precond')}")
     print("args=", args)
 
+    # Init parallel helper & seed
+    PH.init_from_env(args.use_cuda)
+    set_global_seed(args.seed + PH.rank)
+
     # Threads / device info (lightweight)
-    torch.set_num_threads(os.cpu_count() or 1)
+    torch.set_num_threads(os.cpu_count() if args.threads is None else args.threads)
     if args.use_cuda and torch.cuda.is_available():
         print(f"Number of GPUs detected: {torch.cuda.device_count()}")
         for i in range(torch.cuda.device_count()):

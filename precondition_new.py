@@ -18,7 +18,7 @@ def create_preconditioner(precond_type=None, grid=None, use_cuda=False, options=
 
     :type  precond_type: str or None, optional
     :param precond_type:
-        type of preconditioner, available type=[None, "jacobi", "filter", "poisson", "gapp", "shift-and-invert"]
+        type of preconditioner, available type=[None, "jacobi", "filter", "poisson", "gapp", "shift-and-invert", "neumann"]
     :type  grid: gospel.Grid or None, optional
     :param grid:
         Grid object
@@ -398,13 +398,11 @@ class PreShiftAndInvert(Preconditioner):
         max_iter=5,
         correction_scale=0.1,
         no_shift_thr=10.0,
-        # inner_precond=None,
-        # inner_precond="Neumann",############added Neumann inner precond
         fp="DP",
-        verbosityLevel=0,
         locking=True,
-        # order="None" ##added
         inner_precond="gapp",
+        verbosityLevel=0,
+        timing=False,
         options={},  # for inner preconditioner
     ):
         super().__init__("shift-and-invert", use_cuda, fp)
@@ -414,36 +412,17 @@ class PreShiftAndInvert(Preconditioner):
         self.correction_scale = correction_scale
         self.no_shift_thr = no_shift_thr
         self.inner_precond = inner_precond
-        self.verbosityLevel = verbosityLevel
         self.locking = locking
-
-        # self.fp = fp  # TODO: Implementation
-        # self.order = order #added
-        
-        print("inner_precond = ", inner_precond, "pcg = ", max_iter ) ## added
-        # self.__precond_for_pcg = create_preconditioner(inner_precond, grid, use_cuda)
-        # NOTE: Here, add 'fp' to create preconditioner (jeheon)
-
-        #self.__precond_for_pcg = create_preconditioner(
-        #        inner_precond, grid, use_cuda, options={"fp": fp},  original
-        #)
+        self.verbosityLevel = verbosityLevel
+        self.timing = timing
  
         self.inner_precond = inner_precond
         assert inner_precond in ["gapp","poisson","neumann", None], (
             "inner_precond should be gapp, poisson, neumann, or None"
         )
-        self.__precond_for_pcg = create_preconditioner(inner_precond, grid, use_cuda, options={"fp": fp, **options})
-        # if inner_precond == "Neumann":
-        #     self.__precond_for_pcg = create_preconditioner(
-        #         inner_precond, grid, use_cuda, options={"fp": fp,
-        #                                                 "order" : order, # added
-        #                                                 },
-        #     )
-        # else:
-        #     self.__precond_for_pcg = create_preconditioner(
-        #         inner_precond, grid, use_cuda, options={"fp": fp,
-        #                                                 },
-        #     )
+        self.__precond_for_pcg = create_preconditioner(
+            inner_precond, grid, use_cuda, options={"fp": fp, **options}
+        )
         return
 
     def __str__(self):
@@ -455,9 +434,10 @@ class PreShiftAndInvert(Preconditioner):
         s += f"\n* correction_scale : {self.correction_scale}"
         s += f"\n* no_shift_thr     : {self.no_shift_thr}"
         s += f"\n* fp               : {self._fp}"
-        s += f"\n* verbosityLevel   : {self.verbosityLevel}"
         s += f"\n* locking          : {self.locking}"
         s += f"\n* inner_precond    : {self.inner_precond}"
+        s += f"\n* verbosityLevel   : {self.verbosityLevel}"
+        s += f"\n* timing           : {self.timing}"
         s += "\n=====================================================================\n"
         return str(s)
 
@@ -479,6 +459,7 @@ class PreShiftAndInvert(Preconditioner):
             correction_scale=self.correction_scale,
             no_shift_thr=self.no_shift_thr,
             verbosityLevel=self.verbosityLevel,
+            timing=self.timing,
             locking=self.locking,
         )
         return residue
@@ -830,6 +811,7 @@ class PreNeumann(Preconditioner):
         max_order=20,
         error_cutoff=-0.4,
         verbosity=True,
+        timing=False,
     ):
         super().__init__("neumann", use_cuda, fp)
 
@@ -841,6 +823,7 @@ class PreNeumann(Preconditioner):
         self.max_order = int(max_order)
         self.error_cutoff = error_cutoff
         self.verbosity = verbosity
+        self.timing = timing
 
         self.gapp = create_preconditioner("gapp", grid, use_cuda)
 
@@ -852,9 +835,10 @@ class PreNeumann(Preconditioner):
         s += f"\n* order            : {self.order}"
         s += f"\n* correction_scale : {self.correction_scale}"
         s += f"\n* no_shift_thr     : {self.no_shift_thr}"
-        s += f"\n* verbosity        : {self.verbosity}"
         s += f"\n* max_order        : {self.max_order}"
         s += f"\n* error_cutoff     : {self.error_cutoff}"
+        s += f"\n* verbosity        : {self.verbosity}"
+        s += f"\n* timing           : {self.timing}"
         s += "\n=====================================================================\n"
         return str(s)
 
@@ -862,7 +846,8 @@ class PreNeumann(Preconditioner):
         INV_4PI = 0.25 / np.pi
 
         is_needed_residue_norm = (self.order == "dynamic" or self.verbosity or self.correction_scale != 0.0)
-        residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
+        with Timer.track("Neumann. residue norm", self.timing, False):
+            residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
 
         # Modify shift values
         if self.correction_scale != 0.0:
@@ -874,81 +859,91 @@ class PreNeumann(Preconditioner):
         if residue.ndim == 1:
             residue = residue.unsqueeze(0)
 
-        # preconditioned_result = self.gapp(residue).div_(FOUR_PI)
-        preconditioned_result = self.gapp(residue).mul_(INV_4PI)
+        with Timer.track("Neumann. gapp (order 0)", self.timing, False):
+            preconditioned_result = self.gapp(residue).mul_(INV_4PI)
 
-        # cutoff setting and dynamic order
-        if self.order != 0:
-            neumann_term = preconditioned_result.clone()
+        # Early return for order 0
+        if self.order == 0:
+            return preconditioned_result
 
-            if self.order == "dynamic":
-                # check accuracy ## 이전 계산이 아니라 나머지 일때 키기 cutoff 만 보려면 꺼야함
+        # Neumann series expansion for order > 0
+        neumann_term = preconditioned_result.clone()
+
+        if self.order == "dynamic":
+            # check accuracy ## 이전 계산이 아니라 나머지 일때 키기 cutoff 만 보려면 꺼야함
+            with Timer.track("Neumann. (H - e)x", self.timing, False):
                 H_minus_eigval_vec = H @ preconditioned_result
                 H_minus_eigval_vec -= eigval * preconditioned_result
+
+            with Timer.track("Neumann. error calc", self.timing, False):
                 pre_error = torch.norm(H_minus_eigval_vec - residue, dim=0) / residue_norm
 
-                if self.verbosity:
-                    print("test_error (using order = 0) = ", torch.log10(pre_error))
+            if self.verbosity:
+                print("test_error (using order = 0) = ", torch.log10(pre_error))
 
-                for order in range(1, self.max_order + 1): ##########정확도 평가가 들어가는 것만 이렇게 표현
-                    # Compute the next Neumann series and accumulate the result
-                    if order == 1:
-                        # here we can save one H operation
-                        # neumann_term -= self.gapp(H_minus_eigval_vec).div_(FOUR_PI)
+            for order in range(1, self.max_order + 1): ##########정확도 평가가 들어가는 것만 이렇게 표현
+                # Compute the next Neumann series and accumulate the result
+                if order == 1:
+                    # here we can save one H operation
+                    with Timer.track("Neumann. gapp", self.timing, False):
                         neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
-                    else:
+                else:
+                    with Timer.track("Neumann. (H - e)x", self.timing, False):
                         H_minus_eigval_vec = H @ neumann_term
                         H_minus_eigval_vec -= eigval * neumann_term
-                        # neumann_term -= self.gapp(H_minus_eigval_vec).div_(FOUR_PI)
+                    with Timer.track("Neumann. gapp", self.timing, False):
                         neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
-                    preconditioned_result += neumann_term
+                preconditioned_result += neumann_term
 
-                    # Error calculation
+                # Error calculation
+                with Timer.track("Neumann. (H - e)x", self.timing, False):
                     H_minus_eigval_vec = H @ preconditioned_result
                     H_minus_eigval_vec -= eigval * preconditioned_result
+                with Timer.track("Neumann. error calc", self.timing, False):
                     error = torch.norm(H_minus_eigval_vec.sub_(residue), dim=0) / residue_norm
 
-                    if pre_error.sum() > error.sum():
-                        error_log = torch.log10(error)
-                        if order == self.max_order:
-                            if self.verbosity:
-                                print(f"Preconditioned diagonalization error(log10) = {error_log} "
-                                      f"(using order(high_error_cutoff) = {order})")
-                            break
-                        elif self.error_cutoff >= torch.max(error_log):
-                            if self.verbosity:
-                                print(f"Preconditioned diagonalization error(log10) = {error_log} "
-                                    f"(using order(low_order_cutoff) = {order})")
-                            break
-                        else:
-                            pre_error = error
-                            continue
-                    else:
-                        preconditioned_result -= neumann_term
+                if pre_error.sum() > error.sum():
+                    error_log = torch.log10(error)
+                    if order == self.max_order:
                         if self.verbosity:
-                            print(f"Preconditioned diagonalization error(log10)= {torch.log10(pre_error)} "
-                                f"(using order(pre<now_break) = {order - 1})")
+                            print(f"Preconditioned diagonalization error(log10) = {error_log} "
+                                    f"(using order(high_error_cutoff) = {order})")
                         break
-            else: 
-                for order in range(1, self.order + 1):
-                    # Compute the next Neumann series and accumulate the result
-                    neumann_term -= self.gapp(
-                        H @ neumann_term - eigval * neumann_term
-                    # ).div_(FOUR_PI)
-                    ).mul_(INV_4PI)
-                    preconditioned_result += neumann_term
-
-                if self.verbosity:
-                    diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
-                    error = torch.norm(diff, dim=0) / residue_norm
-                    print(f"error (using order = {order}) = ", torch.log10(error))
+                    elif self.error_cutoff >= torch.max(error_log):
+                        if self.verbosity:
+                            print(f"Preconditioned diagonalization error(log10) = {error_log} "
+                                f"(using order(low_order_cutoff) = {order})")
+                        break
+                    else:
+                        pre_error = error
+                        continue
+                else:
+                    preconditioned_result -= neumann_term
+                    if self.verbosity:
+                        print(f"Preconditioned diagonalization error(log10)= {torch.log10(pre_error)} "
+                            f"(using order(pre<now_break) = {order - 1})")
+                    break
+        else:
+            # Fixed order Neumann series
+            for order in range(1, self.order + 1):
+                # Compute the next Neumann series and accumulate the result
+                with Timer.track("Neumann. (H - e)x", self.timing, False):
+                    H_minus_eigval_vec = H @ neumann_term - eigval * neumann_term
+                with Timer.track("Neumann. gapp", self.timing, False):
+                    neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
+                preconditioned_result += neumann_term
 
             if self.verbosity:
-                # inversion accuracy
-                # print("Neumann result:", torch.linalg.norm(preconditioned_result, axis=0))
-                # print("(H-eI)@precond result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
-                # print("(H-eI)@precond - residue result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result - residue , axis=0))
-                print("res norm (Neumann): ", torch.linalg.norm(H @ preconditioned_result - eigval * preconditioned_result, axis=0))
+                diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
+                error = torch.norm(diff, dim=0) / residue_norm
+                print(f"error (using order = {order}) = ", torch.log10(error))
+
+        if self.verbosity:
+            # inversion accuracy
+            # print("Neumann result:", torch.linalg.norm(preconditioned_result, axis=0))
+            # print("(H-eI)@precond result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
+            # print("(H-eI)@precond - residue result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result - residue , axis=0))
+            print("res norm (Neumann): ", torch.linalg.norm(H @ preconditioned_result - eigval * preconditioned_result, axis=0))
 
         return preconditioned_result
 

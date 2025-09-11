@@ -48,8 +48,7 @@ python test.py \
     --filepath data/systems/Si_diamond.cif \
     --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
     --phase fixed --pp_type NNLP \
-    --use_cuda --warmup 0 \
-    --precond neumann --innerorder 3 --outerorder dynamic \
+    --precond neumann --outerorder dynamic \
     --diag_iter 50 \
     --retHistory History.neumann.pt
 
@@ -58,7 +57,6 @@ python test.py \
     --filepath data/systems/Si_diamond.cif \
     --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
     --phase fixed --pp_type NNLP \
-    --use_cuda --warmup 0 \
     --precond gapp \
     --diag_iter 50 \
     --retHistory History.gapp.pt
@@ -68,24 +66,22 @@ python test.py \
     --filepath data/systems/Si_diamond.cif \
     --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
     --phase fixed --pp_type NNLP \
-    --use_cuda --warmup 0 \
     --precond shift-and-invert --inner gapp \
     --diag_iter 50 \
     --retHistory History.isi.pt
 
+# 4. Shift-and-invert Preconditioner + Neumann
+python test.py \
+    --filepath data/systems/Si_diamond.cif \
+    --spacing 0.3 --supercell 1 1 1 --pbc 1 1 1 \
+    --phase fixed --pp_type NNLP \
+    --precond shift-and-invert --inner neumann --innerorder dynamic \
+    --diag_iter 50 \
+    --retHistory History.isi_neumann.pt
+
 # Plot the convergence history
-python plot_convg_history.py  --filepath History.neumann.pt --plot residual \
-    --convg_tol 1e-7 --num_eig 16 --save History.neumann.residual.png
-python plot_convg_history.py  --filepath History.neumann.pt --plot eigval \
-    --convg_tol 1e-14 --num_eig 16 --save History.neumann.eigval.png
-
-python plot_convg_history.py  --filepath History.gapp.pt --plot residual \
-    --convg_tol 1e-7 --num_eig 16 --save History.gapp.residual.png
-python plot_convg_history.py  --filepath History.gapp.pt --plot eigval \
-    --convg_tol 1e-14 --num_eig 16 --save History.gapp.eigval.png
-
-python plot_convg_history.py  --filepath History.isi.pt --plot residual \
-    --convg_tol 1e-7 --num_eig 16 --save History.isi.residual.png
-python plot_convg_history.py  --filepath History.isi.pt --plot eigval \
-    --convg_tol 1e-14 --num_eig 16 --save History.isi.eigval.png
+for m in neumann gapp isi isi_neumann; do
+    python plot_convg_history.py --filepath History.$m.pt --plot residual --convg_tol 1e-7 --num_eig 16 --save History.$m.residual.png
+    python plot_convg_history.py --filepath History.$m.pt --plot eigval --convg_tol 1e-14 --num_eig 16 --save History.$m.eigval.png
+done
 ```

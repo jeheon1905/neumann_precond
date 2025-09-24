@@ -233,6 +233,7 @@ def run_once(args: argparse.Namespace) -> None:
             "energy_tol": float(args.scf_energy_tol),
             # Diagonalization tolerance (also used below for davidson tol)
             "diag_tol": float(args.diag_tol),
+            "bands": "occupied" if args.bands is None else args.bands,
         },
         occupation={"smearing": "Fermi-Dirac", "temperature": float(args.temperature)},
         eigensolver=eigensolver,
@@ -297,6 +298,7 @@ def run_once(args: argparse.Namespace) -> None:
             verbosity=int(args.verbosity),
             retHistory=(args.retHistory is not None),
             timing=True,
+            bands=args.bands,
         )
         del calc
 
@@ -454,6 +456,12 @@ def build_argparser() -> argparse.ArgumentParser:
         "--fill_block",
         action="store_true",
         help="use fill_block in Davidson/eigensolver",
+    )
+    p.add_argument(
+        "--bands",
+        type=int,
+        default=None,
+        help="number of bands to check for diag. convergence (None: 'occupied')",
     )
 
     # Logging / output

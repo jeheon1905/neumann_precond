@@ -40,6 +40,13 @@ cd neumann_precond
 python setup.py develop
 ```
 
+✅ **Note**
+This project uses a customized version of GOSPEL.
+Make sure to use the following Git state:
+
+- **Branch**: `multi_gpu`
+- **Commit**: `7947754a5d1e6b5743f976c2fe46aba8b97c227a`
+
 
 ## Usage example: ...
 ```bash

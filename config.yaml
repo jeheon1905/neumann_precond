@@ -1,0 +1,167 @@
+# Configuration file for repeat_test.py
+# This file replaces the hardcoded configuration at the top of the script
+
+experiment:
+  name: "test"
+  results_root: "result"
+  density_key_mode: "geom4"
+
+systems:
+  roots:
+    - "data/systems"
+  
+  extensions:
+    - "*.cif"
+    - "*.sdf"
+    - "*.xyz"
+  
+  # List of systems to calculate (empty list = all files matching extensions)
+  selected:
+    # Crystals
+    - "CsPbI3.cif"
+    - "MAPbI3.cif"
+    - "Si_diamond.cif"
+    - "MgO.cif"
+    # Biomolecules
+    - "beta_carotene.sdf"
+    - "B12.sdf"
+    - "Maltododecaose.sdf"
+    # Molecular clusters
+    - "water_cluster_64.xyz"
+    - "water_cluster_80.xyz"
+    - "water_cluster_90.xyz"
+    - "water_cluster_108.xyz"
+    - "water_cluster_128.xyz"
+    - "C60_1.xyz"
+    - "C60_2.xyz"
+    - "C60_3.xyz"
+    - "C60_4.xyz"
+  
+  # Default parameters for all systems
+  defaults:
+    supercell: [1, 1, 1]
+    pbc: null  # null means auto-detect from file type
+    spacing: 0.2
+    nbands: null
+  
+  # Override parameters for specific systems
+  overrides:
+    "CsPbI3.cif":
+      supercell:
+        - [4, 3, 3]
+        - [3, 3, 3]
+        - [3, 3, 2]
+      pbc: [1, 1, 1]
+    
+    "MAPbI3.cif":
+      supercell:
+        - [3, 2, 2]
+        - [2, 2, 2]
+        - [2, 2, 1]
+      pbc: [1, 1, 1]
+    
+    "Si_diamond.cif":
+      supercell:
+        - [4, 4, 4]
+        - [4, 4, 3]
+        - [4, 3, 3]
+        - [3, 3, 3]
+      pbc: [1, 1, 1]
+    
+    "MgO.cif":
+      supercell:
+        - [4, 4, 4]
+        - [4, 4, 3]
+        - [4, 3, 3]
+      pbc: [1, 1, 1]
+
+# Parameter sweep configuration
+sweep:
+  # preconds: []  # Empty list = all preconditioners (neumann, shift-and-invert, neu_ISI)
+  preconds: ["neumann", "shift-and-invert"]
+  threads: [1]
+  outerorder: [0, 2, 4, 6, 8, 10, "res"]
+  innerorder: [0]
+  pcg_neumann: [5]
+  error_cutoff: [-0.4]
+  spacing: [0.2]
+  nbands: []  # Empty = use defaults
+  virtual_factor: [1.2]
+  # merge_iter: [3, 5, 7, 9]
+  merge_iter: []  # used in neu_ISI
+
+# Fixed calculation parameters
+calculation:
+  mode: "scf-then-fixed"  # Options: "scf", "fixed", "scf-then-fixed"
+  phase: "fixed"
+  temperature: 0.0
+  scf_print_energies: false
+  # scf_energy_tol: .inf
+  # scf_density_tol: 1.0e-5
+  scf_energy_tol: 1.0e-6
+  scf_density_tol: .inf
+  pp_type: "TM"
+  use_cuda: true
+  warmup_when_cuda: 1
+  virtual_factor: 1.2
+  
+  # Diagonalization parameters
+  diagonalization:
+    # Legacy single value (if specified, overrides both scf and fixed)
+    iter: null
+    tol: null
+    
+    # SCF-specific parameters
+    scf:
+      iter: 11
+      tol: null  # null = not passed to solver (uses internal default)
+    
+    # Fixed Hamiltonian-specific parameters
+    fixed:
+      iter: 1000
+      tol: 1.0e-6
+  
+  # Davidson solver parameters
+  davidson:
+    nblock: 2
+    locking: false
+    fill_block: false
+  
+  # Execution parameters
+  execution:
+    runs_per_combo: 3
+    resume: true
+    dry_run: false
+    require_density_for_fixed: true
+    verbosity: 1
+    seed: 0
+
+# Summary field candidates for parsing logs
+summary_fields:
+  davidson_total:
+    candidates:
+      - "davidson"
+      - "Davidson.diagonalize"
+      - "Davidson diagonalize"
+      - "Davidson"
+    attr: "total"
+  
+  diag_iter_count:
+    candidates:
+      - "Diag. Iter."
+      - "Diag Iter."
+      - "Diag Iter"
+      - "SCF iter."
+      - "SCF iter"
+      - "SCF iteration"
+    attr: "count"
+  
+  preconditioning_total:
+    candidates:
+      - "Preconditioning"
+    attr: "total"
+  
+  preconditioning_count:
+    candidates:
+      - "Preconditioning"
+    attr: "count"

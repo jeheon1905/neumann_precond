@@ -17,7 +17,7 @@ from gospel.util import Timer, set_global_seed
 # Prefer local preconditioner; fall back to gospel's if not present.
 try:
     # from precondition import create_preconditioner  # local
-    from precondition_new import create_preconditioner  # local
+    from precondition_new2 import create_preconditioner  # local
 except Exception:
     print("Warning: using gospel's preconditioner instead of local neumann_precond")
     from gospel.Eigensolver.precondition import create_preconditioner  # fallback
@@ -55,6 +55,7 @@ def resolve_upf_files(
     elif pp_type == "ONCV":
         pp_suffix = ".upf"
     elif pp_type == "TM":
+        pp_path = f"./data/pseudopotentials/TM/data_gga/PSEUDOPOTENTIALS_NC"
         pp_suffix = ".pbe-n-nc.UPF"
     elif pp_type == "NNLP":
         pp_suffix = ".nnlp.UPF"
@@ -105,7 +106,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
     def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
         # if isinstance(v, str) and v == "dynamic":
         #     return v
-        if v == "dynamic":
+        if v == "dynamic" or v == "res": ###modified res
             return v
         else:
             return int(v)
@@ -166,6 +167,34 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 },
             },
         }
+    ## addition neumann --> ISI_{neumann, order} merge preconditioner, precond_type = None)
+    elif precond_type == "merge":
+        precond_options = {
+            "precond_type": [("neumann", {"order" : outerorder,
+                                          "no_shift_thr": 10,
+                                          "error_cutoff": error_cutoff,
+                                          "verbosity": args.verbosity,
+                                          "max_order": 20,
+                                          "timing": True}, args.merge_iter),
+                             ("shift-and-invert", {"inner_precond" : args.inner,
+                                                   "no_shift_thr": 10,
+                                                   "max_iter": int(args.pcg_iter),
+                                                   "verbosityLevel": args.verbosity,
+                                                   "correction_scale": 0.1,
+                                                   "timing": True,
+                                                   "options": {
+                                                       "order": innerorder,
+                                                       "verbosity": args.verbosity,
+                                                       "correction_scale": 0.0,
+                                                       "timing": True,
+                                                       },
+                                                   }, args.diag_iter - args.merge_iter)],
+            "grid": calc.grid,
+            "use_cuda": bool(args.use_cuda),
+            "options": {
+                "fp": "DP",
+                },
+            }
     else:
         precond_options = {
             "precond_type": precond_type,
@@ -178,7 +207,6 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
 
     calc.eigensolver.preconditioner = create_preconditioner(**precond_options)
     print("preconditioner:\n", calc.eigensolver.preconditioner)
-
 
 def compute_nbands(atoms, upf_files, args):
     from gospel.Pseudopotential.UPF import UPF
@@ -223,18 +251,21 @@ def run_once(args: argparse.Namespace) -> None:
             "filtering": True,
         },
         print_energies=True,
+        # print_energies=args.scf_print_energies,
         xc={"type": "gga_x_pbe + gga_c_pbe"},
         precond_type=None,
         convergence={
             # SCF checks only energy tolerance; others are disabled (inf)
             "scf_maxiter": 100,
-            "density_tol": np.inf,
+            # "density_tol": np.inf,
+            "density_tol": float(args.scf_density_tol),
             "orbital_energy_tol": np.inf,
             "energy_tol": float(args.scf_energy_tol),
             # Diagonalization tolerance (also used below for davidson tol)
             "diag_tol": float(args.diag_tol),
-            "bands": "occupied" if args.bands is None else args.bands,
+            "bands" : "occupied",
         },
+        mixing={"what": args.scf_mixing},
         occupation={"smearing": "Fermi-Dirac", "temperature": float(args.temperature)},
         eigensolver=eigensolver,
         nbands=nbands,
@@ -285,6 +316,7 @@ def run_once(args: argparse.Namespace) -> None:
         # Diagonalization
         calc.eigensolver._initialize_guess(calc.hamiltonian)
         Timer.reset()
+        print(f"nelec = {calc.nelec}")
         results = davidson(
             A=calc.hamiltonian[0, 0],
             X=calc.eigensolver._starting_vector[0, 0],
@@ -298,7 +330,8 @@ def run_once(args: argparse.Namespace) -> None:
             verbosity=int(args.verbosity),
             retHistory=(args.retHistory is not None),
             timing=True,
-            bands=args.bands,
+            bands=int(ceil(calc.nelec/2)),
+            debug_recalc_convg_history=False,  # locking 을 켰을 때 residual norm 을 확인하기 위함 시간 계산 때는 빼야한다.
         )
         del calc
 
@@ -343,7 +376,7 @@ def build_argparser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="preconditioner type",
-        choices=["neumann", "shift-and-invert", "gapp", None],
+        choices=["neumann", "shift-and-invert", "gapp", "merge", "poisson", None], ##merge, poisson 추가했다.
     )
     p.add_argument(
         "--inner", type=str, default=None, help="inner preconditioner in ISI"
@@ -401,10 +434,31 @@ def build_argparser() -> argparse.ArgumentParser:
         help="temperature for smearing (default: 1160.45 K = 0.1 eV)",
     )
     p.add_argument(
+        "--scf_print_energies",
+        action="store_true",
+        help="calcualte and print energies at every SCF step",
+    )
+    p.add_argument(
         "--scf_energy_tol",
-        type=float,
-        default=1e-4,
-        help="SCF energy tolerance (Hartree/electron); only energy is checked",
+        # type=float,
+        type=lambda x: np.inf if x.lower() == 'inf' else float(x),
+        default=1e-6,
+        help="SCF energy tolerance (Hartree/electron); use 'inf' to disable",
+        # help="SCF energy tolerance (Hartree/electron); only energy is checked",
+    )
+    p.add_argument(
+        "--scf_density_tol",
+        # type=float,
+        type=lambda x: np.inf if x.lower() == 'inf' else float(x),
+        default=1e-5,
+        help="SCF density tolerance (/electron); use 'inf' to disable",
+    )
+    p.add_argument(
+        "--scf_mixing",
+        type=str,
+        default="density",
+        choices=["density", "potential"],
+        help="scf mixing type",
     )
     p.add_argument(
         "--virtual_factor",
@@ -443,7 +497,7 @@ def build_argparser() -> argparse.ArgumentParser:
     p.add_argument(
         "--diag_tol",
         type=float,
-        default=1e-4,
+        default=1e-6,
         help="residual tolerance for diagonalization",
     )
     p.add_argument(
@@ -456,12 +510,6 @@ def build_argparser() -> argparse.ArgumentParser:
         "--fill_block",
         action="store_true",
         help="use fill_block in Davidson/eigensolver",
-    )
-    p.add_argument(
-        "--bands",
-        type=int,
-        default=None,
-        help="number of bands to check for diag. convergence (None: 'occupied')",
     )
 
     # Logging / output
@@ -476,6 +524,9 @@ def build_argparser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="filename to save (eigHistory, resHistory)",
+    )
+    p.add_argument(
+        "--merge_iter", type=int, default=5, help="first preconditioner iteration number"
     )
     return p
 

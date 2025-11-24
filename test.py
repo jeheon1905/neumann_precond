@@ -250,8 +250,7 @@ def run_once(args: argparse.Namespace) -> None:
             "use_dense_proj": True,
             "filtering": True,
         },
-        print_energies=True,
-        # print_energies=args.scf_print_energies,
+        print_energies=args.scf_print_energies,
         xc={"type": "gga_x_pbe + gga_c_pbe"},
         precond_type=None,
         convergence={
@@ -262,7 +261,7 @@ def run_once(args: argparse.Namespace) -> None:
             "orbital_energy_tol": np.inf,
             "energy_tol": float(args.scf_energy_tol),
             # Diagonalization tolerance (also used below for davidson tol)
-            "diag_tol": float(args.diag_tol),
+            "diag_tol": float(args.diag_tol),  # for phase=fixed
             "bands" : "occupied",
         },
         mixing={"what": args.scf_mixing},

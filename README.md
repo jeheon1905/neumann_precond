@@ -45,8 +45,7 @@ This project uses a customized version of GOSPEL.
 Make sure to use the following Git state:
 
 - **Branch**: `multi_gpu`
-- **Commit**: `7947754a5d1e6b5743f976c2fe46aba8b97c227a`
-
+- **Commit**: `77621e1fdeff01df1d6adeadd557c056aad278b1`
 
 ## Usage example: ...
 ```bash
@@ -92,3 +91,7 @@ for m in neumann gapp isi isi_neumann; do
     python plot_convg_history.py --filepath History.$m.pt --plot eigval --convg_tol 1e-14 --num_eig 16 --save History.$m.eigval.png
 done
 ```
+
+
+## Reproduce experiments
+

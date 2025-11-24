@@ -897,12 +897,20 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
     fields = CFG.summary_fields
     scf_iter_cnt = pick_metric(
         metrics,
-        fields.get("diag_iter_count", {}).get("candidates", ["SCF iter."]),
+        fields.get("diag_iter_count", {}).get("candidates",
+            ["SCF iter.", "SCF iter", "SCF iteration"]),
         "count"
     )
     dav_total = pick_metric(
         metrics,
-        fields.get("davidson_total", {}).get("candidates", ["davidson"]),
+        fields.get("davidson_total", {}).get("candidates",
+            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"]),
+        "total"
+    )
+    gospel_total = pick_metric(
+        metrics,
+        fields.get("gospel_total", {}).get("candidates",
+            ["GOSPEL.calculate", "GOSPEL calculate", "GOSPEL"]),
         "total"
     )
 
@@ -978,6 +986,7 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
         "scf_iterations": scf_iter_cnt,
         "davidson_total": dav_total,
         "scf_iter_count": scf_iter_cnt,
+        "gospel_total": gospel_total,
     }
     write_pretty_summary(
         CFG.DENSITY_ROOT.parent, row, filename="calculation_summary_scf.txt"
@@ -1002,6 +1011,7 @@ def find_label_log(runpaths: RunPaths, label: str, idx: Optional[int]) -> Option
 
 def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]) -> None:
     median_idx = labels.get("median")
+
     log_path = find_label_log(runpaths, "median", median_idx)
     metrics: Dict[str, Dict[str, float]] = {}
     if log_path is not None:
@@ -1057,17 +1067,20 @@ def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]
     fields = CFG.summary_fields
     row["davidson_total"] = pick_metric(
         metrics,
-        fields.get("davidson_total", {}).get("candidates", ["davidson"]),
+        fields.get("davidson_total", {}).get("candidates",
+            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"]),
         "total"
     )
     row["diag_iter_count"] = pick_metric(
         metrics,
-        fields.get("diag_iter_count", {}).get("candidates", ["Diag. Iter."]),
+        fields.get("diag_iter_count", {}).get("candidates",
+            ["Diag. Iter.", "Diag Iter.", "Diag Iter"]),
         "count"
     )
     row["preconditioning_total"] = pick_metric(
         metrics,
-        fields.get("preconditioning_total", {}).get("candidates", ["Preconditioning"]),
+        fields.get("preconditioning_total", {}).get("candidates",
+            ["Preconditioning"]),
         "total"
     )
 

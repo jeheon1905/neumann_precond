@@ -94,4 +94,9 @@ done
 
 
 ## Reproduce experiments
+You can reproduce the experiments described in this repository using the provided configuration file.
+
+```bash
+python repeat_test.py --config config.yaml
+```
 

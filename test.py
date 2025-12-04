@@ -78,6 +78,7 @@ def build_eigensolver(args: argparse.Namespace) -> dict:
         "locking": bool(args.locking),
         "fill_block": bool(args.fill_block),
         "verbosity": int(args.verbosity),
+        "nblock": int(args.nblock),
     }
 
 
@@ -248,7 +249,7 @@ def run_once(args: argparse.Namespace) -> None:
         pp={
             "upf": upf_files,
             "use_dense_proj": True,
-            "filtering": True,
+            "filtering": args.filtering,
         },
         print_energies=args.scf_print_energies,
         xc={"type": "gga_x_pbe + gga_c_pbe"},
@@ -472,6 +473,11 @@ def build_argparser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--pp_type", type=str, default="SG15", choices=["SG15", "ONCV", "TM", "NNLP"]
+    )
+    p.add_argument(
+        "--filtering",
+        action="store_true",
+        help="pseudopotential filtering",
     )
 
     # Misc / system

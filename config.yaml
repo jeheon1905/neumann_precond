@@ -69,6 +69,7 @@ calculation:
   # scf_mixing: "density"
   scf_mixing: "potential"
   pp_type: "TM"
+  filtering: true
   use_cuda: true
   warmup_when_cuda: 1
   virtual_factor: 1.2

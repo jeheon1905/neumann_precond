@@ -161,6 +161,7 @@ class FixedConfig:
     scf_density_tol: float = 1e-5
     scf_mixing: str = "density"
     pp_type: str = "TM"
+    filtering: bool = True
     use_cuda: bool = False
     warmup_when_cuda: int = 1
     virtual_factor: float = 1.2
@@ -227,6 +228,7 @@ class FixedConfig:
         cfg.scf_density_tol = float(calc.get("scf_density_tol", 1e-5))
         cfg.scf_mixing = calc.get("scf_mixing", "density")
         cfg.pp_type = calc.get("pp_type", "TM")
+        cfg.filtering = calc.get("filtering", True)
         cfg.use_cuda = calc.get("use_cuda", False)
         cfg.warmup_when_cuda = int(calc.get("warmup_when_cuda", 1))
         cfg.virtual_factor = float(calc.get("virtual_factor", 1.2))
@@ -711,6 +713,8 @@ def build_cmd(
         cmd.append("--use_cuda")
     if cfg.scf_print_energies:
         cmd.append("--scf_print_energies")
+    if cfg.filtering:
+        cmd.append("--filtering")
     if combo.nbands is not None:
         eff = int(
             combo.nbands * combo.supercell[0] * combo.supercell[1] * combo.supercell[2]

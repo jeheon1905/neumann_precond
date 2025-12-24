@@ -20,7 +20,7 @@ systems:
     # Crystals
     - "MAPbI3.cif"
     # Biomolecules
-    - "beta_carotene.sdf"
+    #    - "beta_carotene.sdf"
     - "B12.sdf"
     # Molecular clusters
     - "water_cluster_128.xyz"
@@ -43,17 +43,22 @@ systems:
 # Parameter sweep configuration
 sweep:
   # preconds: []  # Empty list = all preconditioners (neumann, shift-and-invert, neu_ISI)
-  preconds: ["neumann", "shift-and-invert"]
+  preconds: ["shift-and-invert", "neumann"]
   threads: [1]
-  outerorder: [0, 2, 4, 6, 8, 10, "res"]
+  outerorder: [0,2,4,6,8,10,"res_(2,6,10;1e-0,1e-1)", "res_(4,7,10;1e-0,1e-1)", "res_(3,6,9;1e-0,1e-1)", "res_(4,7,10;1e-1,1e-2)", "res_(3,6,9;1e-1,1e-2)"]
   innerorder: [0]
   pcg_neumann: [5]
   error_cutoff: [-0.4]
-  spacing: [0.2]
+  spacing: [1.0]
   nbands: []  # Empty = use defaults
   virtual_factor: [1.2]
   # merge_iter: [3, 5, 7, 9]
   merge_iter: []  # used in neu_ISI
+
+#res defult setting (when res opption empty like outerrder = ["res"] )
+neumann:
+  res_orders: [2, 6, 10]
+  res_thresholds: [1e-0, 1e-1]
 
 # Fixed calculation parameters
 calculation:

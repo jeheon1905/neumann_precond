@@ -13,6 +13,36 @@ from gospel.precision import to_DP, to_SP, to_HP, to_BF16
 # TODO: Remove useless code comments
 # TODO: Replace use_cuda argument with device argument for consistency
 
+#--------------modified----------------------
+def _parse_res_order_spec(order_spec: str):
+    s = order_spec.strip()
+    if s.startswith("res_(") and s.endswith(")"):
+        inner = s[len("res_("):-1]
+    elif s.startswith("res(") and s.endswith(")"):
+        inner = s[len("res("):-1]
+    elif s.startswith("res[") and s.endswith("]"):
+        inner = s[len("res["):-1]
+    else:
+        return None
+    if ";" not in inner:
+        raise ValueError("res(...) requires 'orders;thresholds'")
+    orders_part, thr_part = [p.strip() for p in inner.split(";", 1)]
+    orders = [int(x.strip()) for x in orders_part.split(",") if x.strip()]
+    thresholds = [float(x.strip()) for x in thr_part.split(",") if x.strip()]
+    if len(orders) != len(thresholds) + 1:
+        raise ValueError("res(...) requires len(orders) = len(thresholds) + 1")
+    return orders, thresholds
+
+
+def _choose_res_order(orders, thresholds, residue_norm):
+    max_res = float(torch.max(residue_norm))
+    for idx, thr in enumerate(thresholds):
+        if max_res > thr:
+            return orders[idx]
+    return orders[-1]
+
+#-----------------------------------------------
+
 def create_preconditioner(precond_type=None, grid=None, use_cuda=False, options={}):
     """Create Preconditioner object from input parameters.
 
@@ -815,9 +845,26 @@ class PreNeumann(Preconditioner):
     ):
         super().__init__("neumann", use_cuda, fp)
 #----------------------ㅡmodified---------------------------------
-        assert order == "dynamic" or order == "res" or (type(order)==int and order>=0), "order should be int >=0 or 'dynamic' or 'res'"
+
+#        assert order == "dynamic" or order == "res" or (type(order)==int and order>=0), "order should be int >=0 or 'dynamic' or 'res'"
+        self.res_orders = None
+        self.res_thresholds = None
+        if isinstance(order, str):
+            if order == "dynamic":
+                self.order = order
+            elif order.startswith("res"):
+                parsed = _parse_res_order_spec(order)
+                if parsed is None:
+                    raise AssertionError("use res(orders;thresholds)")
+                self.order = "res"
+                self.res_orders, self.res_thresholds = parsed
+            else:
+                raise AssertionError("order should be int >=0, 'dynamic', or 'res(...)'")
+        else:
+            assert type(order) == int and order >= 0, "order should be int >=0, 'dynamic', or 'res(...)'"
+            self.order = order
 #-----------------------------------------------------------------
-        self.order = order
+#        self.order = order
         self.grid = grid
         self.correction_scale = correction_scale
         self.no_shift_thr = no_shift_thr
@@ -843,10 +890,15 @@ class PreNeumann(Preconditioner):
         s += "\n=====================================================================\n"
         return str(s)
 
+
     def call(self, residue, H, eigval):
         INV_4PI = 0.25 / np.pi
 
-        is_needed_residue_norm = (self.order == "dynamic" or self.verbosity or self.correction_scale != 0.0)
+#        is_needed_residue_norm = (self.order == "dynamic" or self.verbosity or self.correction_scale != 0.0)
+        is_needed_residue_norm = (
+            self.order in ("dynamic", "res") or self.verbosity or self.correction_scale != 0.0
+        )
+
         with Timer.track("Neumann. residue norm", self.timing, False):
             residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
         # Modify shift values
@@ -924,25 +976,33 @@ class PreNeumann(Preconditioner):
                             f"(using order(pre<now_break) = {order - 1})")
                     break
         else:
-#---------------------modified---------------------------
-            # determine order when self.order == res  
-            print(f"residual = {residue}")
+
+#            # determine order when self.order == res  
+#            print(f"residual = {residue}")
+#            if self.order == "res":
+#                if torch.max(residue_norm) > 1e-0:
+#                    order = 2
+#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
+#
+#                elif torch.max(residue_norm) > 1e-1 and torch.max(residue_norm) < 1e-0:
+#                    order = 6
+#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
+#
+#                else:
+#                    order = 10
+#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
+#
+#            else:
+#                order = self.order
+
+#------------------modified-------------------------
             if self.order == "res":
-                if torch.max(residue_norm) > 1e-0:
-                    order = 2
+                order = _choose_res_order(self.res_orders, self.res_thresholds, residue_norm)
+                if self.verbosity:
                     print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-
-                elif torch.max(residue_norm) > 1e-1 and torch.max(residue_norm) < 1e-0:
-                    order = 6
-                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-
-                else:
-                    order = 10
-                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-
             else:
                 order = self.order
-#---------------------------------------------------
+#--------------------------------------------------
             # Fixed order Neumann series
 #            for order in range(1, self.order + 1):
             for _ in range(1, order + 1):

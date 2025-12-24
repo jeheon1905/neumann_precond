@@ -95,6 +95,22 @@ def _as_number_seq(v, default: float):
         return tuple(float(x) for x in v)
     return (float(v),)
 
+def _format_res_spec(res_orders, res_thresholds) -> str:
+    orders = ",".join(str(x) for x in res_orders)
+    thrs = ",".join(str(x) for x in res_thresholds)
+    return f"res({orders};{thrs})"
+
+
+def _expand_res_defaults(outerorder_list, res_orders, res_thresholds):
+    spec = _format_res_spec(res_orders, res_thresholds)
+    out = []
+    for v in outerorder_list:
+        if isinstance(v, str) and v.strip() == "res":
+            out.append(spec)
+        else:
+            out.append(v)
+    return tuple(out)
+
 
 def _get_override_by_name(name: str, overrides: Dict) -> Dict:
     if name in overrides:
@@ -189,6 +205,8 @@ class FixedConfig:
     inner_for_isi: Sequence[str] = ("neumann",)
     outerorder_list: Sequence[str] = ("dynamic",)
     innerorder_list: Sequence[str] = ("0", "1", "2")
+    res_orders: Sequence[int] = (2, 6, 10)
+    res_thresholds: Sequence[float] = (1e-0, 1e-1)
     pcg_iter_by_inner: Dict[str, Sequence[int]] = field(
         default_factory=lambda: {"neumann": (2,)}
     )
@@ -300,9 +318,20 @@ class FixedConfig:
         
         # Summary fields
         cfg.summary_fields = config.get("summary_fields", {})
-        
+#-----------------------modified--------------------------        
+        # Neumann res defaults
+        neu = config.get("neumann", {})
+        if neu.get("res_orders"):
+            cfg.res_orders = tuple(int(x) for x in neu["res_orders"])
+        if neu.get("res_thresholds"):
+            cfg.res_thresholds = tuple(float(x) for x in neu["res_thresholds"])
+        if len(cfg.res_orders) != len(cfg.res_thresholds) +1:
+            raise ValueError("res_orders must be one longer than res_thresholds")
+        cfg.outerorder_list = _expand_res_defaults(
+            cfg.outerorder_list, cfg.res_orders, cfg.res_thresholds
+        )
         return cfg
-
+#-----------------------modified---------------------------
 
 CFG: Optional[FixedConfig] = None
 VARY_TOKENS: Set[str] = set()

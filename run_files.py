@@ -57,8 +57,13 @@ if __name__ == "__main__":  # pragma: no cover
     if args.innerorder != "dynamic":
         innerorder = int(args.innerorder)
 
-    if args.outerorder != "dynamic":
+#    if args.outerorder != "dynamic":
+#        outerorder = int(args.outerorder)
+
+#--------------------modified----------------------
+    if args.outerorder != "dynamic" and not str(args.outerorder).startswith("res"):
         outerorder = int(args.outerorder)
+#---------------------------------------------------
 
     pcg = int(args.pcg_Neumann)
     error_cutoff = float(args.error_cutoff)
@@ -134,7 +139,6 @@ if __name__ == "__main__":  # pragma: no cover
              "scf_maxiter": 1,
              "diag_tol":1e-4,
              },
-        #converge added #########################################
         #symmetry=False,
         #kpts=(2, 2, 2, "gamma"),
         #kpts=(2, 1, 1, "gamma"),

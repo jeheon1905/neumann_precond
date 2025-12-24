@@ -104,17 +104,25 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
         else:
             return int(v)
 
+#-----------modified-------------
     def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
-        # if isinstance(v, str) and v == "dynamic":
-        #     return v
-        if v == "dynamic" or v == "res": ###modified res
+        v = str(v).strip()
+        if v == "dynamic" or v.startswith("res"):
             return v
-        else:
-            return int(v)
+        return int(v)
+#--------------------------------
 
+#    def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
+#        # if isinstance(v, str) and v == "dynamic":
+#        #     return v
+#        if v == "dynamic" or v == "res": ###modified res
+#            return v
+#        else:
+#            return int(v)
+#
     innerorder = _innerorder_value(args.innerorder)
     outerorder = _outerorder_value(args.outerorder)
-    # pcg = int(args.pcg_Neumann)  # kept for compatibility with potential future use
+    #pcg = int(args.pcg_Neumann)  # kept for compatibility with potential future use
     error_cutoff = float(args.error_cutoff)
 
     if precond_type == "neumann":

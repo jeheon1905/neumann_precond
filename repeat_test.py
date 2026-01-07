@@ -173,6 +173,7 @@ class FixedConfig:
     phase: str = "fixed"
     temperature: float = 0.01
     scf_print_energies: bool = False
+    scf_maxiter: int = 100
     scf_energy_tol: float = 1e-6
     scf_density_tol: float = 1e-5
     scf_mixing: str = "density"
@@ -242,6 +243,7 @@ class FixedConfig:
         cfg.phase = calc.get("phase", "fixed")
         cfg.temperature = float(calc.get("temperature", 0.0))
         cfg.scf_print_energies = calc.get("scf_print_energies", False)
+        cfg.scf_maxiter = int(calc.get("scf_maxiter", 100))
         cfg.scf_energy_tol = float(calc.get("scf_energy_tol", 1e-6))
         cfg.scf_density_tol = float(calc.get("scf_density_tol", 1e-5))
         cfg.scf_mixing = calc.get("scf_mixing", "density")
@@ -727,6 +729,8 @@ def build_cmd(
         str(cfg.seed + run_idx),
         "--temperature",
         str(cfg.temperature),
+        "--scf_maxiter",
+        str(cfg.scf_maxiter),
         "--scf_energy_tol",
         str(cfg.scf_energy_tol),
         "--scf_density_tol",

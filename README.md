@@ -18,6 +18,7 @@ pip install numpy==1.26.4     # Torch compatibility (numpy version pinned)
 pip install ase               # Atomic Simulation Environment
 pip install gitpython         # Git interface for Python
 pip install "spglib>=1.16.1"  # Symmetry analysis library
+pip install pyyaml
 
 # Install GOSPEL (local development mode)
 git clone https://gitlab.com/jhwoo15/gospel.git

@@ -264,7 +264,7 @@ def run_once(args: argparse.Namespace) -> None:
         precond_type=None,
         convergence={
             # SCF checks only energy tolerance; others are disabled (inf)
-            "scf_maxiter": 100,
+            "scf_maxiter": int(args.scf_maxiter),
             # "density_tol": np.inf,
             "density_tol": float(args.scf_density_tol),
             "orbital_energy_tol": np.inf,
@@ -445,6 +445,12 @@ def build_argparser() -> argparse.ArgumentParser:
         "--scf_print_energies",
         action="store_true",
         help="calcualte and print energies at every SCF step",
+    )
+    p.add_argument(
+        "--scf_maxiter",
+        type=int,
+        default=100,
+        help="maximum number of SCF iterations (default: 100)",
     )
     p.add_argument(
         "--scf_energy_tol",

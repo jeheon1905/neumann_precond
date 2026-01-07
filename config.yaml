@@ -20,7 +20,6 @@ systems:
     # Crystals
     - "MAPbI3.cif"
     # Biomolecules
-    #    - "beta_carotene.sdf"
     - "B12.sdf"
     # Molecular clusters
     - "water_cluster_128.xyz"
@@ -49,7 +48,7 @@ sweep:
   innerorder: [0]
   pcg_neumann: [5]
   error_cutoff: [-0.4]
-  spacing: [1.0]
+  spacing: [0.2]
   nbands: []  # Empty = use defaults
   virtual_factor: [1.2]
   # merge_iter: [3, 5, 7, 9]
@@ -93,9 +92,7 @@ calculation:
     # Fixed Hamiltonian-specific parameters
     fixed:
       iter: 1000
-        # tol: 1.0e-6
       tol: 1.0e-5
-      # tol: 1.0e-4
 
   # Davidson solver parameters
   davidson:

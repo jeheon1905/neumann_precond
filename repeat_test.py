@@ -95,6 +95,7 @@ def _as_number_seq(v, default: float):
         return tuple(float(x) for x in v)
     return (float(v),)
 
+
 def _format_res_spec(res_orders, res_thresholds) -> str:
     orders = ",".join(str(x) for x in res_orders)
     thrs = ",".join(str(x) for x in res_thresholds)
@@ -144,7 +145,7 @@ def scan_systems(config: Dict) -> Dict[str, Dict[str, Sequence]]:
     defaults = sys_cfg["defaults"]
     overrides = sys_cfg.get("overrides", {})
     out: Dict[str, Dict[str, Sequence]] = {}
-    
+
     for root in sys_cfg["roots"]:
         rp = Path(root)
         if not rp.exists():
@@ -197,7 +198,7 @@ class FixedConfig:
     locking: bool = False
     fill_block: bool = False
     verbosity: int = 1
-    seed: int = 0
+    seed_list: Sequence[int] = (0, 1, 2)  # List of seeds for each run
 
     merge_neu_steps: int = 5
 
@@ -219,7 +220,8 @@ class FixedConfig:
     systems: Dict[str, Dict[str, Sequence]] = field(default_factory=dict)
 
     runs_per_combo: int = 3
-    resume: bool = True
+    scf_runs_per_combo: int = 1  # Number of SCF runs per combo (default: 1)
+    do_retHistory: bool = True  # Whether to save convergence history for FIXED runs
     dry_run: bool = False
     require_density_for_fixed: bool = True
 
@@ -229,14 +231,14 @@ class FixedConfig:
     def from_yaml_config(cls, config: Dict) -> "FixedConfig":
         """Create FixedConfig from loaded YAML configuration"""
         cfg = cls()
-        
+
         # Experiment settings
         exp = config.get("experiment", {})
         results_root = Path(exp.get("results_root", "result_scail_up"))
         cfg.DENSITY_ROOT = results_root / "density"
         cfg.HISTORY_ROOT = results_root / "history"
         cfg.LOG_ROOT = results_root / "logs"
-        
+
         # Calculation settings
         calc = config.get("calculation", {})
         cfg.mode = calc.get("mode", "scf-then-fixed")
@@ -252,12 +254,12 @@ class FixedConfig:
         cfg.use_cuda = calc.get("use_cuda", False)
         cfg.warmup_when_cuda = int(calc.get("warmup_when_cuda", 1))
         cfg.virtual_factor = float(calc.get("virtual_factor", 1.2))
-        
+
         # Diagonalization settings
         diag = calc.get("diagonalization", {})
         cfg.diag_iter_scf = int(diag.get("scf", {}).get("iter", 11))
         cfg.diag_iter_fixed = int(diag.get("fixed", {}).get("iter", 1000))
-        
+
         scf_tol = diag.get("scf", {}).get("tol")
         fixed_tol = diag.get("fixed", {}).get("tol")
         if scf_tol is not None:
@@ -266,22 +268,33 @@ class FixedConfig:
         if fixed_tol is not None:
             cfg.diag_tol_fixed = float(fixed_tol)
             cfg.diag_tol_fixed_is_set = True
-        
+
         # Davidson settings
         dav = calc.get("davidson", {})
         cfg.nblock = int(dav.get("nblock", 2))
         cfg.locking = bool(dav.get("locking", False))
         cfg.fill_block = bool(dav.get("fill_block", False))
-        
+
         # Execution settings
         exec_cfg = calc.get("execution", {})
         cfg.runs_per_combo = int(exec_cfg.get("runs_per_combo", 3))
-        cfg.resume = bool(exec_cfg.get("resume", True))
+        cfg.scf_runs_per_combo = int(exec_cfg.get("scf_runs_per_combo", 1))
+        cfg.do_retHistory = bool(exec_cfg.get("do_retHistory", True))
         cfg.dry_run = bool(exec_cfg.get("dry_run", False))
-        cfg.require_density_for_fixed = bool(exec_cfg.get("require_density_for_fixed", True))
+        cfg.require_density_for_fixed = bool(
+            exec_cfg.get("require_density_for_fixed", True)
+        )
         cfg.verbosity = int(exec_cfg.get("verbosity", 1))
-        cfg.seed = int(exec_cfg.get("seed", 0))
-        
+
+        # Seed list: always required as a list
+        seed_value = exec_cfg.get("seed", [0, 1, 2])
+        if not isinstance(seed_value, list):
+            raise ValueError(
+                f"'seed' must be a list of integers, got {type(seed_value).__name__}. "
+                f"Example: seed: [0, 1, 2]"
+            )
+        cfg.seed_list = tuple(int(x) for x in seed_value)
+
         # Sweep parameters
         sweep = config.get("sweep", {})
         if sweep.get("threads"):
@@ -293,7 +306,9 @@ class FixedConfig:
         if sweep.get("innerorder"):
             cfg.innerorder_list = tuple(sweep["innerorder"])
         if sweep.get("pcg_neumann"):
-            cfg.pcg_iter_by_inner["neumann"] = tuple(int(x) for x in sweep["pcg_neumann"])
+            cfg.pcg_iter_by_inner["neumann"] = tuple(
+                int(x) for x in sweep["pcg_neumann"]
+            )
         if sweep.get("error_cutoff"):
             vals = sweep["error_cutoff"]
             cfg.error_cutoff_list = tuple(float(x) for x in vals)
@@ -301,10 +316,10 @@ class FixedConfig:
             cfg.virtual_factor_list = tuple(float(x) for x in sweep["virtual_factor"])
         if sweep.get("merge_iter"):
             cfg.merge_neu_steps_list = tuple(int(x) for x in sweep["merge_iter"])
-        
+
         # Systems
         cfg.systems = scan_systems(config)
-        
+
         # Apply spacing and nbands from sweep to systems
         if sweep.get("spacing"):
             vals = tuple(float(x) for x in sweep["spacing"])
@@ -317,23 +332,25 @@ class FixedConfig:
             )
             for k in list(cfg.systems.keys()):
                 cfg.systems[k]["nbands"] = vals
-        
+
         # Summary fields
         cfg.summary_fields = config.get("summary_fields", {})
-#-----------------------modified--------------------------        
+        # -----------------------modified--------------------------
         # Neumann res defaults
         neu = config.get("neumann", {})
         if neu.get("res_orders"):
             cfg.res_orders = tuple(int(x) for x in neu["res_orders"])
         if neu.get("res_thresholds"):
             cfg.res_thresholds = tuple(float(x) for x in neu["res_thresholds"])
-        if len(cfg.res_orders) != len(cfg.res_thresholds) +1:
+        if len(cfg.res_orders) != len(cfg.res_thresholds) + 1:
             raise ValueError("res_orders must be one longer than res_thresholds")
         cfg.outerorder_list = _expand_res_defaults(
             cfg.outerorder_list, cfg.res_orders, cfg.res_thresholds
         )
         return cfg
-#-----------------------modified---------------------------
+
+
+# -----------------------modified---------------------------
 
 CFG: Optional[FixedConfig] = None
 VARY_TOKENS: Set[str] = set()
@@ -341,13 +358,32 @@ VARY_TOKENS: Set[str] = set()
 # ========== 결과 로그에서 원하는 값 추출 ==========
 
 _davidson_re = re.compile(r"^\s*davidson\s*\|\s*([0-9]*\.?[0-9]+)\s*\|", re.M)
+_gospel_total_re = re.compile(
+    r"^\s*GOSPEL\.calculate\s*\|\s*([0-9]*\.?[0-9]+)\s*\|", re.M
+)
 _timer_row_re = re.compile(
     r"^(?P<label>[A-Za-z0-9 .()_@&\\/\\-]+?)\s*\|\s*(?P<total>[0-9]*\.?[0-9]+)\s*\|\s*(?P<count>\d+)\s*$",
     re.M,
 )
 
 
+def parse_gospel_total_seconds(log_path: Path) -> Optional[float]:
+    """Parse GOSPEL.calculate total time (for SCF phase)"""
+    try:
+        text = log_path.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return None
+    m = _gospel_total_re.search(text)
+    if not m:
+        return None
+    try:
+        return float(m.group(1))
+    except Exception:
+        return None
+
+
 def parse_davidson_seconds(log_path: Path) -> Optional[float]:
+    """Parse davidson time (for FIXED phase)"""
     try:
         text = log_path.read_text(encoding="utf-8", errors="ignore")
     except Exception:
@@ -524,6 +560,7 @@ class RunPaths:
     logs_scf_dir: Path
     logs_fixed_dir: Path
 
+    # FIXED run paths
     def run_dir(self, run_idx: int) -> Path:
         return ensure_dir(self.logs_fixed_dir / f"run-{run_idx}")
 
@@ -535,6 +572,15 @@ class RunPaths:
 
     def hist_run_log_path(self, run_idx: int) -> Path:
         return self.history_dir / f"run-{run_idx}" / "stdout.log"
+
+    # SCF run paths
+    def scf_run_log_path(self, run_idx: int) -> Path:
+        """Get log path for SCF run (1-indexed)"""
+        return self.logs_scf_dir / f"scf_run-{run_idx}.log"
+
+    def scf_class_dir(self, label: str) -> Path:
+        """Get directory for classified SCF runs (fast/median/slow)"""
+        return ensure_dir(self.history_scf_dir / label)
 
     def density_file(self) -> Path:
         return self.density_dir / "density.pt"
@@ -686,6 +732,29 @@ def prepare_paths(cfg: FixedConfig, combo: Combo) -> RunPaths:
 # ========== 실제 실행 커맨드 및 실행 ==========
 
 
+def get_seed_for_run(cfg: FixedConfig, run_idx: int) -> int:
+    """
+    Get the seed value for a specific run from seed_list.
+
+    Both SCF and FIXED use 1-based indexing (run_idx = 1, 2, 3, ...).
+
+    Args:
+        cfg: Configuration object
+        run_idx: Run index (1-based for both SCF and FIXED)
+
+    Returns:
+        Seed value to use for this run
+    """
+    # Convert 1-based to 0-based for list indexing
+    idx = run_idx - 1
+
+    if idx < len(cfg.seed_list):
+        return cfg.seed_list[idx]
+    else:
+        # Fallback: if index exceeds seed_list length, extend
+        return cfg.seed_list[-1] + (idx - len(cfg.seed_list) + 1)
+
+
 def build_cmd(
     cfg: FixedConfig,
     combo: Combo,
@@ -694,6 +763,7 @@ def build_cmd(
     *,
     phase: str,
     include_ret_history: bool = True,
+    density_filename: Optional[str] = None,  # If None, don't add --density_filename
 ) -> List[str]:
     warmup = cfg.warmup_when_cuda if cfg.use_cuda else 0
     diag_iter_for_phase = cfg.diag_iter_scf if phase == "scf" else cfg.diag_iter_fixed
@@ -726,7 +796,7 @@ def build_cmd(
         "--verbosity",
         str(cfg.verbosity),
         "--seed",
-        str(cfg.seed + run_idx),
+        str(get_seed_for_run(cfg, run_idx)),
         "--temperature",
         str(cfg.temperature),
         "--scf_maxiter",
@@ -737,9 +807,12 @@ def build_cmd(
         str(cfg.scf_density_tol),
         "--scf_mixing",
         str(cfg.scf_mixing),
-        "--density_filename",
-        str(paths.density_file()),
     ]
+
+    # Add density_filename only if provided
+    if density_filename is not None:
+        cmd.extend(["--density_filename", density_filename])
+
     if diag_tol_for_phase is not None:
         cmd.extend(["--diag_tol", str(diag_tol_for_phase)])
     if cfg.use_cuda:
@@ -818,9 +891,7 @@ def run_once(cmd: List[str], log_path: Path, threads: int) -> int:
         return proc.wait()
 
 
-def classify_runs_by_time(
-    times: List[Tuple[int, Optional[float]]]
-) -> Dict[str, int]:
+def classify_runs_by_time(times: List[Tuple[int, Optional[float]]]) -> Dict[str, int]:
     def key(t: Tuple[int, Optional[float]]):
         _, sec = t
         return float("inf") if sec is None else sec
@@ -929,26 +1000,30 @@ def write_pretty_summary(dirpath: Path, row: Dict[str, object], filename: str) -
 
 def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
     metrics = parse_timer_metrics(scf_log)
-    
+
     # Get candidates from config
     fields = CFG.summary_fields
     scf_iter_cnt = pick_metric(
         metrics,
-        fields.get("diag_iter_count", {}).get("candidates",
-            ["SCF iter.", "SCF iter", "SCF iteration"]),
-        "count"
+        fields.get("diag_iter_count", {}).get(
+            "candidates", ["SCF iter.", "SCF iter", "SCF iteration"]
+        ),
+        "count",
     )
     dav_total = pick_metric(
         metrics,
-        fields.get("davidson_total", {}).get("candidates",
-            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"]),
-        "total"
+        fields.get("davidson_total", {}).get(
+            "candidates",
+            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"],
+        ),
+        "total",
     )
     gospel_total = pick_metric(
         metrics,
-        fields.get("gospel_total", {}).get("candidates",
-            ["GOSPEL.calculate", "GOSPEL calculate", "GOSPEL"]),
-        "total"
+        fields.get("gospel_total", {}).get(
+            "candidates", ["GOSPEL.calculate", "GOSPEL calculate", "GOSPEL"]
+        ),
+        "total",
     )
 
     material = Path(combo.sys_path).stem
@@ -1030,7 +1105,9 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
     )
 
 
-def find_label_log(runpaths: RunPaths, label: str, idx: Optional[int]) -> Optional[Path]:
+def find_label_log(
+    runpaths: RunPaths, label: str, idx: Optional[int]
+) -> Optional[Path]:
     cand: List[Path] = [
         runpaths.history_dir / label / "stdout.log",
         runpaths.logs_fixed_dir / label / "stdout.log",
@@ -1046,14 +1123,16 @@ def find_label_log(runpaths: RunPaths, label: str, idx: Optional[int]) -> Option
     return None
 
 
-def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]) -> None:
+def write_fixed_summary(
+    runpaths: RunPaths, combo: Combo, labels: Dict[str, int]
+) -> None:
     median_idx = labels.get("median")
 
     log_path = find_label_log(runpaths, "median", median_idx)
     metrics: Dict[str, Dict[str, float]] = {}
     if log_path is not None:
         metrics = parse_timer_metrics(log_path)
-    
+
     material = Path(combo.sys_path).stem
     base_row: Dict[str, object] = {
         "material": material,
@@ -1099,26 +1178,28 @@ def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]
         ),
         "merge_iter": (combo.merge_neu_steps if combo.precond == "neu_ISI" else None),
     }
-    
+
     row = dict(base_row)
     fields = CFG.summary_fields
     row["davidson_total"] = pick_metric(
         metrics,
-        fields.get("davidson_total", {}).get("candidates",
-            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"]),
-        "total"
+        fields.get("davidson_total", {}).get(
+            "candidates",
+            ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"],
+        ),
+        "total",
     )
     row["diag_iter_count"] = pick_metric(
         metrics,
-        fields.get("diag_iter_count", {}).get("candidates",
-            ["Diag. Iter.", "Diag Iter.", "Diag Iter"]),
-        "count"
+        fields.get("diag_iter_count", {}).get(
+            "candidates", ["Diag. Iter.", "Diag Iter.", "Diag Iter"]
+        ),
+        "count",
     )
     row["preconditioning_total"] = pick_metric(
         metrics,
-        fields.get("preconditioning_total", {}).get("candidates",
-            ["Preconditioning"]),
-        "total"
+        fields.get("preconditioning_total", {}).get("candidates", ["Preconditioning"]),
+        "total",
     )
 
     if row["davidson_total"] is None:
@@ -1134,7 +1215,7 @@ def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]
                         break
         except Exception:
             pass
-    
+
     write_pretty_summary(
         CFG.DENSITY_ROOT.parent, row, filename="calculation_summary_fixed.txt"
     )
@@ -1145,67 +1226,60 @@ def write_fixed_summary(runpaths: RunPaths, combo: Combo, labels: Dict[str, int]
 
 def main():
     global CFG, VARY_TOKENS
-    
-    parser = argparse.ArgumentParser(description="DFT calculation sweep with YAML config")
+
+    parser = argparse.ArgumentParser(
+        description="DFT calculation sweep with YAML config"
+    )
     parser.add_argument(
         "--config",
         type=str,
         default="config.yaml",
-        help="Path to YAML configuration file (default: config.yaml)"
+        help="Path to YAML configuration file (default: config.yaml)",
     )
     parser.add_argument(
         "--mode",
         type=str,
         choices=["scf", "fixed", "scf-then-fixed"],
         default=None,
-        help="Override mode from config"
+        help="Override mode from config",
     )
     parser.add_argument(
         "--dry_run",
         action="store_true",
-        help="Dry run mode (don't execute calculations)"
+        help="Dry run mode (don't execute calculations)",
     )
     parser.add_argument(
         "--runs_per_combo",
         type=int,
         default=None,
-        help="Override runs per combo from config"
+        help="Override runs per combo from config",
     )
     parser.add_argument(
         "--diag_tol",
         type=str,
         default=None,
-        help="(legacy) Global diag_tol; 'none' means don't pass option"
+        help="(legacy) Global diag_tol; 'none' means don't pass option",
     )
     parser.add_argument(
         "--diag_tol_scf",
         type=str,
         default=None,
-        help="SCF-specific diag_tol; 'none' means don't pass option"
+        help="SCF-specific diag_tol; 'none' means don't pass option",
     )
     parser.add_argument(
         "--diag_tol_fixed",
         type=str,
         default=None,
-        help="Fixed-specific diag_tol; 'none' means don't pass option"
+        help="Fixed-specific diag_tol; 'none' means don't pass option",
     )
     parser.add_argument(
-        "--diag_iter",
-        type=int,
-        default=None,
-        help="(legacy) Global diag_iter"
+        "--diag_iter", type=int, default=None, help="(legacy) Global diag_iter"
     )
     parser.add_argument(
-        "--diag_iter_scf",
-        type=int,
-        default=None,
-        help="SCF-specific diag_iter"
+        "--diag_iter_scf", type=int, default=None, help="SCF-specific diag_iter"
     )
     parser.add_argument(
-        "--diag_iter_fixed",
-        type=int,
-        default=None,
-        help="Fixed-specific diag_iter"
+        "--diag_iter_fixed", type=int, default=None, help="Fixed-specific diag_iter"
     )
 
     args = parser.parse_args()
@@ -1237,7 +1311,7 @@ def main():
     g_set, g_val = _parse_optional_float_arg(args.diag_tol)
     s_set, s_val = _parse_optional_float_arg(args.diag_tol_scf)
     f_set, f_val = _parse_optional_float_arg(args.diag_tol_fixed)
-    
+
     if g_set:
         CFG.diag_tol_global_is_set = True
         CFG.diag_tol_global = g_val
@@ -1300,8 +1374,9 @@ def main():
         "fill",
     }
     values: Dict[str, set] = {k: set() for k in keys}
-    
+
     for c in combos:
+
         def put(k: str, v):
             if v is None:
                 return
@@ -1329,9 +1404,9 @@ def main():
         put("nblock", CFG.nblock)
         put("lock", int(CFG.locking))
         put("fill", int(CFG.fill_block))
-    
+
     VARY_TOKENS = {k for k, s in values.items() if len(s) > 1}
-    
+
     results_root = CFG.DENSITY_ROOT.parent
     write_setting_summary(results_root, combos, CFG.systems)
 
@@ -1340,32 +1415,175 @@ def main():
         paths = prepare_paths(CFG, combo)
         dens_file = paths.density_file()
 
-        # --- SCF: Always execute ---
+        # --- SCF: Execute with configurable runs_per_combo ---
         scf_rc = 0
-        if CFG.mode in ("scf", "scf-then-fixed"):
-            scf_cmd = build_cmd(
-                CFG, combo, paths, run_idx=0, phase="scf", include_ret_history=False
-            )
-            scf_log = paths.logs_scf_dir / "scf.log"
-            print(f"\n[SCF] ({c_idx}/{len(combos)}) combo={paths.base_subpath_scf}")
-            print("CMD:", " ".join(scf_cmd))
-            
-            if not CFG.dry_run:
-                scf_rc = run_once(scf_cmd, scf_log, combo.threads)
+        scf_results: List[RunResult] = []
+
+        if CFG.mode in ("scf", "scf-then-fixed") and CFG.scf_runs_per_combo > 0:
+            # Warn about density overwriting in SCF multi-run
+            if CFG.scf_runs_per_combo > 1:
+                print(f"\n[WARNING] scf_runs_per_combo={CFG.scf_runs_per_combo} > 1:")
+                print(f"  All SCF runs will save to the same density file:")
+                print(f"  {paths.density_file()}")
+                print(
+                    f"  Only the LAST SCF run's density will be used for FIXED phase!"
+                )
+                print()
+
+            # Run SCF multiple times if scf_runs_per_combo > 1
+            # Use 1-based indexing for consistency with FIXED
+            for scf_run_idx in range(1, CFG.scf_runs_per_combo + 1):
+                scf_cmd = build_cmd(
+                    CFG,
+                    combo,
+                    paths,
+                    run_idx=scf_run_idx,
+                    phase="scf",
+                    include_ret_history=False,
+                    density_filename=str(paths.density_file()),
+                )
+
+                if CFG.scf_runs_per_combo == 1:
+                    # Single SCF run: use original log file name
+                    scf_log = paths.logs_scf_dir / "scf.log"
+                    run_label = ""
+                else:
+                    # Multiple SCF runs: use numbered log files
+                    scf_log = paths.scf_run_log_path(scf_run_idx)
+                    run_label = f" [run {scf_run_idx}/{CFG.scf_runs_per_combo}]"
+
+                print(
+                    f"\n[SCF] ({c_idx}/{len(combos)}) combo={paths.base_subpath_scf}{run_label}"
+                )
+                print(f"  seed={get_seed_for_run(CFG, scf_run_idx)}")
+                print("CMD:", " ".join(scf_cmd))
+
+                if not CFG.dry_run:
+                    scf_rc = run_once(scf_cmd, scf_log, combo.threads)
+                    if scf_rc != 0:
+                        print(f"[ERR][SCF] Return code {scf_rc} – see: {scf_log}")
+                        tail_print(scf_log, 60)
+                    else:
+                        # SCF succeeded - check if density file was created
+                        if not dens_file.exists():
+                            print(
+                                f"[WARN][SCF] Density file not created despite success"
+                            )
+                            scf_rc = 1  # Mark as failed
+
+                    # Parse SCF time if multiple runs
+                    if CFG.scf_runs_per_combo > 1:
+                        scf_time = parse_gospel_total_seconds(scf_log)
+                        print(f"  → GOSPEL.calculate(s) = {scf_time}")
+                        scf_results.append(
+                            RunResult(scf_run_idx, None, scf_log, scf_time)
+                        )
+                else:
+                    ensure_dir(scf_log.parent)
+                    scf_log.write_text(
+                        f"[dry_run] scf run {scf_run_idx}\n", encoding="utf-8"
+                    )
+
+                # Stop if SCF failed
                 if scf_rc != 0:
-                    print(f"[ERR][SCF] Return code {scf_rc} – see: {scf_log}")
-                    tail_print(scf_log, 60)
+                    break
+
+            # Write SCF summary
+            if CFG.scf_runs_per_combo == 1:
+                scf_log = paths.logs_scf_dir / "scf.log"
+                write_scf_only_summary(combo, scf_log)
             else:
-                ensure_dir(scf_log.parent)
-                scf_log.write_text("[dry_run] scf\n", encoding="utf-8")
-            
-            write_scf_only_summary(combo, scf_log)
+                # For multiple SCF runs, classify and organize like FIXED
+                print(f"\n[SCF Summary] Total {len(scf_results)} runs")
+                if scf_results:
+                    scf_times = [(r.run_idx, r.davidson_s) for r in scf_results]
+                    scf_labels = classify_runs_by_time(scf_times)
+                    scf_order = sorted(
+                        scf_times,
+                        key=lambda t: float("inf") if t[1] is None else t[1],
+                    )
+
+                    # Print summary
+                    for label, idx in scf_labels.items():
+                        result = next(r for r in scf_results if r.run_idx == idx)
+                        print(
+                            f"  {label}: run-{idx}, GOSPEL.calculate={result.davidson_s}s"
+                        )
+
+                    # Save ranking
+                    ranking = {"order": scf_order, "labels": scf_labels}
+                    (paths.history_scf_dir / "run_ranking.json").write_text(
+                        json.dumps(ranking, indent=2), encoding="utf-8"
+                    )
+
+                    with open(
+                        paths.history_scf_dir / "run_ranking.txt", "w", encoding="utf-8"
+                    ) as f:
+                        for rank, (idx, sec) in enumerate(scf_order, 1):
+                            tag = [k for k, v in scf_labels.items() if v == idx]
+                            f.write(
+                                f"{rank}) run-{idx}: GOSPEL.calculate={sec}  label={tag[0] if tag else '-'}\n"
+                            )
+
+                    # Move files to labeled directories (fast/median/slow)
+                    for label, idx in scf_labels.items():
+                        dst_dir = paths.scf_class_dir(label)
+                        src_log = paths.scf_run_log_path(idx)
+
+                        if src_log.exists():
+                            ensure_dir(dst_dir)
+                            shutil.move(str(src_log), str(dst_dir / "scf.log"))
+                        else:
+                            print(
+                                f"[WARN] SCF log not found for label={label}: {src_log}"
+                            )
+
+                    # Write SCF summary JSON
+                    (paths.history_scf_dir / "summary.json").write_text(
+                        json.dumps(
+                            {
+                                "path": str(paths.history_scf_dir),
+                                "phase": "scf",
+                                "runs": [
+                                    {
+                                        "run": r.run_idx,
+                                        "gospel_calculate_seconds": r.davidson_s,
+                                    }
+                                    for r in scf_results
+                                ],
+                                "labels": scf_labels,
+                            },
+                            indent=2,
+                        ),
+                        encoding="utf-8",
+                    )
+
+                    # Write calculation_summary_scf.txt using median run
+                    median_idx = scf_labels.get("median")
+                    if median_idx is not None:
+                        # Find the median run's log file
+                        median_log = paths.scf_class_dir("median") / "scf.log"
+                        if median_log.exists():
+                            write_scf_only_summary(combo, median_log)
+                        else:
+                            print(
+                                f"[WARN] Cannot create calculation_summary_scf.txt: median log not found"
+                            )
+
+        elif CFG.scf_runs_per_combo == 0:
+            # Skip SCF completely
+            print(f"\n[SCF] ({c_idx}/{len(combos)}) SKIPPED (scf_runs_per_combo=0)")
+            print("  FIXED phase will use initialized density (no SCF density file)")
 
         if CFG.mode == "scf":
             continue
 
-        # FIXED requires SCF density if configured
-        if CFG.require_density_for_fixed and (scf_rc != 0 or not dens_file.exists()):
+        # FIXED requires SCF density if configured (unless scf_runs_per_combo=0)
+        if (
+            CFG.scf_runs_per_combo > 0
+            and CFG.require_density_for_fixed
+            and (scf_rc != 0 or not dens_file.exists())
+        ):
             print(
                 f"[SKIP][FIXED] Missing/failed SCF density for combo={paths.base_subpath_fixed} – skip fixed runs."
             )
@@ -1374,14 +1592,30 @@ def main():
         # --- FIXED (multi-run) ---
         results: List[RunResult] = []
         for run_idx in range(1, CFG.runs_per_combo + 1):
+            # Determine density filename:
+            # - If scf_runs_per_combo=0: use None (initialized density)
+            # - Otherwise: use density file from SCF
+            density_fn = (
+                None if CFG.scf_runs_per_combo == 0 else str(paths.density_file())
+            )
+
             cmd = build_cmd(
-                CFG, combo, paths, run_idx, phase="fixed", include_ret_history=True
+                CFG,
+                combo,
+                paths,
+                run_idx,
+                phase="fixed",
+                include_ret_history=CFG.do_retHistory,
+                density_filename=density_fn,
             )
             print(
                 f"\n[RUN] ({c_idx}/{len(combos)}) combo={paths.base_subpath_fixed} run={run_idx}"
             )
+            print(f"  seed={get_seed_for_run(CFG, run_idx)}")
+            if density_fn is None:
+                print(f"  density=initialized (no SCF density)")
             print("CMD:", " ".join(cmd))
-            
+
             if CFG.dry_run:
                 results.append(
                     RunResult(
@@ -1392,17 +1626,17 @@ def main():
                     )
                 )
                 continue
-            
+
             ensure_dir(paths.run_history_path(run_idx).parent)
             rc = run_once(cmd, paths.run_log_path(run_idx), combo.threads)
-            
+
             if rc != 0:
                 print(f"[ERR] Return code {rc} – see: {paths.run_log_path(run_idx)}")
                 tail_print(paths.run_log_path(run_idx), 60)
-            
+
             dtime = parse_davidson_seconds(paths.run_log_path(run_idx))
             print(f"  → davidson(s) = {dtime}")
-            
+
             results.append(
                 RunResult(
                     run_idx,
@@ -1419,11 +1653,11 @@ def main():
             key=lambda t: float("inf") if t[1] is None else t[1],
         )
         ranking = {"order": order, "labels": labels}
-        
+
         (paths.history_dir / "run_ranking.json").write_text(
             json.dumps(ranking, indent=2), encoding="utf-8"
         )
-        
+
         with open(paths.history_dir / "run_ranking.txt", "w", encoding="utf-8") as f:
             for rank, (idx, sec) in enumerate(order, 1):
                 tag = [k for k, v in labels.items() if v == idx]
@@ -1436,19 +1670,21 @@ def main():
             dst_dir = paths.class_dir(label)
             src_h = paths.run_history_path(idx)
             src_l = paths.run_log_path(idx)
-            
-            if src_h.exists():
-                ensure_dir(dst_dir)
-                shutil.move(str(src_h), str(dst_dir / "history.pt"))
-            else:
-                print(f"[WARN] history not found for label={label}: {src_h}")
-            
+
+            # Only check/move history file if do_retHistory is enabled
+            if CFG.do_retHistory:
+                if src_h.exists():
+                    ensure_dir(dst_dir)
+                    shutil.move(str(src_h), str(dst_dir / "history.pt"))
+                else:
+                    print(f"[WARN] history not found for label={label}: {src_h}")
+
             if src_l.exists():
                 ensure_dir(dst_dir)
                 shutil.move(str(src_l), str(dst_dir / "stdout.log"))
             else:
                 print(f"[WARN] log not found for label={label}: {src_l}")
-        
+
         # Clean up temporary run directories
         for d in paths.logs_fixed_dir.glob("run-*"):
             shutil.rmtree(d, ignore_errors=True)

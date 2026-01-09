@@ -231,7 +231,7 @@ def compute_nbands(atoms, upf_files, args):
 # ------------------------------
 # Core
 # ------------------------------
-def run_once(args: argparse.Namespace) -> None:
+def run_once(args: argparse.Namespace, warmup_set=False) -> None:
     # --- System / atoms ---
     atoms = make_atoms(args.filepath, args.supercell, pbc=args.pbc, vacuum=3.0)
     print(atoms)
@@ -246,6 +246,14 @@ def run_once(args: argparse.Namespace) -> None:
     else:
         nbands = compute_nbands(atoms, upf_files, args)
     print(f"Number of bands: {nbands}")
+
+    # In a warmup setting, set the iterations to a minimum.
+    if warmup_set:
+        scf_maxiter = 1
+        diag_iter = 2
+    else:
+        scf_maxiter = args.scf_maxiter
+        diag_iter = args.diag_iter
 
     # --- Eigensolver / Calculator ---
     eigensolver = build_eigensolver(args)
@@ -264,7 +272,7 @@ def run_once(args: argparse.Namespace) -> None:
         precond_type=None,
         convergence={
             # SCF checks only energy tolerance; others are disabled (inf)
-            "scf_maxiter": int(args.scf_maxiter),
+            "scf_maxiter": scf_maxiter,
             # "density_tol": np.inf,
             "density_tol": float(args.scf_density_tol),
             "orbital_energy_tol": np.inf,
@@ -277,6 +285,7 @@ def run_once(args: argparse.Namespace) -> None:
         occupation={"smearing": "Fermi-Dirac", "temperature": float(args.temperature)},
         eigensolver=eigensolver,
         nbands=nbands,
+        random_seed=args.seed,
     )
     atoms.calc = calc
     calc.initialize(atoms)
@@ -331,7 +340,7 @@ def run_once(args: argparse.Namespace) -> None:
             B=None,
             preconditioner=calc.eigensolver.preconditioner,
             tol=float(args.diag_tol),
-            maxiter=int(args.diag_iter),
+            maxiter=diag_iter,
             nblock=int(args.nblock),
             locking=bool(args.locking),
             fill_block=bool(args.fill_block),
@@ -359,7 +368,7 @@ def main(args: argparse.Namespace) -> None:
     # Warm-up (optional)
     if int(args.warmup):
         with block_all_print():
-            run_once(args)
+            run_once(args, warmup_set=True)
         print("Warm-up finished")
 
     # Actual timed run
@@ -433,7 +442,7 @@ def build_argparser() -> argparse.ArgumentParser:
         "--density_filename",
         type=str,
         default=None,
-        help="charge density filename to save (or for initialization)",
+        help="charge density filename (to save the converged density in the scf phase or to load the initial density in the fixed phase)",
     )
     p.add_argument(
         "--temperature",

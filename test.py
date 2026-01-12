@@ -16,8 +16,7 @@ from gospel.util import Timer, set_global_seed
 
 # Prefer local preconditioner; fall back to gospel's if not present.
 try:
-    # from precondition import create_preconditioner  # local
-    from precondition_new2 import create_preconditioner  # local
+    from precondition import create_preconditioner  # local
 except Exception:
     print("Warning: using gospel's preconditioner instead of local neumann_precond")
     from gospel.Eigensolver.precondition import create_preconditioner  # fallback

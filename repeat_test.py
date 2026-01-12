@@ -873,6 +873,8 @@ def build_cmd(
 
     if phase == "fixed" and include_ret_history:
         cmd.extend(["--retHistory", str(paths.run_history_path(run_idx))])
+    if phase == "scf":
+        cmd.extend(["--retHistoryScfDir", str(paths.history_scf_dir)])
     return [x for x in cmd if x]
 
 

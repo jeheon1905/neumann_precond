@@ -104,25 +104,14 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
         else:
             return int(v)
 
-#-----------modified-------------
     def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
         v = str(v).strip()
-        if v == "dynamic" or v.startswith("res"):
+        if v == "dynamic" or v.startswith("res") or v.startswith("DO"):
             return v
         return int(v)
-#--------------------------------
 
-#    def _outerorder_value(v: Union[int, str]) -> Union[int, str]:
-#        # if isinstance(v, str) and v == "dynamic":
-#        #     return v
-#        if v == "dynamic" or v == "res": ###modified res
-#            return v
-#        else:
-#            return int(v)
-#
     innerorder = _innerorder_value(args.innerorder)
     outerorder = _outerorder_value(args.outerorder)
-    #pcg = int(args.pcg_Neumann)  # kept for compatibility with potential future use
     error_cutoff = float(args.error_cutoff)
 
     if precond_type == "neumann":
@@ -295,6 +284,9 @@ def run_once(args: argparse.Namespace, warmup_set=False) -> None:
 
     # --- Phase: SCF or Fixed ---
     if args.phase == "scf":
+        if args.retHistoryScfDir is not None:
+            os.makedirs(args.retHistoryScfDir, exist_ok = True)
+            calc.parameters["history_scf_dir"] = args.retHistoryScfDir
         _ = atoms.get_potential_energy()
         if args.density_filename is not None:
             torch.save(
@@ -552,6 +544,12 @@ def build_argparser() -> argparse.ArgumentParser:
         type=str,
         default=None,
         help="filename to save (eigHistory, resHistory)",
+    )
+    p.add_argument(
+        "--retHistoryScfDir",
+        type=str,
+        default=None,
+        help="Directory to save SCF Davidson history (.pt per SCF iter)",
     )
     p.add_argument(
         "--merge_iter", type=int, default=5, help="first preconditioner iteration number"

@@ -14,25 +14,34 @@ from gospel.precision import to_DP, to_SP, to_HP, to_BF16
 # TODO: Replace use_cuda argument with device argument for consistency
 
 #--------------modified----------------------
-def _parse_res_order_spec(order_spec: str):
+def _parse_res_DO_order_spec(order_spec: str):
     s = order_spec.strip()
-    if s.startswith("res_(") and s.endswith(")"):
-        inner = s[len("res_("):-1]
-    elif s.startswith("res(") and s.endswith(")"):
-        inner = s[len("res("):-1]
-    elif s.startswith("res[") and s.endswith("]"):
-        inner = s[len("res["):-1]
-    else:
-        return None
+
+    # 1. 껍데기 벗기기 (res 또는 DO 모두 처리)
+    inner = None
+    prefixes = ["res_(", "res(", "res[", "DO_(", "DO(", "DO["]
+    suffixes = [")", ")", "]", ")", ")", "]"]
+
+    for pre, suf in zip(prefixes, suffixes):
+        if s.startswith(pre) and s.endswith(suf):
+            inner = s[len(pre):-1]
+            break
+
+    if inner is None:
+        return None  # 형식이 안 맞으면 None 반환
+
+    # 2. 내용 파싱 (이후 로직은 동일)
     if ";" not in inner:
-        raise ValueError("res(...) requires 'orders;thresholds'")
+        raise ValueError(f"{order_spec} requires 'orders;thresholds'")
+
     orders_part, thr_part = [p.strip() for p in inner.split(";", 1)]
     orders = [int(x.strip()) for x in orders_part.split(",") if x.strip()]
     thresholds = [float(x.strip()) for x in thr_part.split(",") if x.strip()]
-    if len(orders) != len(thresholds) + 1:
-        raise ValueError("res(...) requires len(orders) = len(thresholds) + 1")
-    return orders, thresholds
 
+    if len(orders) != len(thresholds) + 1:
+        raise ValueError("requires len(orders) = len(thresholds) + 1")
+
+    return orders, thresholds
 
 def _choose_res_order(orders, thresholds, residue_norm):
     max_res = float(torch.max(residue_norm))
@@ -708,17 +717,17 @@ class PreNeumann(Preconditioner):
 #----------------------ㅡmodified---------------------------------
 
 #        assert order == "dynamic" or order == "res" or (type(order)==int and order>=0), "order should be int >=0 or 'dynamic' or 'res'"
-        self.res_orders = None
-        self.res_thresholds = None
+        self.orders = None
+        self.thresholds = None
         if isinstance(order, str):
             if order == "dynamic":
                 self.order = order
-            elif order.startswith("res"):
-                parsed = _parse_res_order_spec(order)
+            elif order.startswith("res") or order.startswith("DO"):
+                parsed = _parse_res_DO_order_spec(order)
                 if parsed is None:
-                    raise AssertionError("use res(orders;thresholds)")
-                self.order = "res"
-                self.res_orders, self.res_thresholds = parsed
+                    raise AssertionError("Format error. use res_(orders;thresholds) or DO_(orders;thresholds)")
+                self.order = order
+                self.res_orders, self.res_thresholds = parsed  # FIXME: check this line not used
             else:
                 raise AssertionError("order should be int >=0, 'dynamic', or 'res(...)'")
         else:
@@ -837,54 +846,66 @@ class PreNeumann(Preconditioner):
                             f"(using order(pre<now_break) = {order - 1})")
                     break
         else:
+            #------------------modified-------------------------
+            # determine order when self.order == "res" or "DO"
+            norder = torch.zeros(residue_norm.size(), device = residue_norm.device, dtype = torch.long)
 
-#            # determine order when self.order == res  
-#            print(f"residual = {residue}")
-#            if self.order == "res":
-#                if torch.max(residue_norm) > 1e-0:
-#                    order = 2
-#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-#
-#                elif torch.max(residue_norm) > 1e-1 and torch.max(residue_norm) < 1e-0:
-#                    order = 6
-#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-#
-#                else:
-#                    order = 10
-#                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
-#
-#            else:
-#                order = self.order
+            if str(self.order).startswith("DO"):
+                    orders, thresholds = _parse_res_DO_order_spec(self.order)
+                    norder.fill_(orders[-1])
 
-#------------------modified-------------------------
-            if self.order == "res":
-                order = _choose_res_order(self.res_orders, self.res_thresholds, residue_norm)
+                    for i in range(len(thresholds) -1, -1, -1):
+                        thr = thresholds[i]
+                        ord_val = orders[i]
+                        norder[residue_norm > thr] = ord_val
+
+                    if self.verbosity:
+                        total_count = residue_norm.numel()
+                        print(f"Total residual norms count = {total_count}")
+                        uni_orders, counts = torch.unique(norder, sorted=True, return_counts = True)
+                        print("Order Distribution:")
+                        for ord_val, cnt in zip(uni_orders.tolist(), counts.tolist()):
+                            print(f" Order {ord_val}: Count = {cnt} ({cnt/total_count*100:.2f}%)")
+
+            elif str(self.order).startswith("res"):
+                orders, thresholds = _parse_res_DO_order_spec(self.order)
+                max_res = float(torch.max(residue_norm))
+                selected_order = orders[-1]
+                for idx, thr in enumerate(thresholds):
+                    if max_res > thr:
+                        selected_order = orders[idx]
+                        break
+                norder.fill_(selected_order)
                 if self.verbosity:
-                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {order}")
+                    print(f"max residual norm = {torch.max(residue_norm)}. using order = {selected_order}")
             else:
-                order = self.order
-#--------------------------------------------------
+                order = int(self.order)
+                norder.fill_(order)
+
+
             # Fixed order Neumann series
-#            for order in range(1, self.order + 1):
-            for _ in range(1, order + 1):
+            max_ord = int(torch.max(norder).item())
+            for _ in range(1, max_ord + 1):
+                active = (norder >= _ ).view(-1)
+
+                if not active.any():
+                    break
+
+                active_neumann_term = neumann_term[:, active]
+                active_eigval = eigval[:, active]
+
                 # Compute the next Neumann series and accumulate the result
                 with Timer.track("Neumann. (H - e)x", self.timing, False):
-                    H_minus_eigval_vec = H @ neumann_term - eigval * neumann_term
+                    active_H_minus_eigval_vec = H @ active_neumann_term - active_eigval * active_neumann_term
                 with Timer.track("Neumann. gapp", self.timing, False):
-                    neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
-                preconditioned_result += neumann_term
+                    active_neumann_term -= self.gapp(active_H_minus_eigval_vec).mul_(INV_4PI)
+                preconditioned_result[:,active] += active_neumann_term
+                neumann_term[:,active] = active_neumann_term
 
             if self.verbosity:
                 diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
                 error = torch.norm(diff, dim=0) / residue_norm
-                print(f"error (using order = {order}) = ", torch.log10(error))
-
-        if self.verbosity:
-            # inversion accuracy
-            # print("Neumann result:", torch.linalg.norm(preconditioned_result, axis=0))
-            # print("(H-eI)@precond result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result , axis=0))
-            # print("(H-eI)@precond - residue result:", torch.linalg.norm( H@preconditioned_result - eigval.reshape(1,-1)*preconditioned_result - residue , axis=0))
-            print("res norm (Neumann): ", torch.linalg.norm(H @ preconditioned_result - eigval * preconditioned_result, axis=0))
+                print(f"relative error log10 = {torch.log10(error)}")
 
         return preconditioned_result
 

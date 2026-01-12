@@ -1,0 +1,23 @@
+gnode5 gnode5 gnode5 gnode5
+gnode5
+gnode5
+gnode5
+gnode5
+Tue May 10 13:52:07 KST 2022
+0
+* data type : float32
+* Matrix : 1000 x 1000
+Initialization Time: 0.012638092041015625 sec
+ Numpy time : 0.3046839237213135 sec
+ torch time : 0.19354605674743652 sec
+GeForce RTX 2080 Ti
+time module Time: 0.0008933544158935547 sec
+torch (GPU) Time : 0.022774112701416015 sec
+* data type : float64
+* Matrix : 1000 x 1000
+Initialization Time: 0.012184858322143555 sec
+ Numpy time : 0.37720513343811035 sec
+ torch time : 0.3238227367401123 sec
+GeForce RTX 2080 Ti
+time module Time: 0.0013804435729980469 sec
+torch (GPU) Time : 0.4680830078125 sec

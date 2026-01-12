@@ -1,0 +1,1139 @@
+/home/jhwoo/.conda/envs/GOSPEL_torch11/lib/python3.9/site-packages/ase/io/cif.py:401: UserWarning: crystal system 'cubic' is not interpreted for space group Spacegroup(225, setting=1). This may result in wrong setting!
+  warnings.warn(
+/home/jhwoo/.conda/envs/GOSPEL_torch11/lib/python3.9/site-packages/scipy/sparse/_index.py:146: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is more efficient.
+  self._set_arrayXarray(i, j, x)
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[0.01173394 0.00826817 0.01209586 0.01265797 0.02974087 0.072371
+ 0.09052507 0.0228732  0.05570763 0.09024572 0.10147881 0.14049199
+ 0.167471   0.06598042 0.08003496 0.16215341 0.14296595 0.10932223
+ 0.13484202 0.12957506]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+/home/jhwoo/programs/gospel/gospel/smearing_functions.py:11: RuntimeWarning: overflow encountered in exp
+  return 1 / (np.exp(val) + 1)
+Date :  2022-05-26 14:05:06.399963
+
+============================= [ Grid ] =============================
+* cell     (Bohr) : 
+[[7.958 0.    0.   ]
+ [0.    7.958 0.   ]
+ [0.    0.    7.958]]
+* cell     (ang ) : 
+[[4.211 0.    0.   ]
+ [0.    4.211 0.   ]
+ [0.    0.    4.211]]
+* spacings (Bohr) : [0.274 0.274 0.274]
+* spacings (ang ) : [0.145 0.145 0.145]
+* gpts            : [29 29 29]
+* ngpts           : 24389
+* pbc             : [ True  True  True]
+* FD_order        : 3
+* center_point    : [3.97900733 3.97900733 3.97900733] (Bohr)
+====================================================================
+
+
+============================ [ Kpoint ] =============================
+* kpts mesh : (1, 1, 1, 'gamma')
+Print all k-points and mapping to irreducible k-points
+  1 ->  1 : [0. 0. 0.]
+
+* nkpts   : 1
+* nibzkpts: 1
+=====================================================================
+
+Warning: 'rho_cutoff'(=0.0) value is too large or small. 'rho_cutoff' is set to 20.0.
+Warning: 'rho_cutoff'(=0.0) value is too large or small. 'rho_cutoff' is set to 20.0.
+Elapsed time[_calc_energy_correction]: 0.013192176818847656 sec
+
+=========================== [ Compensation ] ==========================
+ symbol | r_gauss | r_short (Bohr) | r_comp (Bohr)
+      O |     1.0 |           3.58 |         3.727
+     Mg |     1.0 |           4.16 |         3.577
+=======================================================================
+
+Elapsed time[calc_local_pot]: 0.06031203269958496 sec
+KB projector non-zero ratio: 17.023775355400268 %
+
+========================== [ KB_projector ] ==========================
+* number of atoms : 8
+* use_dense_proj  : False
+ index | symbol | # of projectors
+     0 |     Mg |               4
+     1 |     Mg |               4
+     2 |     Mg |               4
+     3 |     Mg |               4
+     4 |      O |               3
+     5 |      O |               3
+     6 |      O |               3
+     7 |      O |               3
+======================================================================
+
+Elapsed time[create_Pseudopotential]: 0.35522890090942383 sec
+
+========================= [ Pseudopotential ] =========================
+* type      : NCPP
+* upf       : 
+    ../tests/DATA/O.pbe-n-nc.UPF
+    ../tests/DATA/Mg.pbe-n-nc.UPF
+* NLCC      : True
+* use_comp  : True
+* comp_grid : 0.1
+* filtering : False
+=======================================================================
+
+'Poisson_ISF_python.py'
+ISF_cutoff is set to [100 100 100].
+ISF method is used for Poisson
+* [0.05, 0.2] : 12 points
+* [0.2, 0.4] : 12 points
+* [0.4, 2.0] : 12 points
+* [2.0, 500.0] : 12 points
+
+============================= [ Poisson ] =============================
+* type          : ISF
+* use_fine_grid : False
+* ISF_cutoff    : [100 100 100]
+=======================================================================
+
+
+========================== [ XC_Functional ] ==========================
+* functional : ['lda_x' 'lda_c_pz']
+* weight     : [1. 1.]
+
+Functional ID: 1
+Functional Name: lda_x
+Attributes:
+    Name: Slater exchange
+    Kind: 0
+  Family: 1
+Citations:
+   P. A. M. Dirac, Math. Proc. Cambridge Philos. Soc. 26, 376 (1930)
+   F. Bloch, Z. Phys. 57, 545 (1929)
+Functional ID: 9
+Functional Name: lda_c_pz
+Attributes:
+    Name: Perdew & Zunger
+    Kind: 1
+  Family: 1
+Citations:
+   J. P. Perdew and A. Zunger, Phys. Rev. B 23, 5048 (1981)
+=======================================================================
+
+
+========================== [ Occupation ] ==========================
+* smearing    : Fermi-Dirac
+* temperature : 0.01
+* nelec       : 32.0
+* nspins      : 1
+* nbands      : 20
+* nkpts       : 1
+====================================================================
+
+
+========================== [ Preconditioner ] =========================
+* precond_type  : None
+=======================================================================
+
+
+====================== [ Eigensolver(Tucker) ] ======================
+* type          : tucker
+* convg_tol     : 1e-07
+* maxiter       : 20
+* tucker_iter   : 1
+* ranks         : (12, 12, 12)
+* ignore_kbproj : True
+* diag_method   : lobpcg
+* local_shift   : -500.0
+* mode          : hosvd
+=====================================================================
+
+Elapsed time[calc_NLCC_core_density]: 0.03121805191040039 sec
+
+============================ [ Density ] ===========================
+* nelec         : 32.0
+* nspins        : 1
+* magmom        : 0.0
+* fix_magmom    : True
+* density guess : rhoatom
+* orbital guess : None
+* occ guess     : None
+=====================================================================
+
+=========================[ Input Parameters ]=========================
+{'centered': False,
+ 'convergence': {'density_tol': 0.0001,
+                 'energy_tol': 1e-06,
+                 'orbital_energy_tol': 1e-06,
+                 'scf_maxiter': 35},
+ 'eigensolver': {'check_residue': False,
+                 'ignore_kbproj': True,
+                 'ranks': (12, 12, 12),
+                 'type': 'tucker'},
+ 'force': {'deriv_comp': True, 'deriv_density': False},
+ 'grid': {'FD_order': 3, 'gpts': (29, 29, 29), 'spacing': None},
+ 'init_guess': {'density': 'rhoatom', 'occ': None, 'orbital': None},
+ 'kpts': (1, 1, 1, 'gamma'),
+ 'kpts_and_weights': None,
+ 'mixing': {'history': 3,
+            'parameter': 0.2,
+            'pulay_beta': 0.3,
+            'scheme': 'pulay',
+            'what': 'density'},
+ 'nbands': None,
+ 'nelec': None,
+ 'occupation': {'MP_order': 2,
+                'fix_magmom': True,
+                'magmom': 0.0,
+                'smearing': 'Fermi-Dirac',
+                'temperature': 0.01},
+ 'output_file': None,
+ 'poisson': None,
+ 'pp': {'NLCC': True,
+        'comp_grid': 0.1,
+        'filtering': False,
+        'num_near_cell': 1,
+        'upf': ['../tests/DATA/O.pbe-n-nc.UPF',
+                '../tests/DATA/Mg.pbe-n-nc.UPF'],
+        'use_comp': True,
+        'use_dense_proj': False},
+ 'precond_type': None,
+ 'print_energies': False,
+ 'spin': 'unpolarized',
+ 'symmetry': True,
+ 'use_cuda': False,
+ 'verbose': 0,
+ 'xc': {'type': 'lda_x + lda_c_pz', 'weight': None}}
+
+* pbc                      : [ True  True  True]
+
+* Positions of atoms (ang) :
+Mg : [0. 0. 0.]
+Mg : [0.     2.1056 2.1056]
+Mg : [2.1056 0.     2.1056]
+Mg : [2.1056 2.1056 0.    ]
+O : [2.1056 2.1056 2.1056]
+O : [2.1056 0.     0.    ]
+O : [0.     2.1056 0.    ]
+O : [0.     0.     2.1056]
+======================================================================
+Elapsed time[initialize]: 0.5813436508178711 sec
+
+============================ [ Mixing ] =============================
+* what       : density
+* scheme     : pulay
+* parameter  : 0.2
+* pulay_beta : 0.3
+* history    : 3
+=====================================================================
+
+
+============================== [ SCF ] ==============================
+* scf_maxiter        : 35
+* energy_tol         : 1e-06
+* density_tol        : 0.0001
+* orbital_energy_tol : 1e-06
+=====================================================================
+
+
+==================== [ SCF CYCLE 1 ] ====================
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+WARNING!! method<Grid.spherical_to_grid()>: 'num_near_cell'(=1) is not sufficent to interpolate the effects of nearing cells.
+integral of init_density :  31.99808069922719
+Integral of density (=31.99808069922719) is normalized to 31.999999999999996
+Elapsed time[compute_potential]: 0.008795022964477539 sec
+Elapsed time[compute]: 0.00394892692565918 sec
+Elapsed time[_get_mixed_var]: 6.198883056640625e-06 sec
+==== Tucker Diagonalization ====
+Elapsed time[decompose]: 0.65863037109375 sec
+Elapsed time[project_kinetic_to_core]: 0.02229475975036621 sec
+Elapsed time[project_local_potential_to_core]: 0.046211957931518555 sec
+Elapsed time[project_KB_projectors_to_core]: 0.013492822647094727 sec
+Elapsed time[restore_orbital]: 0.0020635128021240234 sec
+Elapsed time[core_diagonalize]: 0.1880786418914795 sec
+Elapsed time[diagonalize]: 0.9379076957702637 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7123781394282533
+2          2.0        -0.6639536868176955
+3          2.0        -0.6639396956306984
+4          2.0        -0.6637604643030539
+5          2.0        -0.1403169745492356
+6          2.0        -0.13910471573416305
+7          2.0        -0.13842715711719467
+8          2.0        -0.01995080283464584
+9          2.0        -0.019098600369524838
+10         2.0        -0.016614606338347743
+11         2.0        -0.01350404440647148
+12         2.0        -0.011326715336518732
+13         2.0        -0.008608441540807735
+14         2.0        0.04779104739678715
+15         2.0        0.048259532508483506
+16         2.0        0.05344187704723859
+17         0.0        0.14848710360359438
+18         0.0        0.32814332325029055
+19         0.0        0.3450382419328673
+20         0.0        0.35387748781187245
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[1.50699471e-06 1.96192288e-06 1.95580625e-06 1.85234370e-06
+ 4.08100001e-05 7.64848738e-05 6.86959055e-05 1.93987157e-04
+ 2.45445300e-04 2.36378749e-04 1.82327007e-04 2.95188982e-04
+ 3.54904298e-04 3.40007644e-04 9.32282283e-05 5.22381744e-04
+ 1.50695823e-03 1.81525546e-02 3.77657216e-02 7.98450186e-02]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.000000009237766) is normalized to 32.00000000000001
+Orbital energy difference = -6.122983174908203
+Density difference (relative) = 0.20679641644671665
+Elapsed time for 1 th cycle: 1.4051499366760254 sec
+
+==================== [ END CYCLE 1 ] ====================
+Elapsed time[_get_mixed_var]: 4.649162292480469e-05 sec
+Elapsed time[compute_potential]: 0.008950948715209961 sec
+Elapsed time[compute]: 0.00407862663269043 sec
+
+==================== [ SCF CYCLE 2 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.0710446834564209 sec
+Elapsed time[restore_orbital]: 0.002485990524291992 sec
+Elapsed time[core_diagonalize]: 0.24507808685302734 sec
+Elapsed time[diagonalize]: 0.3163127899169922 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7140411486523112
+2          2.0        -0.6684134911861735
+3          2.0        -0.6657925421495638
+4          2.0        -0.6642257504713593
+5          2.0        -0.1397783757659048
+6          2.0        -0.13957035418944233
+7          2.0        -0.13944935079543716
+8          2.0        -0.020158828525603197
+9          2.0        -0.01911354949547522
+10         2.0        -0.018786431276878943
+11         2.0        -0.017763468569607414
+12         2.0        -0.017241215886083603
+13         2.0        -0.016091163785257316
+14         2.0        0.04605572964897711
+15         2.0        0.046120743052678645
+16         2.0        0.04634110675391269
+17         0.0        0.13952532319738392
+18         0.0        0.3223839283779398
+19         0.0        0.32304336953844237
+20         0.0        0.326705832525326
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[3.37661073e-07 1.18886312e-06 8.73590963e-07 1.10158387e-06
+ 1.62393701e-06 2.93602214e-06 1.19243749e-06 3.50450299e-06
+ 4.51590808e-06 5.30859809e-06 4.36698571e-06 4.31768161e-06
+ 4.75346780e-06 5.61414903e-06 6.65083190e-06 7.81899433e-06
+ 3.17390909e-05 7.14949853e-03 9.28223056e-03 1.97379221e-03]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=31.99999999999997) is normalized to 31.999999999999996
+Orbital energy difference = -0.08083300767885504
+Density difference (relative) = 0.1648917781752021
+Elapsed time for 2 th cycle: 0.32039308547973633 sec
+
+==================== [ END CYCLE 2 ] ====================
+Elapsed time[_get_mixed_var]: 8.726119995117188e-05 sec
+Elapsed time[compute_potential]: 0.008948802947998047 sec
+Elapsed time[compute]: 0.004140138626098633 sec
+
+==================== [ SCF CYCLE 3 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05397152900695801 sec
+Elapsed time[restore_orbital]: 0.002354145050048828 sec
+Elapsed time[core_diagonalize]: 0.20648622512817383 sec
+Elapsed time[diagonalize]: 0.2606484889984131 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7132379063643053
+2          2.0        -0.6673259092135415
+3          2.0        -0.6661284194554764
+4          2.0        -0.6634804970391297
+5          2.0        -0.13792002093636557
+6          2.0        -0.13775764941236684
+7          2.0        -0.137673452310277
+8          2.0        -0.017834532918414317
+9          2.0        -0.01739098551654735
+10         2.0        -0.017280307861107132
+11         2.0        -0.015781166598429666
+12         2.0        -0.015517429572687563
+13         2.0        -0.01499200060053874
+14         2.0        0.04770062693714851
+15         2.0        0.04774624554757187
+16         2.0        0.0479168189083648
+17         0.0        0.138686662194017
+18         0.0        0.3235944528026005
+19         0.0        0.32376446430240574
+20         0.0        0.32389017710431406
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[5.63828297e-07 2.44387536e-06 2.43967874e-06 3.66589939e-06
+ 1.27058443e-05 1.22872163e-05 9.09574144e-06 6.98979633e-06
+ 1.49858269e-05 1.11246331e-05 1.36806444e-05 8.60067356e-06
+ 8.00714370e-06 1.30828838e-05 8.78575026e-06 1.08244607e-05
+ 3.66925646e-05 3.12258396e-03 1.53092748e-03 6.18314820e-04]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=31.999999999999954) is normalized to 31.999999999999996
+Orbital energy difference = 0.04590300977485384
+Density difference (relative) = 0.13014711478135133
+Elapsed time for 3 th cycle: 0.26433706283569336 sec
+
+==================== [ END CYCLE 3 ] ====================
+Elapsed time[_get_mixed_var]: 0.0007698535919189453 sec
+Elapsed time[compute_potential]: 0.009004354476928711 sec
+Elapsed time[compute]: 0.004133939743041992 sec
+
+==================== [ SCF CYCLE 4 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.053991079330444336 sec
+Elapsed time[restore_orbital]: 0.0037009716033935547 sec
+Elapsed time[core_diagonalize]: 0.22677898406982422 sec
+Elapsed time[diagonalize]: 0.2810096740722656 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7050088933567279
+2          2.0        -0.6591599897651911
+3          2.0        -0.6589567696392838
+4          2.0        -0.6550828222375432
+5          2.0        -0.12807967785998953
+6          2.0        -0.12807355698941958
+7          2.0        -0.12807132103874458
+8          2.0        -0.006955545623946168
+9          2.0        -0.006894688594220962
+10         2.0        -0.0068136765918410756
+11         2.0        -0.0050999285013435675
+12         2.0        -0.005024899019571323
+13         2.0        -0.004977425281710763
+14         2.0        0.05873886353296891
+15         2.0        0.05874079198676879
+16         2.0        0.058751263494735424
+17         0.0        0.1384158722708261
+18         0.0        0.3304249546229725
+19         0.0        0.33043440850647293
+20         0.0        0.33043982634841373
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[3.26690977e-08 9.77144823e-08 1.40731625e-07 6.06451300e-08
+ 6.39415911e-07 6.48353972e-07 6.61523369e-07 9.04089242e-07
+ 1.24138970e-06 1.16267521e-06 5.78459454e-07 7.19695731e-07
+ 5.23584884e-07 3.93919353e-07 1.09983616e-06 6.01788008e-07
+ 4.03003913e-06 8.04507635e-04 3.37613615e-04 2.34512668e-04]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000006) is normalized to 32.0
+Orbital energy difference = 0.31397662184208297
+Density difference (relative) = 0.005769268933609366
+Elapsed time for 4 th cycle: 0.288440465927124 sec
+
+==================== [ END CYCLE 4 ] ====================
+Elapsed time[_get_mixed_var]: 0.0010285377502441406 sec
+Elapsed time[compute_potential]: 0.009882450103759766 sec
+Elapsed time[compute]: 0.004686117172241211 sec
+
+==================== [ SCF CYCLE 5 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05592823028564453 sec
+Elapsed time[restore_orbital]: 0.002057790756225586 sec
+Elapsed time[core_diagonalize]: 0.17806267738342285 sec
+Elapsed time[diagonalize]: 0.23418140411376953 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7031762848551979
+2          2.0        -0.6570086033846637
+3          2.0        -0.6567533000970445
+4          2.0        -0.6533129936448863
+5          2.0        -0.1270489764315331
+6          2.0        -0.1270412073749341
+7          2.0        -0.12703639229775168
+8          2.0        -0.005569178693014144
+9          2.0        -0.00546149239176451
+10         2.0        -0.0054189447795897
+11         2.0        -0.0035197449554947675
+12         2.0        -0.0034649573662628324
+13         2.0        -0.0033538909612739233
+14         2.0        0.06052985624010138
+15         2.0        0.06053518546554142
+16         2.0        0.06054869367172227
+17         0.0        0.13895953376988285
+18         0.0        0.3305898876732852
+19         0.0        0.3306058368666841
+20         0.0        0.33061313410844423
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[4.32774788e-08 7.23418502e-08 3.39448901e-08 6.33934349e-08
+ 8.29495579e-08 1.05177262e-07 7.80302522e-08 1.54804873e-07
+ 1.79187976e-07 1.68469300e-07 1.06483017e-07 1.75417425e-07
+ 1.85569657e-07 2.04865756e-07 1.97097261e-07 2.87879879e-07
+ 1.38070357e-06 3.51589682e-04 1.29063630e-04 7.95621787e-05]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.000000000000064) is normalized to 31.999999999999996
+Orbital energy difference = 0.05083208725802901
+Density difference (relative) = 0.0025926027206861373
+Elapsed time for 5 th cycle: 0.23720598220825195 sec
+
+==================== [ END CYCLE 5 ] ====================
+Elapsed time[_get_mixed_var]: 0.00063323974609375 sec
+Elapsed time[compute_potential]: 0.008901596069335938 sec
+Elapsed time[compute]: 0.00417780876159668 sec
+
+==================== [ SCF CYCLE 6 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.04566597938537598 sec
+Elapsed time[restore_orbital]: 0.0027856826782226562 sec
+Elapsed time[core_diagonalize]: 0.23451781272888184 sec
+Elapsed time[diagonalize]: 0.28035974502563477 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7031525215075033
+2          2.0        -0.6568874029528281
+3          2.0        -0.656826242124877
+4          2.0        -0.653249545869499
+5          2.0        -0.1270670618218506
+6          2.0        -0.12705937871516423
+7          2.0        -0.12705602586702266
+8          2.0        -0.005501657666547065
+9          2.0        -0.005478749309575629
+10         2.0        -0.0054730553742898215
+11         2.0        -0.0034847587346622947
+12         2.0        -0.003469582923037241
+13         2.0        -0.003442675688870805
+14         2.0        0.060534220755589035
+15         2.0        0.06053702287419768
+16         2.0        0.06054671014665833
+17         0.0        0.1389946588512047
+18         0.0        0.33058272104906994
+19         0.0        0.33059488649831725
+20         0.0        0.3306009816034188
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[2.83533004e-08 5.58411452e-08 6.51783620e-08 7.57645354e-08
+ 8.35530585e-08 1.03049353e-07 9.02927121e-08 1.08007517e-07
+ 1.12645537e-07 8.77504880e-08 1.18851314e-07 9.04496126e-08
+ 1.04634832e-07 6.60541682e-08 1.74225484e-07 7.57787662e-08
+ 8.13382123e-07 8.98835206e-05 3.91553814e-05 2.52084703e-05]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000012) is normalized to 32.00000000000001
+Orbital energy difference = 4.305415352678921e-05
+Density difference (relative) = 0.0014043680384821734
+Elapsed time for 6 th cycle: 0.2851831912994385 sec
+
+==================== [ END CYCLE 6 ] ====================
+Elapsed time[_get_mixed_var]: 0.0006508827209472656 sec
+Elapsed time[compute_potential]: 0.013956069946289062 sec
+Elapsed time[compute]: 0.0056459903717041016 sec
+
+==================== [ SCF CYCLE 7 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.0634467601776123 sec
+Elapsed time[restore_orbital]: 0.0025224685668945312 sec
+Elapsed time[core_diagonalize]: 0.21067047119140625 sec
+Elapsed time[diagonalize]: 0.2742931842803955 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7033726499636992
+2          2.0        -0.6571179244849594
+3          2.0        -0.6570969605225614
+4          2.0        -0.6534676217449646
+5          2.0        -0.1272142086136577
+6          2.0        -0.1272101477425222
+7          2.0        -0.1272086750174431
+8          2.0        -0.00569581024495702
+9          2.0        -0.005687952437087273
+10         2.0        -0.0056770822141111775
+11         2.0        -0.003686748669975296
+12         2.0        -0.003677521574976669
+13         2.0        -0.003673574780833481
+14         2.0        0.060299137663211516
+15         2.0        0.06029985343828445
+16         2.0        0.060303830392646654
+17         0.0        0.13895825387024072
+18         0.0        0.3305710424944288
+19         0.0        0.33057624672341424
+20         0.0        0.3305791977926659
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[3.48310115e-08 5.11322067e-08 5.34256108e-08 4.71802879e-08
+ 6.93452735e-08 5.41634655e-08 5.59963491e-08 7.33955962e-08
+ 7.65991935e-08 6.43999725e-08 8.41602140e-08 7.52558754e-08
+ 6.97973887e-08 6.71165987e-08 7.93373034e-08 7.35555773e-08
+ 2.43709895e-07 2.74796701e-05 1.00798377e-05 7.37234096e-06]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000009) is normalized to 32.00000000000001
+Orbital energy difference = -0.006706703476647036
+Density difference (relative) = 0.00018499854549497855
+Elapsed time for 7 th cycle: 0.2781333923339844 sec
+
+==================== [ END CYCLE 7 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005557537078857422 sec
+Elapsed time[compute_potential]: 0.0095977783203125 sec
+Elapsed time[compute]: 0.00428009033203125 sec
+
+==================== [ SCF CYCLE 8 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05317044258117676 sec
+Elapsed time[restore_orbital]: 0.002633810043334961 sec
+Elapsed time[core_diagonalize]: 0.20520615577697754 sec
+Elapsed time[diagonalize]: 0.2585434913635254 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034132605823759
+2          2.0        -0.6571526245233742
+3          2.0        -0.657150639246808
+4          2.0        -0.6535182563767005
+5          2.0        -0.1272356957290174
+6          2.0        -0.1272335268551638
+7          2.0        -0.12723265295137767
+8          2.0        -0.005726166868629643
+9          2.0        -0.005723766817807347
+10         2.0        -0.005722036217935883
+11         2.0        -0.0037130375929839963
+12         2.0        -0.0037117773867229413
+13         2.0        -0.0037107502403862895
+14         2.0        0.06025813139547012
+15         2.0        0.06025862138103332
+16         2.0        0.060260846176470664
+17         0.0        0.1389490421174058
+18         0.0        0.3305745164156808
+19         0.0        0.330577481968709
+20         0.0        0.33057909919777384
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[3.83121307e-08 5.12507413e-08 4.30189919e-08 4.38154061e-08
+ 5.54577394e-08 5.76377421e-08 5.04877524e-08 5.93134358e-08
+ 5.86287513e-08 5.74680016e-08 6.84253598e-08 5.47916011e-08
+ 8.70540153e-08 6.00100136e-08 7.32072065e-08 6.86234863e-08
+ 1.83698379e-07 4.66639089e-06 1.41775024e-06 3.39214825e-06]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000005) is normalized to 32.00000000000001
+Orbital energy difference = -0.0011650718374065505
+Density difference (relative) = 9.226399954402817e-05
+Elapsed time for 8 th cycle: 0.26215243339538574 sec
+
+==================== [ END CYCLE 8 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005249977111816406 sec
+Elapsed time[compute_potential]: 0.00902700424194336 sec
+Elapsed time[compute]: 0.004100322723388672 sec
+
+==================== [ SCF CYCLE 9 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05275583267211914 sec
+Elapsed time[restore_orbital]: 0.0033359527587890625 sec
+Elapsed time[core_diagonalize]: 0.1977078914642334 sec
+Elapsed time[diagonalize]: 0.2506275177001953 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.703419751756103
+2          2.0        -0.6571600914388299
+3          2.0        -0.6571570751852552
+4          2.0        -0.6535286070563874
+5          2.0        -0.12723626140317637
+6          2.0        -0.1272356824866259
+7          2.0        -0.12723544446517762
+8          2.0        -0.0057307248087687165
+9          2.0        -0.005729717281711073
+10         2.0        -0.005729520750465981
+11         2.0        -0.0037160828218199818
+12         2.0        -0.003715259643658269
+13         2.0        -0.003713895632170909
+14         2.0        0.06025267249316418
+15         2.0        0.06025286752164989
+16         2.0        0.06025355848067644
+17         0.0        0.13894785030715287
+18         0.0        0.3305799291194436
+19         0.0        0.3305809281912292
+20         0.0        0.33058136424021217
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[5.14591585e-08 3.52787602e-08 4.40768817e-08 3.75337349e-08
+ 6.92106341e-08 5.16050214e-08 7.27686367e-08 4.58240722e-08
+ 4.45238379e-08 7.38524021e-08 6.64813012e-08 5.57376958e-08
+ 5.67617740e-08 4.49574204e-08 4.66585638e-08 5.32038864e-08
+ 9.74495420e-08 1.63042101e-06 1.10429809e-06 2.21258763e-06]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.000000000000085) is normalized to 32.0
+Orbital energy difference = -0.00016484759670021276
+Density difference (relative) = 4.824653654357312e-05
+Elapsed time for 9 th cycle: 0.25432848930358887 sec
+
+==================== [ END CYCLE 9 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005509853363037109 sec
+Elapsed time[compute_potential]: 0.00921630859375 sec
+Elapsed time[compute]: 0.004034519195556641 sec
+
+==================== [ SCF CYCLE 10 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05358171463012695 sec
+Elapsed time[restore_orbital]: 0.002729654312133789 sec
+Elapsed time[core_diagonalize]: 0.18878555297851562 sec
+Elapsed time[diagonalize]: 0.24253320693969727 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034131248163032
+2          2.0        -0.6571515679960506
+3          2.0        -0.6571512253869655
+4          2.0        -0.6535217254842282
+5          2.0        -0.12723088103615618
+6          2.0        -0.12723076165930064
+7          2.0        -0.12723054525952374
+8          2.0        -0.005724395684448682
+9          2.0        -0.005724174735360324
+10         2.0        -0.005723906452442806
+11         2.0        -0.0037086574845175244
+12         2.0        -0.003708489459929885
+13         2.0        -0.0037083344244982232
+14         2.0        0.06025994803320373
+15         2.0        0.06026010444737695
+16         2.0        0.06026012412706652
+17         0.0        0.1389499955495878
+18         0.0        0.3305834207397042
+19         0.0        0.3305836357721732
+20         0.0        0.33058374009417724
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[4.71720011e-08 5.57533666e-08 5.55062172e-08 5.60205703e-08
+ 8.43170450e-08 7.62717744e-08 8.62273341e-08 6.98546310e-08
+ 6.92282592e-08 6.69533269e-08 6.84923417e-08 5.74380681e-08
+ 8.33599330e-08 7.51505999e-08 8.15989887e-08 6.28948481e-08
+ 5.71261175e-08 6.64899182e-07 4.98933428e-07 1.02047520e-06]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=31.999999999999996) is normalized to 32.00000000000001
+Orbital energy difference = 0.00020280592516197515
+Density difference (relative) = 1.238261585158643e-05
+Elapsed time for 10 th cycle: 0.24608826637268066 sec
+
+==================== [ END CYCLE 10 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005919933319091797 sec
+Elapsed time[compute_potential]: 0.00938105583190918 sec
+Elapsed time[compute]: 0.004038095474243164 sec
+
+==================== [ SCF CYCLE 11 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05137133598327637 sec
+Elapsed time[restore_orbital]: 0.002584695816040039 sec
+Elapsed time[core_diagonalize]: 0.18416953086853027 sec
+Elapsed time[diagonalize]: 0.23570656776428223 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034107010201041
+2          2.0        -0.6571489238355339
+3          2.0        -0.6571486205240208
+4          2.0        -0.6535188845770719
+5          2.0        -0.1272293048592537
+6          2.0        -0.1272292020351562
+7          2.0        -0.12722900111104118
+8          2.0        -0.005722074333326961
+9          2.0        -0.005722034580217988
+10         2.0        -0.005721915401018773
+11         2.0        -0.003706557827473577
+12         2.0        -0.003706427086980803
+13         2.0        -0.0037063057297814436
+14         2.0        0.06026240864215591
+15         2.0        0.060262583738393584
+16         2.0        0.06026261848935847
+17         0.0        0.1389507546466995
+18         0.0        0.33058395317223843
+19         0.0        0.33058413539217757
+20         0.0        0.33058429872980505
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[5.24380645e-08 6.96090387e-08 5.13720727e-08 7.91363314e-08
+ 5.45078945e-08 4.83651228e-08 5.25391293e-08 5.33549615e-08
+ 5.07921010e-08 4.29696993e-08 5.70238551e-08 4.85520906e-08
+ 5.46731829e-08 5.32867907e-08 5.73537651e-08 5.64420743e-08
+ 6.89070497e-08 1.76882133e-07 1.39916608e-07 3.36282805e-07]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000002) is normalized to 31.999999999999996
+Orbital energy difference = 7.054244201043502e-05
+Density difference (relative) = 7.180240275514826e-06
+Elapsed time for 11 th cycle: 0.23944091796875 sec
+
+==================== [ END CYCLE 11 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005435943603515625 sec
+Elapsed time[compute_potential]: 0.009425163269042969 sec
+Elapsed time[compute]: 0.0040683746337890625 sec
+
+==================== [ SCF CYCLE 12 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05187416076660156 sec
+Elapsed time[restore_orbital]: 0.003485441207885742 sec
+Elapsed time[core_diagonalize]: 0.19460129737854004 sec
+Elapsed time[diagonalize]: 0.2467498779296875 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034103366494684
+2          2.0        -0.6571484395229219
+3          2.0        -0.6571483630902062
+4          2.0        -0.6535183508752515
+5          2.0        -0.127228997469664
+6          2.0        -0.12722898227731022
+7          2.0        -0.12722894744953406
+8          2.0        -0.005721657306491195
+9          2.0        -0.005721642210534075
+10         2.0        -0.005721629961202321
+11         2.0        -0.0037062729342555727
+12         2.0        -0.003706235591991072
+13         2.0        -0.0037062084304449595
+14         2.0        0.060262859195099404
+15         2.0        0.06026289235085109
+16         2.0        0.060262900559740436
+17         0.0        0.13895090492665724
+18         0.0        0.33058417138513707
+19         0.0        0.33058420395375543
+20         0.0        0.33058423015953015
+
+
+/home/jhwoo/programs/tucy/tucy/Tucy.py:113: UserWarning: Exited at iteration 20 with accuracies 
+[5.52348677e-08 4.94094814e-08 5.68068977e-08 5.65958643e-08
+ 8.68634820e-08 8.41662407e-08 6.91651846e-08 7.56086962e-08
+ 7.31138707e-08 7.33868209e-08 7.14406449e-08 7.56422970e-08
+ 8.31450534e-08 9.01396308e-08 8.41349213e-08 6.93225617e-08
+ 8.18556125e-08 1.62874079e-07 1.02663972e-07 9.79231370e-08]
+not reaching the requested tolerance 1e-07.
+  val, vec = scipy.sparse.linalg.lobpcg(**solve_options)
+Integral of density (=32.00000000000005) is normalized to 32.0
+Orbital energy difference = 9.860774976999664e-06
+Density difference (relative) = 3.9619482575036e-06
+Elapsed time for 12 th cycle: 0.2506103515625 sec
+
+==================== [ END CYCLE 12 ] ====================
+Elapsed time[_get_mixed_var]: 0.0007679462432861328 sec
+Elapsed time[compute_potential]: 0.009460926055908203 sec
+Elapsed time[compute]: 0.0043408870697021484 sec
+
+==================== [ SCF CYCLE 13 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.05139780044555664 sec
+Elapsed time[restore_orbital]: 0.0020236968994140625 sec
+Elapsed time[core_diagonalize]: 0.1387641429901123 sec
+Elapsed time[diagonalize]: 0.19037389755249023 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034107546432995
+2          2.0        -0.6571488960199868
+3          2.0        -0.6571488500686321
+4          2.0        -0.6535187856564608
+5          2.0        -0.12722927310534476
+6          2.0        -0.1272292458004406
+7          2.0        -0.12722923054588367
+8          2.0        -0.0057220099254664545
+9          2.0        -0.00572199324148839
+10         2.0        -0.005721987048537897
+11         2.0        -0.003706666663509512
+12         2.0        -0.0037066502105532104
+13         2.0        -0.003706633857569283
+14         2.0        0.060262430290186145
+15         2.0        0.060262434741912306
+16         2.0        0.0602624592390329
+17         0.0        0.13895081571483758
+18         0.0        0.3305841366782177
+19         0.0        0.3305841692160533
+20         0.0        0.33058419114870113
+
+
+Integral of density (=32.00000000000009) is normalized to 31.999999999999996
+Orbital energy difference = -1.2481704913192004e-05
+Density difference (relative) = 2.053843965743304e-06
+Elapsed time for 13 th cycle: 0.19371700286865234 sec
+
+==================== [ END CYCLE 13 ] ====================
+Elapsed time[_get_mixed_var]: 0.0004811286926269531 sec
+Elapsed time[compute_potential]: 0.009186267852783203 sec
+Elapsed time[compute]: 0.003950357437133789 sec
+
+==================== [ SCF CYCLE 14 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.047335147857666016 sec
+Elapsed time[restore_orbital]: 0.004125833511352539 sec
+Elapsed time[core_diagonalize]: 0.0950174331665039 sec
+Elapsed time[diagonalize]: 0.142561674118042 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034110256204816
+2          2.0        -0.6571491928073055
+3          2.0        -0.6571491540339407
+4          2.0        -0.6535190698071641
+5          2.0        -0.12722946854334333
+6          2.0        -0.1272294342412536
+7          2.0        -0.12722941869909224
+8          2.0        -0.005722266543491845
+9          2.0        -0.00572224095416053
+10         2.0        -0.005722238250284178
+11         2.0        -0.003706937939631002
+12         2.0        -0.0037069183113095823
+13         2.0        -0.00370689663155176
+14         2.0        0.06026212910974512
+15         2.0        0.06026213666441741
+16         2.0        0.06026217001294038
+17         0.0        0.138950768759498
+18         0.0        0.33058409861874305
+19         0.0        0.3305841389848592
+20         0.0        0.33058416591590617
+
+
+Integral of density (=31.99999999999999) is normalized to 32.00000000000001
+Orbital energy difference = -8.348159731497162e-06
+Density difference (relative) = 8.962428899760506e-07
+Elapsed time for 14 th cycle: 0.14895057678222656 sec
+
+==================== [ END CYCLE 14 ] ====================
+Elapsed time[_get_mixed_var]: 0.001356363296508789 sec
+Elapsed time[compute_potential]: 0.009599924087524414 sec
+Elapsed time[compute]: 0.0044443607330322266 sec
+
+==================== [ SCF CYCLE 15 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.053400278091430664 sec
+Elapsed time[restore_orbital]: 0.0018544197082519531 sec
+Elapsed time[core_diagonalize]: 0.04812002182006836 sec
+Elapsed time[diagonalize]: 0.10203123092651367 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034109636932575
+2          2.0        -0.6571491036635408
+3          2.0        -0.6571490918015529
+4          2.0        -0.6535190145073234
+5          2.0        -0.1272294196987707
+6          2.0        -0.1272294040643696
+7          2.0        -0.12722939799643943
+8          2.0        -0.005722222555573814
+9          2.0        -0.005722208362048909
+10         2.0        -0.005722206764825671
+11         2.0        -0.0037068693425737023
+12         2.0        -0.0037068608610830002
+13         2.0        -0.003706851165861468
+14         2.0        0.06026219375104332
+15         2.0        0.06026219803279103
+16         2.0        0.06026221435303036
+17         0.0        0.13895079600604263
+18         0.0        0.3305841304165293
+19         0.0        0.3305841511610219
+20         0.0        0.3305841626945314
+
+
+Integral of density (=32.00000000000004) is normalized to 32.0
+Orbital energy difference = 1.6365111026317436e-06
+Density difference (relative) = 5.685145316983195e-07
+Elapsed time for 15 th cycle: 0.10477566719055176 sec
+
+==================== [ END CYCLE 15 ] ====================
+Elapsed time[_get_mixed_var]: 0.0004534721374511719 sec
+Elapsed time[compute_potential]: 0.00899505615234375 sec
+Elapsed time[compute]: 0.003961801528930664 sec
+
+==================== [ SCF CYCLE 16 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.042462825775146484 sec
+Elapsed time[restore_orbital]: 0.0017235279083251953 sec
+Elapsed time[core_diagonalize]: 0.03883004188537598 sec
+Elapsed time[diagonalize]: 0.0814363956451416 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034108810895782
+2          2.0        -0.6571490079262436
+3          2.0        -0.6571489961849952
+4          2.0        -0.6535189367727262
+5          2.0        -0.1272293547472408
+6          2.0        -0.1272293526989508
+7          2.0        -0.12722934996394794
+8          2.0        -0.005722154460664991
+9          2.0        -0.0057221512864491925
+10         2.0        -0.0057221493603114544
+11         2.0        -0.0037067819676071066
+12         2.0        -0.003706779455509461
+13         2.0        -0.003706775506447026
+14         2.0        0.06026228411956314
+15         2.0        0.060262284924965145
+16         2.0        0.06026228527875701
+17         0.0        0.13895082569512793
+18         0.0        0.33058417143318813
+19         0.0        0.3305841738223603
+20         0.0        0.3305841754736348
+
+
+Integral of density (=32.000000000000036) is normalized to 32.0
+Orbital energy difference = 2.382485938312584e-06
+Density difference (relative) = 2.476717742882881e-07
+Elapsed time for 16 th cycle: 0.0839531421661377 sec
+
+==================== [ END CYCLE 16 ] ====================
+Elapsed time[_get_mixed_var]: 0.00040984153747558594 sec
+Elapsed time[compute_potential]: 0.008834600448608398 sec
+Elapsed time[compute]: 0.003879547119140625 sec
+
+==================== [ SCF CYCLE 17 ] ====================
+==== Tucker Diagonalization ====
+Elapsed time[project_local_potential_to_core]: 0.03918790817260742 sec
+Elapsed time[restore_orbital]: 0.0016286373138427734 sec
+Elapsed time[core_diagonalize]: 0.01491999626159668 sec
+Elapsed time[diagonalize]: 0.054244041442871094 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.7034108724572832
+2          2.0        -0.6571489988536481
+3          2.0        -0.657148985513107
+4          2.0        -0.6535189338382139
+5          2.0        -0.12722934492361185
+6          2.0        -0.12722934227835248
+7          2.0        -0.1272293372700667
+8          2.0        -0.005722147488025763
+9          2.0        -0.0057221440075191045
+10         2.0        -0.005722142133165963
+11         2.0        -0.003706770384613852
+12         2.0        -0.0037067652634076636
+13         2.0        -0.003706761862362143
+14         2.0        0.06026229207833514
+15         2.0        0.060262295731081494
+16         2.0        0.060262296858991704
+17         0.0        0.13895082989635543
+18         0.0        0.33058418221901825
+19         0.0        0.3305841867838761
+20         0.0        0.33058419007002005
+
+
+Integral of density (=32.000000000000014) is normalized to 31.999999999999996
+Orbital energy difference = 3.1098483521674325e-07
+Density difference (relative) = 1.3807060010123462e-07
+Elapsed time for 17 th cycle: 0.0566561222076416 sec
+
+==================== [ END CYCLE 17 ] ====================
+SCF CONVERGED with 17 iters!!
+Elapsed time[calc_external_energy]: 6.4849853515625e-05 sec
+Elapsed time[calc_nonlocal_energy]: 0.011879205703735352 sec
+
+============ Energy (Hartree) ============
+|   Total Energy        : -66.8846963284 |
+------------------------------------------
+| * Ion-ion Energy      : 0.0            |
+| * Eigenvals sum for 0 : -5.8008313232  |
+| * Hartree Energy      : 2.6012623899   |
+| * XC Energy           : -17.4659930234 |
+| * Kinetic Energy      : 41.1963301691  |
+| * External Energy     : -83.3325693111 |
+| * Non-local Energy    : -9.8837265529  |
+==========================================
+Elapsed time[calc_and_print_energies]: 0.021285533905029297 sec
+Total Energy: -66.88469632841517 Ha
+Fermi Level : 1.9615443111180597 eV
+Gap: 2.141 eV
+Transition (v -> c):
+  (s=0, k=0, n=15, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=16, [0.00, 0.00, 0.00])
+
+* TOTAL TIME : 5.783211946487427 sec

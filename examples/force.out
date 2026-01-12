@@ -1,0 +1,659 @@
+PyTucker is not installed. tucker_diagonalize will not be allowed
+distance = 0.7371660000000002
+Date :  2022-05-10 03:27:08.585346
+
+============================= [ Grid ] =============================
+* cell     (Bohr) : 
+[[15.118  0.     0.   ]
+ [ 0.    15.118  0.   ]
+ [ 0.     0.    18.897]]
+* cell     (ang ) : 
+[[ 8.  0.  0.]
+ [ 0.  8.  0.]
+ [ 0.  0. 10.]]
+* spacings (Bohr) : [0.378 0.378 0.378]
+* spacings (ang ) : [0.2 0.2 0.2]
+* gpts            : [40 40 50]
+* ngpts           : 80000
+* pbc             : [False False False]
+* FD_order        : 3
+* center_point    : [7.5589045  7.5589045  9.44863063] (Bohr)
+====================================================================
+
+
+============================ [ Kpoint ] =============================
+* kpts mesh : (1, 1, 1, 'gamma')
+Print all k-points and mapping to irreducible k-points
+  1 ->  1 : [0. 0. 0.]
+
+* nkpts   : 1
+* nibzkpts: 1
+=====================================================================
+
+Warning: 'rho_cutoff'(=6.01) value is too large or small. 'rho_cutoff' is set to 6.01.
+Elapsed time[_calc_energy_correction]: 0.0002281665802001953 sec
+
+=========================== [ Compensation ] ==========================
+ symbol | r_gauss | r_short (Bohr) | r_comp (Bohr)
+      H |     1.0 |           3.44 |         3.478
+=======================================================================
+
+Elapsed time[calc_local_pot]: 0.01314854621887207 sec
+KB projector non-zero ratio: 4.4799999999999995 %
+
+========================== [ KB_projector ] ==========================
+* number of atoms : 2
+* use_dense_proj  : False
+ index | symbol | # of projectors
+     0 |      H |               2
+     1 |      H |               2
+======================================================================
+
+Elapsed time[create_Pseudopotential]: 0.3383162021636963 sec
+
+========================= [ Pseudopotential ] =========================
+* type      : NCPP
+* upf       : 
+    /appl/ACE-Molecule/DATA/sg15_oncv_upf_2020-02-06/H_ONCV_PBE-1.2.upf
+* NLCC      : True
+* use_comp  : True
+* comp_grid : 0.1
+* filtering : True
+=======================================================================
+
+'Poisson_ISF_python.py'
+ISF_cutoff is set to [0 0 0].
+ISF method is used for Poisson
+* [0.0, 0.0] : 0 points
+* [0.0, 0.4] : 12 points
+* [0.4, 2.0] : 12 points
+* [2.0, 500.0] : 12 points
+
+============================= [ Poisson ] =============================
+* type          : ISF
+* use_fine_grid : False
+* ISF_cutoff    : [0 0 0]
+=======================================================================
+
+
+========================== [ XC_Functional ] ==========================
+* functional : ['gga_x_pbe' 'gga_c_pbe']
+* weight     : [1. 1.]
+
+Functional ID: 101
+Functional Name: gga_x_pbe
+Attributes:
+    Name: Perdew, Burke & Ernzerhof
+    Kind: 0
+  Family: 2
+Citations:
+   J. P. Perdew, K. Burke, and M. Ernzerhof, Phys. Rev. Lett. 77, 3865 (1996)
+   J. P. Perdew, K. Burke, and M. Ernzerhof, Phys. Rev. Lett. 78, 1396 (1997)
+Functional ID: 130
+Functional Name: gga_c_pbe
+Attributes:
+    Name: Perdew, Burke & Ernzerhof
+    Kind: 1
+  Family: 2
+Citations:
+   J. P. Perdew, K. Burke, and M. Ernzerhof, Phys. Rev. Lett. 77, 3865 (1996)
+   J. P. Perdew, K. Burke, and M. Ernzerhof, Phys. Rev. Lett. 78, 1396 (1997)
+=======================================================================
+
+
+========================== [ Occupation ] ==========================
+* smearing    : Fermi-Dirac
+* temperature : 1e-09
+* nelec       : 2.0
+* nspins      : 1
+* nbands      : 5
+* nkpts       : 1
+====================================================================
+
+
+========================== [ Preconditioner ] =========================
+* type         : None
+=======================================================================
+
+
+======================= [ Eigensolver(Scipy) ] =======================
+* scipy_type   : lobpcg
+* convg_tol    : None
+* maxiter      : 20
+* verbosity    : 0
+======================================================================
+
+Elapsed time[calc_NLCC_core_density]: 8.940696716308594e-05 sec
+
+============================ [ Density ] ===========================
+* nelec         : 2.0
+* nspins        : 1
+* magmom        : 0.0
+* fix_magmom    : True
+* density guess : rhoatom
+* orbital guess : None
+* occ guess     : None
+=====================================================================
+
+===========================[ Input Parameters ]===========================
+{'centered': True,
+ 'convergence': {'density_tol': 0.0001,
+                 'energy_tol': 1e-06,
+                 'orbital_energy_tol': 1e-06,
+                 'scf_maxiter': 100},
+ 'eigensolver': None,
+ 'force': {'deriv_comp': True, 'deriv_density': False},
+ 'grid': {'FD_order': 3, 'gpts': None, 'spacing': 0.2},
+ 'init_guess': {'density': 'rhoatom', 'occ': None, 'orbital': None},
+ 'kpts': (1, 1, 1, 'gamma'),
+ 'kpts_and_weights': None,
+ 'mixing': {'history': 3,
+            'parameter': 0.2,
+            'pulay_beta': 0.3,
+            'scheme': 'pulay',
+            'what': 'density'},
+ 'nbands': None,
+ 'nelec': None,
+ 'occupation': {'MP_order': 2,
+                'fix_magmom': True,
+                'magmom': 0.0,
+                'smearing': 'Fermi-Dirac',
+                'temperature': 1e-09},
+ 'output_file': None,
+ 'poisson': None,
+ 'pp': {'NLCC': True,
+        'comp_grid': 0.1,
+        'filtering': True,
+        'num_near_cell': 1,
+        'upf': ['/appl/ACE-Molecule/DATA/sg15_oncv_upf_2020-02-06/H_ONCV_PBE-1.2.upf'],
+        'use_comp': True,
+        'use_dense_proj': False},
+ 'precond_type': None,
+ 'print_energies': False,
+ 'spin': 'unpolarized',
+ 'symmetry': True,
+ 'verbose': 0,
+ 'xc': {'type': 'gga_x_pbe + gga_c_pbe', 'weight': None}}
+
+* pbc                      : [False False False]
+
+* Positions of atoms (ang) :
+H : [4.       4.       5.368583]
+H : [4.       4.       4.631417]
+==========================================================================
+Elapsed time[initialize]: 0.4634096622467041 sec
+
+============================ [ Mixing ] =============================
+* what       : density
+* scheme     : pulay
+* parameter  : 0.2
+* pulay_beta : 0.3
+* history    : 3
+=====================================================================
+
+
+============================== [ SCF ] ==============================
+* scf_maxiter        : 100
+* energy_tol         : 1e-06
+* density_tol        : 0.0001
+* orbital_energy_tol : 1e-06
+=====================================================================
+
+
+==================== [ SCF CYCLE 1 ] ====================
+integral of init_density :  1.995823677082372
+Integral of density (=1.995823677082372) is normalized to 1.9999999999999996
+Elapsed time[compute_potential]: 0.052344322204589844 sec
+Elapsed time[compute]: 0.5737919807434082 sec
+Elapsed time[_get_mixed_var]: 6.4373016357421875e-06 sec
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.7017784118652344 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.45446130540829327
+2          0.0        0.08809457276230422
+3          0.0        0.32082249801868395
+4          0.0        0.35007150864440156
+5          0.0        0.4141905274022282
+
+
+Integral of density (=2.000000000017598) is normalized to 1.9999999999999996
+Orbital energy difference = -0.9089226108165865
+Density difference (relative) = 0.3068266907041835
+Elapsed time for 1 th cycle: 2.349679708480835 sec
+
+==================== [ END CYCLE 1 ] ====================
+Elapsed time[_get_mixed_var]: 0.0011696815490722656 sec
+Elapsed time[compute_potential]: 0.06796741485595703 sec
+Elapsed time[compute]: 0.0871133804321289 sec
+
+==================== [ SCF CYCLE 2 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.611311674118042 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.49223514120547546
+2          0.0        0.02001922875925694
+3          0.0        0.05018387158821422
+4          0.0        0.09276312227923356
+5          0.0        0.15267305006263873
+
+
+Integral of density (=1.9999999999999925) is normalized to 2.0000000000000004
+Orbital energy difference = -0.07554767159436437
+Density difference (relative) = 0.35190511895917287
+Elapsed time for 2 th cycle: 1.6186439990997314 sec
+
+==================== [ END CYCLE 2 ] ====================
+Elapsed time[_get_mixed_var]: 0.0005564689636230469 sec
+Elapsed time[compute_potential]: 0.06584310531616211 sec
+Elapsed time[compute]: 0.08601713180541992 sec
+
+==================== [ SCF CYCLE 3 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.660383939743042 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.4644644726106953
+2          0.0        0.00015548537168413995
+3          0.0        0.022823267869326376
+4          0.0        0.04604294691009847
+5          0.0        0.09993735480620693
+
+
+Integral of density (=1.999999999999999) is normalized to 2.0
+Orbital energy difference = 0.055541337189560336
+Density difference (relative) = 0.26534467282494223
+Elapsed time for 3 th cycle: 1.668933629989624 sec
+
+==================== [ END CYCLE 3 ] ====================
+Elapsed time[_get_mixed_var]: 0.003506898880004883 sec
+Elapsed time[compute_potential]: 0.06911134719848633 sec
+Elapsed time[compute]: 0.08694863319396973 sec
+
+==================== [ SCF CYCLE 4 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.6682920455932617 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.3812212796173741
+2          0.0        0.01884001458882559
+3          0.0        0.03948614970628837
+4          0.0        0.058380814382054835
+5          0.0        0.07119419559624025
+
+
+Integral of density (=2.0000000000000173) is normalized to 2.0
+Orbital energy difference = 0.16648638598664234
+Density difference (relative) = 0.014670623027691182
+Elapsed time for 4 th cycle: 1.6750619411468506 sec
+
+==================== [ END CYCLE 4 ] ====================
+Elapsed time[_get_mixed_var]: 0.0021965503692626953 sec
+Elapsed time[compute_potential]: 0.06860113143920898 sec
+Elapsed time[compute]: 0.09089303016662598 sec
+
+==================== [ SCF CYCLE 5 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.729729175567627 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38809733650751066
+2          0.0        0.015929454931551824
+3          0.0        0.0385650319265587
+4          0.0        0.05646479582051643
+5          0.0        0.05790842082288025
+
+
+Integral of density (=2.000000000000003) is normalized to 2.0
+Orbital energy difference = -0.013752113780273079
+Density difference (relative) = 0.017298372644065908
+Elapsed time for 5 th cycle: 1.7350573539733887 sec
+
+==================== [ END CYCLE 5 ] ====================
+Elapsed time[_get_mixed_var]: 0.001634836196899414 sec
+Elapsed time[compute_potential]: 0.06398582458496094 sec
+Elapsed time[compute]: 0.08219146728515625 sec
+
+==================== [ SCF CYCLE 6 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.642571210861206 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38267610713547856
+2          0.0        0.01885506833673057
+3          0.0        0.04160354175008863
+4          0.0        0.0586153799185571
+5          0.0        0.05893040617890731
+
+
+Integral of density (=1.9999999999999996) is normalized to 2.0
+Orbital energy difference = 0.010842458744064198
+Density difference (relative) = 0.0008937645201273894
+Elapsed time for 6 th cycle: 1.6504216194152832 sec
+
+==================== [ END CYCLE 6 ] ====================
+Elapsed time[_get_mixed_var]: 0.0025551319122314453 sec
+Elapsed time[compute_potential]: 0.06759285926818848 sec
+Elapsed time[compute]: 0.08254075050354004 sec
+
+==================== [ SCF CYCLE 7 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.6221308708190918 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38278089549920646
+2          0.0        0.01891133771182811
+3          0.0        0.04173455253081195
+4          0.0        0.05855878759927149
+5          0.0        0.058897271612886354
+
+
+Integral of density (=2.0000000000000027) is normalized to 2.0000000000000004
+Orbital energy difference = -0.0002095767274558069
+Density difference (relative) = 0.0004150374377409399
+Elapsed time for 7 th cycle: 1.6277210712432861 sec
+
+==================== [ END CYCLE 7 ] ====================
+Elapsed time[_get_mixed_var]: 0.0019791126251220703 sec
+Elapsed time[compute_potential]: 0.07022953033447266 sec
+Elapsed time[compute]: 0.07796907424926758 sec
+
+==================== [ SCF CYCLE 8 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.643282175064087 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38272119860043996
+2          0.0        0.019094268046190032
+3          0.0        0.04201494810036167
+4          0.0        0.05873730117184904
+5          0.0        0.05904591169464532
+
+
+Integral of density (=1.9999999999999953) is normalized to 2.0
+Orbital energy difference = 0.00011939379753300727
+Density difference (relative) = 0.00016706308842664845
+Elapsed time for 8 th cycle: 1.6498377323150635 sec
+
+==================== [ END CYCLE 8 ] ====================
+Elapsed time[_get_mixed_var]: 0.001978158950805664 sec
+Elapsed time[compute_potential]: 0.0696263313293457 sec
+Elapsed time[compute]: 0.07977175712585449 sec
+
+==================== [ SCF CYCLE 9 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.4263718128204346 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38270543398994844
+2          0.0        0.019153085642414885
+3          0.0        0.04211314323325818
+4          0.0        0.05880274260804977
+5          0.0        0.05909912023415335
+
+
+Integral of density (=2.000000000000007) is normalized to 2.000000000000001
+Orbital energy difference = 3.1529220983039785e-05
+Density difference (relative) = 0.0001039290532489577
+Elapsed time for 9 th cycle: 1.4319825172424316 sec
+
+==================== [ END CYCLE 9 ] ====================
+Elapsed time[_get_mixed_var]: 0.0016050338745117188 sec
+Elapsed time[compute_potential]: 0.06872129440307617 sec
+Elapsed time[compute]: 0.07958602905273438 sec
+
+==================== [ SCF CYCLE 10 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.4221234321594238 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38269616514195237
+2          0.0        0.019205108336024082
+3          0.0        0.04221084764301553
+4          0.0        0.058867155917785345
+5          0.0        0.05915239517162191
+
+
+Integral of density (=2.0000000000000075) is normalized to 2.0
+Orbital energy difference = 1.8537695992137948e-05
+Density difference (relative) = 1.3366106170276867e-05
+Elapsed time for 10 th cycle: 1.4275779724121094 sec
+
+==================== [ END CYCLE 10 ] ====================
+Elapsed time[_get_mixed_var]: 0.002348661422729492 sec
+Elapsed time[compute_potential]: 0.06015515327453613 sec
+Elapsed time[compute]: 0.08019399642944336 sec
+
+==================== [ SCF CYCLE 11 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.382824182510376 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38269681356030877
+2          0.0        0.019207315905217057
+3          0.0        0.04221553953978934
+4          0.0        0.05886989968313898
+5          0.0        0.05915486145695884
+
+
+Integral of density (=1.999999999999991) is normalized to 1.9999999999999993
+Orbital energy difference = -1.296836712794125e-06
+Density difference (relative) = 8.333239839045123e-06
+Elapsed time for 11 th cycle: 1.3884522914886475 sec
+
+==================== [ END CYCLE 11 ] ====================
+Elapsed time[_get_mixed_var]: 0.0016930103302001953 sec
+Elapsed time[compute_potential]: 0.0659635066986084 sec
+Elapsed time[compute]: 0.07996916770935059 sec
+
+==================== [ SCF CYCLE 12 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.3760044574737549 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38269836037777893
+2          0.0        0.019208829170883387
+3          0.0        0.04221904315682644
+4          0.0        0.05887195474443293
+5          0.0        0.05915663769591672
+
+
+Integral of density (=2.000000000000012) is normalized to 2.0
+Orbital energy difference = -3.0936349403321017e-06
+Density difference (relative) = 1.9242130821731547e-06
+Elapsed time for 12 th cycle: 1.3808882236480713 sec
+
+==================== [ END CYCLE 12 ] ====================
+Elapsed time[_get_mixed_var]: 0.0019087791442871094 sec
+Elapsed time[compute_potential]: 0.06541967391967773 sec
+Elapsed time[compute]: 0.0729067325592041 sec
+
+==================== [ SCF CYCLE 13 ] ====================
+convg_tol is set to 8e-06
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[diagonalize]: 1.3461973667144775 sec
+
+[ PRINT EIGENVALUES ]
+( spin alpha )
+* 1 th kpt (=[0. 0. 0.])
+num        occ        value
+1          2.0        -0.38269829792234217
+2          0.0        0.0192094551890654
+3          0.0        0.04222023816679856
+4          0.0        0.058872692129564204
+5          0.0        0.059157347621116754
+
+
+/home/jhwoo/.conda/envs/GOSPEL_torch/lib/python3.8/site-packages/scipy/sparse/_index.py:146: SparseEfficiencyWarning: Changing the sparsity structure of a csr_matrix is expensive. lil_matrix is more efficient.
+  self._set_arrayXarray(i, j, x)
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[0.52750244 0.40982693 0.6300896  0.64152329 0.56946677]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/smearing_functions.py:11: RuntimeWarning: overflow encountered in exp
+  return 1 / (np.exp(val) + 1)
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[0.01523102 0.09271064 0.38912314 0.40755396 0.34734811]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[0.00035586 0.14641039 0.00934802 0.12566662 0.29814544]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[0.00128218 0.05669983 0.00844462 0.04400095 0.18506831]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[0.00011851 0.01858893 0.00165743 0.02258845 0.06731052]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[7.38968387e-05 5.19408079e-03 9.83901168e-04 1.84731554e-02
+ 1.72364946e-02]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[6.91974309e-06 1.50531953e-03 2.30194650e-04 8.00220280e-03
+ 5.31686598e-03]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[6.84834052e-06 5.49685387e-04 3.94720467e-04 3.35585897e-03
+ 1.97659447e-03]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[6.87990527e-06 1.81958743e-04 1.45905468e-04 1.30315574e-03
+ 8.05248060e-04]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[6.04598392e-06 1.77104522e-04 1.82372958e-04 6.03176109e-04
+ 4.10477082e-04]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[5.80466209e-06 2.70220860e-05 3.71589185e-05 2.20925742e-04
+ 1.26311170e-04]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[5.72010226e-06 2.32411337e-05 2.67497572e-05 1.10058459e-04
+ 6.95889130e-05]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+/home/jhwoo/programs/gospel/gospel/Eigensolver/Scipy.py:68: UserWarning: Exited at iteration 20 with accuracies 
+[5.64760047e-06 6.91950372e-06 7.79178572e-06 4.11624313e-05
+ 2.15284068e-05]
+not reaching the requested tolerance 8e-06.
+  val, vec = lobpcg(
+Integral of density (=1.9999999999999896) is normalized to 2.0000000000000004
+Orbital energy difference = 1.249108735335014e-07
+Density difference (relative) = 1.328715423277575e-06
+Elapsed time for 13 th cycle: 1.3519186973571777 sec
+
+==================== [ END CYCLE 13 ] ====================
+SCF CONVERGED with 13 iters!!
+Elapsed time[calc_external_energy]: 0.00047397613525390625 sec
+Debug: sparse nonlocal_op@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+Elapsed time[calc_nonlocal_energy]: 0.0006461143493652344 sec
+
+============ Energy (Hartree) ============
+|   Total Energy        : -1.1678210484  |
+------------------------------------------
+| * Ion-ion Energy      : 0.0            |
+| * Eigenvals sum for 0 : -0.7653965958  |
+| * Hartree Energy      : 0.0086254884   |
+| * XC Energy           : -0.6916373659  |
+| * Kinetic Energy      : 1.1235820205   |
+| * External Energy     : -1.4957794193  |
+| * Non-local Energy    : -0.1126117721  |
+==========================================
+Elapsed time[calc_and_print_energies]: 0.0053293704986572266 sec
+Total Energy: -1.1678210484346088 Ha
+Fermi Level : -4.401998846668631 eV
+Gap: 10.936 eV
+Transition (v -> c):
+  (s=0, k=0, n=0, [0.00, 0.00, 0.00]) -> (s=0, k=0, n=1, [0.00, 0.00, 0.00])
+Elapsed time[calc_nonlocal_forces]: 0.014655113220214844 sec
+Debug: Make small grid Time: 0.0036640167236328125 sec
+Elapsed time[calc_short_forces]: 0.01000213623046875 sec
+Debug: Make small grid Time: 0.0027158260345458984 sec
+Elapsed time[get_comp_forces]: 0.004064321517944336 sec
+Elapsed time[get_comp_comp_forces]: 0.0003693103790283203 sec
+Elapsed time[get_forces_correction]: 0.004459857940673828 sec
+'Debug:'
+'  F_NN   = \n0.0'
+('  F_NL   = \n'
+ '[[-2.01895658e-09 -3.97316792e-08 -3.81051382e-02]\n'
+ ' [-1.31712916e-08 -2.93888823e-08  3.81051754e-02]]')
+('  F_loc  = \n'
+ '[[-3.44352974e-07 -5.04686780e-07 -2.39330874e-01]\n'
+ ' [-3.71401701e-07 -4.64813614e-07  2.39327629e-01]]')
+('  F_comp = \n'
+ '[[-8.74557584e-07 -9.41054666e-07  2.85350616e-01]\n'
+ ' [-8.73101485e-07 -9.14428409e-07 -2.85350374e-01]]')
+('  F      = \n'
+ '[[-1.22092951e-06 -1.48547312e-06  7.91460453e-03]\n'
+ ' [-1.25767448e-06 -1.40863091e-06 -7.91756902e-03]]')
+Elapsed time[calc_forces]: 0.030434608459472656 sec
+Elapsed time[calc_forces]: 0.030452489852905273 sec
+Atomic Forces (eV/ang):
+ index | symbol |  x-axis  |  y-axis  |  z-axis
+     0 |      H |   -6e-05 |   -8e-05 |  0.40699
+     1 |      H |   -6e-05 |   -7e-05 | -0.40714
+
+* TOTAL TIME : 23.390552282333374 sec
+positions = 
+ [[4.       4.       5.368583]
+ [4.       4.       4.631417]]

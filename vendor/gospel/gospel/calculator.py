@@ -354,6 +354,8 @@ class GOSPEL(Calculator):
                 self.parameters.get("mixing"),
                 self.density,
             )
+            if self.parameters.get("history_scf_dir") is not None:
+                self.scf.history_dir = self.parameters.get("history_scf_dir")
         elif self.parameters.iter_type == "lbfgs":
             self.scf = LBFGS(
                 self.parameters.get("convergence"),

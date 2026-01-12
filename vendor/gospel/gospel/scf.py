@@ -1,5 +1,7 @@
 import torch
+from pathlib import Path 
 
+from gospel.ParallelHelper import ParallelHelper as PH
 from gospel.Mixing import Mixing
 from gospel.util import Timer
 
@@ -44,6 +46,8 @@ class SCF:
         self.mixing = Mixing(**mixing_params)
         print(self.mixing)
         self.density = density
+
+        self.history_dir = None
 
         self.eigvec = None
         self.eigval = None
@@ -102,9 +106,25 @@ class SCF:
             # Diagonalize Hamiltonian and get orbitals.
             # Note: For first iteration with bands='occupied', self.nocc is None,
             # so davidson will check all bands initially
-            eigval, eigvec = hamiltonian.diagonalize(
-                convg_tol=self.diag_tol, i_scf=i_iter, bands=self.nocc
+            ret_hist = self.history_dir is not None
+            diag_out = hamiltonian.diagonalize(
+                convg_tol=self.diag_tol, i_scf=i_iter, bands=self.nocc, retHistory=ret_hist
             )
+            
+            if ret_hist:
+                eigval, eigvec, histories = diag_out
+                if PH.is_master():
+                    out_dir = Path(self.history_dir)
+                    out_dir.mkdir(parents=True, exist_ok=True)
+                    for i_s in range(histories.shape[0]):
+                        for i_k in range(histories.shape[1]):
+                            out_path = out_dir / f"scf_{i_iter + 1:03d}_s{i_s}_k{i_k}.pt"
+                            torch.save(histories[i_s, i_k], out_path)
+            else:
+                eigval, eigvec = diag_out
+            # eigval, eigvec = hamiltonian.diagonalize(
+            #     convg_tol=self.diag_tol, i_scf=i_iter, bands=self.nocc
+            # )
 
             # Fill the occupation.
             occ = self.occupation.get_occupation(eigval)

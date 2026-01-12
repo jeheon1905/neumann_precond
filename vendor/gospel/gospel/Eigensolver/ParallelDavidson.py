@@ -2,7 +2,7 @@ import warnings
 from itertools import product
 import numpy as np
 import torch
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Union
 
 from gospel.LinearOperator import LinearOperator, aslinearoperator
 from gospel.Eigensolver.Eigensolver import (
@@ -101,7 +101,8 @@ class Davidson(Eigensolver):
         convg_tol: float = 1e-4,
         i_scf: int = None,
         bands: int = None,
-    ) -> Tuple[torch.Tensor, np.ndarray]:
+        retHistory: bool = False,
+    ) -> Union[Tuple[torch.Tensor, np.ndarray], Tuple[torch.Tensor, np.ndarray, np.ndarray]]:
         """Diagonalize hamiltonians corresponding each spin and k-points.
 
         :type  hamiltonian: gospel.Hamiltonian
@@ -128,6 +129,9 @@ class Davidson(Eigensolver):
         # TODO: remove eigval and eigvec for memory efficiency
         # eigval = torch.zeros_like(self._starting_value)
         eigvec = np.zeros_like(self._starting_vector)  # eigvec.dtype = object
+        histories = None
+        if retHistory:
+            histories = np.empty((hamiltonian.nspins, hamiltonian.nibzkpts), dtype=object)
 
         # Solve EVP for Hamiltonians
         for i_s, i_k in product(range(hamiltonian.nspins), range(hamiltonian.nibzkpts)):
@@ -148,8 +152,13 @@ class Davidson(Eigensolver):
                 "MP_dtype": self.__MP_dtype,
                 "MP_scheme": self.__MP_scheme,
                 "bands": bands,
+                "retHistory": retHistory,
             }
-            val, vec = davidson(**solve_options)
+            if retHistory:
+                val, vec, eigHistory, resHistory = davidson(**solve_options)
+                histories[i_s, i_k] = (eigHistory, resHistory)
+            else:
+                val, vec = davidson(**solve_options)
 
             # eigval[i_s, i_k] = val
             eigvec[i_s, i_k] = vec.T
@@ -160,6 +169,8 @@ class Davidson(Eigensolver):
             self._starting_value[i_s, i_k] = val
             self._starting_vector[i_s, i_k] = vec  # not efficient memory
         # return eigval, eigvec
+        if retHistory:
+            return self._starting_value, eigvec, histories
         return self._starting_value, eigvec
 
     @property

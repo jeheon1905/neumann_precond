@@ -20,33 +20,50 @@ pip install gitpython         # Git interface for Python
 pip install "spglib>=1.16.1"  # Symmetry analysis library
 pip install pyyaml
 
-# Install GOSPEL (local development mode)
-git clone https://gitlab.com/jhwoo15/gospel.git
-cd gospel
+# Install neumann_precond (this repo)
 python setup.py develop
+```
 
+
+## GOSPEL dependency
+
+This project vendors a customized version of **GOSPEL** inside the repository
+under `vendor/gospel` (using `git subtree`).
+
+The vendored source is provided to ensure reproducibility and to apply
+project-specific modifications.
+**GOSPEL should be installed from this vendored source.**
+
+Upstream repository:
+- https://gitlab.com/jhwoo15/gospel.git
+
+Base Git state of the vendored GOSPEL:
+- **Branch**: `multi_gpu`
+- **Commit**: `77621e1fdeff01df1d6adeadd557c056aad278b1`
+
+Additional local modifications are applied on top of this commit
+to support the Neumann preconditioner workflow.
+
+### Install GOSPEL (from vendored source)
+```bash
+cd vendor/gospel
+python setup.py develop
+```
+
+### pylibxc dependency
+```bash
 # Install pylibxc (for XC functionals)
 git clone https://gitlab.com/libxc/libxc.git
 cd libxc
 git checkout 6.0.0  # Switch to 6.0.0 tag
+
+# Patch CMakeLists.txt for newer CMake (required on some systems)
+sed -i 's/^cmake_minimum_required(VERSION 3.1)/cmake_minimum_required(VERSION 3.5)/' CMakeLists.txt
+
 conda install -c conda-forge cmake  # Run this if cmake is not installed
 python setup.py develop  # or: pip install -e .
-
-# If pylibxc import fails:
-# You may need to add libxc.so* to your library path.
-# Example: export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/path/to/libxc
-
-# Install neumann_precond (this repo)
-cd neumann_precond
-python setup.py develop
 ```
 
-✅ **Note**
-This project uses a customized version of GOSPEL.
-Make sure to use the following Git state:
-
-- **Branch**: `multi_gpu`
-- **Commit**: `77621e1fdeff01df1d6adeadd557c056aad278b1`
 
 ## Usage example: ...
 ```bash

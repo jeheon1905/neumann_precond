@@ -230,7 +230,7 @@ class Hamiltonian:
 
         return LinearOperator(self.__shape, matvec, dtype, f"Hamiltonian ({dtype})")
 
-    def diagonalize(self, convg_tol=1e-4, i_scf=None, bands=None):
+    def diagonalize(self, convg_tol=1e-4, i_scf=None, bands=None, retHistory=False):
         """Diagonalize Hamiltonian
 
         :type convg_tol: float, optional
@@ -247,7 +247,7 @@ class Hamiltonian:
         :return:
             eigenvalues and eigenvectors
         """
-        return self.eigensolver.diagonalize(self, convg_tol, i_scf, bands)
+        return self.eigensolver.diagonalize(self, convg_tol, i_scf, bands, retHistory=retHistory)
 
     @Timer.timeit
     # def calc_energies(..., print=True)  # TODO: rename

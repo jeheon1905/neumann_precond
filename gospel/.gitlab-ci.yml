@@ -1,0 +1,9 @@
+image: python:3.8-alpine
+
+pages:
+    stage: deploy
+    script:
+        - mv docs/build/html/ public/
+    artifacts:
+        paths:
+            - public

@@ -124,7 +124,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "no_shift_thr": 10,
                 "order": outerorder,
                 "error_cutoff": error_cutoff,
-                "verbosity": args.verbosity,
+                "verbosityLevel": args.verbosity,
                 "max_order": 20,
                 "timing": True,
             },
@@ -159,7 +159,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "timing": True,
                 "options": {
                     "order": innerorder,
-                    "verbosity": args.verbosity,
+                    "verbosityLevel": args.verbosity,
                     "correction_scale": 0.0,  # to avoid double shift
                     "timing": True,
                 },
@@ -171,7 +171,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
             "precond_type": [("neumann", {"order" : outerorder,
                                           "no_shift_thr": 10,
                                           "error_cutoff": error_cutoff,
-                                          "verbosity": args.verbosity,
+                                          "verbosityLevel": args.verbosity,
                                           "max_order": 20,
                                           "timing": True}, args.merge_iter),
                              ("shift-and-invert", {"inner_precond" : args.inner,
@@ -182,7 +182,7 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                                                    "timing": True,
                                                    "options": {
                                                        "order": innerorder,
-                                                       "verbosity": args.verbosity,
+                                                       "verbosityLevel": args.verbosity,
                                                        "correction_scale": 0.0,
                                                        "timing": True,
                                                        },

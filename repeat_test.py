@@ -222,6 +222,7 @@ class FixedConfig:
     runs_per_combo: int = 3
     scf_runs_per_combo: int = 1  # Number of SCF runs per combo (default: 1)
     do_retHistory: bool = True  # Whether to save convergence history for FIXED runs
+    do_retHistoryScfDir: bool = True  # Whether to save convergence history for SCF runs
     dry_run: bool = False
     require_density_for_fixed: bool = True
 
@@ -280,6 +281,7 @@ class FixedConfig:
         cfg.runs_per_combo = int(exec_cfg.get("runs_per_combo", 3))
         cfg.scf_runs_per_combo = int(exec_cfg.get("scf_runs_per_combo", 1))
         cfg.do_retHistory = bool(exec_cfg.get("do_retHistory", True))
+        cfg.do_retHistoryScfDir = bool(exec_cfg.get("do_retHistoryScfDir", True))
         cfg.dry_run = bool(exec_cfg.get("dry_run", False))
         cfg.require_density_for_fixed = bool(
             exec_cfg.get("require_density_for_fixed", True)
@@ -873,7 +875,7 @@ def build_cmd(
 
     if phase == "fixed" and include_ret_history:
         cmd.extend(["--retHistory", str(paths.run_history_path(run_idx))])
-    if phase == "scf":
+    if phase == "scf" and cfg.do_retHistoryScfDir:
         cmd.extend(["--retHistoryScfDir", str(paths.history_scf_dir)])
     return [x for x in cmd if x]
 

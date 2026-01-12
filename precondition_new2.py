@@ -710,7 +710,7 @@ class PreNeumann(Preconditioner):
         fp="DP",
         max_order=20,
         error_cutoff=-0.4,
-        verbosity=True,
+        verbosityLevel=0,
         timing=False,
     ):
         super().__init__("neumann", use_cuda, fp)
@@ -740,7 +740,7 @@ class PreNeumann(Preconditioner):
         self.no_shift_thr = no_shift_thr
         self.max_order = int(max_order)
         self.error_cutoff = error_cutoff
-        self.verbosity = verbosity
+        self.verbosityLevel = verbosityLevel
         self.timing = timing
 
         self.gapp = create_preconditioner("gapp", grid, use_cuda)
@@ -755,7 +755,7 @@ class PreNeumann(Preconditioner):
         s += f"\n* no_shift_thr     : {self.no_shift_thr}"
         s += f"\n* max_order        : {self.max_order}"
         s += f"\n* error_cutoff     : {self.error_cutoff}"
-        s += f"\n* verbosity        : {self.verbosity}"
+        s += f"\n* verbosityLevel   : {self.verbosityLevel}"
         s += f"\n* timing           : {self.timing}"
         s += "\n=====================================================================\n"
         return str(s)
@@ -764,13 +764,13 @@ class PreNeumann(Preconditioner):
     def call(self, residue, H, eigval):
         INV_4PI = 0.25 / np.pi
 
-#        is_needed_residue_norm = (self.order == "dynamic" or self.verbosity or self.correction_scale != 0.0)
         is_needed_residue_norm = (
-            self.order in ("dynamic", "res") or self.verbosity or self.correction_scale != 0.0
+            self.order in ("dynamic", "res") or self.verbosityLevel > 0 or self.correction_scale != 0.0
         )
 
         with Timer.track("Neumann. residue norm", self.timing, False):
             residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
+
         # Modify shift values
         if self.correction_scale != 0.0:
             perturb = -(residue_norm.conj() * residue_norm)
@@ -800,7 +800,7 @@ class PreNeumann(Preconditioner):
             with Timer.track("Neumann. error calc", self.timing, False):
                 pre_error = torch.norm(H_minus_eigval_vec - residue, dim=0) / residue_norm
 
-            if self.verbosity:
+            if self.verbosityLevel > 0:
                 print("test_error (using order = 0) = ", torch.log10(pre_error))
 
             for order in range(1, self.max_order + 1): ##########정확도 평가가 들어가는 것만 이렇게 표현
@@ -827,12 +827,12 @@ class PreNeumann(Preconditioner):
                 if pre_error.sum() > error.sum():
                     error_log = torch.log10(error)
                     if order == self.max_order:
-                        if self.verbosity:
+                        if self.verbosityLevel > 0:
                             print(f"Preconditioned diagonalization error(log10) = {error_log} "
                                     f"(using order(high_error_cutoff) = {order})")
                         break
                     elif self.error_cutoff >= torch.max(error_log):
-                        if self.verbosity:
+                        if self.verbosityLevel > 0:
                             print(f"Preconditioned diagonalization error(log10) = {error_log} "
                                 f"(using order(low_order_cutoff) = {order})")
                         break
@@ -841,7 +841,7 @@ class PreNeumann(Preconditioner):
                         continue
                 else:
                     preconditioned_result -= neumann_term
-                    if self.verbosity:
+                    if self.verbosityLevel > 0:
                         print(f"Preconditioned diagonalization error(log10)= {torch.log10(pre_error)} "
                             f"(using order(pre<now_break) = {order - 1})")
                     break
@@ -859,7 +859,7 @@ class PreNeumann(Preconditioner):
                         ord_val = orders[i]
                         norder[residue_norm > thr] = ord_val
 
-                    if self.verbosity:
+                    if self.verbosityLevel > 0:
                         total_count = residue_norm.numel()
                         print(f"Total residual norms count = {total_count}")
                         uni_orders, counts = torch.unique(norder, sorted=True, return_counts = True)
@@ -876,7 +876,7 @@ class PreNeumann(Preconditioner):
                         selected_order = orders[idx]
                         break
                 norder.fill_(selected_order)
-                if self.verbosity:
+                if self.verbosityLevel > 0:
                     print(f"max residual norm = {torch.max(residue_norm)}. using order = {selected_order}")
             else:
                 order = int(self.order)
@@ -902,7 +902,7 @@ class PreNeumann(Preconditioner):
                 preconditioned_result[:,active] += active_neumann_term
                 neumann_term[:,active] = active_neumann_term
 
-            if self.verbosity:
+            if self.verbosityLevel > 1:
                 diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
                 error = torch.norm(diff, dim=0) / residue_norm
                 print(f"relative error log10 = {torch.log10(error)}")

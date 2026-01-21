@@ -62,7 +62,6 @@ neumann:
 # Fixed calculation parameters
 calculation:
   mode: "scf-then-fixed"  # Options: "scf", "fixed", "scf-then-fixed"
-  phase: "fixed"
   temperature: 0.0
   # scf_print_energies: true
   scf_print_energies: false
@@ -105,9 +104,8 @@ calculation:
     runs_per_combo: 5        # Number of FIXED runs per combination
     scf_runs_per_combo: 5    # Number of SCF runs (0 = skip SCF, use initialized density)
     do_retHistory: false     # Save convergence history (history.pt) for FIXED runs
-    do_retHistoryScfDir: true  # Save convergence history directory for SCF runs
+    do_retHistoryScfDir: false # Save convergence history directory for SCF runs
     dry_run: false
-    require_density_for_fixed: true
     verbosity: 1
     seed: [0, 1, 2, 3, 4]
 

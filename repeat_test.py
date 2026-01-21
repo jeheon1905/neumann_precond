@@ -171,7 +171,6 @@ class FixedConfig:
     LOG_ROOT: Path = Path("result_scail_up") / "logs"
 
     mode: str = "scf-then-fixed"
-    phase: str = "fixed"
     temperature: float = 0.01
     scf_print_energies: bool = False
     scf_maxiter: int = 100
@@ -224,7 +223,6 @@ class FixedConfig:
     do_retHistory: bool = True  # Whether to save convergence history for FIXED runs
     do_retHistoryScfDir: bool = True  # Whether to save convergence history for SCF runs
     dry_run: bool = False
-    require_density_for_fixed: bool = True
 
     summary_fields: Dict[str, Dict] = field(default_factory=dict)
 
@@ -243,7 +241,6 @@ class FixedConfig:
         # Calculation settings
         calc = config.get("calculation", {})
         cfg.mode = calc.get("mode", "scf-then-fixed")
-        cfg.phase = calc.get("phase", "fixed")
         cfg.temperature = float(calc.get("temperature", 0.0))
         cfg.scf_print_energies = calc.get("scf_print_energies", False)
         cfg.scf_maxiter = int(calc.get("scf_maxiter", 100))
@@ -283,9 +280,6 @@ class FixedConfig:
         cfg.do_retHistory = bool(exec_cfg.get("do_retHistory", True))
         cfg.do_retHistoryScfDir = bool(exec_cfg.get("do_retHistoryScfDir", True))
         cfg.dry_run = bool(exec_cfg.get("dry_run", False))
-        cfg.require_density_for_fixed = bool(
-            exec_cfg.get("require_density_for_fixed", True)
-        )
         cfg.verbosity = int(exec_cfg.get("verbosity", 1))
 
         # Seed list: always required as a list
@@ -575,10 +569,18 @@ class RunPaths:
     def hist_run_log_path(self, run_idx: int) -> Path:
         return self.history_dir / f"run-{run_idx}" / "stdout.log"
 
-    # SCF run paths
+    # SCF run paths (now using run-* directory structure like FIXED)
+    def scf_run_dir(self, run_idx: int) -> Path:
+        """Get log directory for SCF run (1-indexed), similar to FIXED"""
+        return ensure_dir(self.logs_scf_dir / f"run-{run_idx}")
+
     def scf_run_log_path(self, run_idx: int) -> Path:
-        """Get log path for SCF run (1-indexed)"""
-        return self.logs_scf_dir / f"scf_run-{run_idx}.log"
+        """Get log path for SCF run (1-indexed) inside run-* directory"""
+        return self.logs_scf_dir / f"run-{run_idx}" / "scf.log"
+
+    def scf_run_history_dir(self, run_idx: int) -> Path:
+        """Get history directory for SCF run (1-indexed) - for retHistoryScfDir"""
+        return self.history_scf_dir / f"run-{run_idx}"
 
     def scf_class_dir(self, label: str) -> Path:
         """Get directory for classified SCF runs (fast/median/slow)"""
@@ -876,7 +878,7 @@ def build_cmd(
     if phase == "fixed" and include_ret_history:
         cmd.extend(["--retHistory", str(paths.run_history_path(run_idx))])
     if phase == "scf" and cfg.do_retHistoryScfDir:
-        cmd.extend(["--retHistoryScfDir", str(paths.history_scf_dir)])
+        cmd.extend(["--retHistoryScfDir", str(paths.scf_run_history_dir(run_idx))])
     return [x for x in cmd if x]
 
 
@@ -1452,7 +1454,7 @@ def main():
                     scf_log = paths.logs_scf_dir / "scf.log"
                     run_label = ""
                 else:
-                    # Multiple SCF runs: use numbered log files
+                    # Multiple SCF runs: use run-* directory structure like FIXED
                     scf_log = paths.scf_run_log_path(scf_run_idx)
                     run_label = f" [run {scf_run_idx}/{CFG.scf_runs_per_combo}]"
 
@@ -1463,6 +1465,10 @@ def main():
                 print("CMD:", " ".join(scf_cmd))
 
                 if not CFG.dry_run:
+                    # Ensure parent directory exists for run-* structure
+                    if CFG.scf_runs_per_combo > 1:
+                        ensure_dir(scf_log.parent)
+
                     scf_rc = run_once(scf_cmd, scf_log, combo.threads)
                     if scf_rc != 0:
                         print(f"[ERR][SCF] Return code {scf_rc} – see: {scf_log}")
@@ -1529,18 +1535,23 @@ def main():
                                 f"{rank}) run-{idx}: GOSPEL.calculate={sec}  label={tag[0] if tag else '-'}\n"
                             )
 
-                    # Move files to labeled directories (fast/median/slow)
+                    # Copy files to labeled directories (keep originals in run-* directories)
                     for label, idx in scf_labels.items():
                         dst_dir = paths.scf_class_dir(label)
                         src_log = paths.scf_run_log_path(idx)
 
                         if src_log.exists():
                             ensure_dir(dst_dir)
-                            shutil.move(str(src_log), str(dst_dir / "scf.log"))
+                            shutil.copy2(str(src_log), str(dst_dir / "scf.log"))
                         else:
                             print(
                                 f"[WARN] SCF log not found for label={label}: {src_log}"
                             )
+
+                    # Note: run-* directories are preserved to keep all seed results
+                    print(
+                        f"[INFO] All SCF run-* directories preserved in {paths.logs_scf_dir}"
+                    )
 
                     # Write SCF summary JSON
                     (paths.history_scf_dir / "summary.json").write_text(
@@ -1583,11 +1594,7 @@ def main():
             continue
 
         # FIXED requires SCF density if configured (unless scf_runs_per_combo=0)
-        if (
-            CFG.scf_runs_per_combo > 0
-            and CFG.require_density_for_fixed
-            and (scf_rc != 0 or not dens_file.exists())
-        ):
+        if CFG.scf_runs_per_combo > 0 and (scf_rc != 0 or not dens_file.exists()):
             print(
                 f"[SKIP][FIXED] Missing/failed SCF density for combo={paths.base_subpath_fixed} – skip fixed runs."
             )
@@ -1669,31 +1676,30 @@ def main():
                     f"{rank}) run-{idx}: davidson={sec}  label={tag[0] if tag else '-'}\n"
                 )
 
-        # Move files to labeled directories
+        # Copy files to labeled directories (keep originals in run-* directories)
         for label, idx in labels.items():
             dst_dir = paths.class_dir(label)
             src_h = paths.run_history_path(idx)
             src_l = paths.run_log_path(idx)
 
-            # Only check/move history file if do_retHistory is enabled
+            # Only check/copy history file if do_retHistory is enabled
             if CFG.do_retHistory:
                 if src_h.exists():
                     ensure_dir(dst_dir)
-                    shutil.move(str(src_h), str(dst_dir / "history.pt"))
+                    shutil.copy2(str(src_h), str(dst_dir / "history.pt"))
                 else:
                     print(f"[WARN] history not found for label={label}: {src_h}")
 
             if src_l.exists():
                 ensure_dir(dst_dir)
-                shutil.move(str(src_l), str(dst_dir / "stdout.log"))
+                shutil.copy2(str(src_l), str(dst_dir / "stdout.log"))
             else:
                 print(f"[WARN] log not found for label={label}: {src_l}")
 
-        # Clean up temporary run directories
-        for d in paths.logs_fixed_dir.glob("run-*"):
-            shutil.rmtree(d, ignore_errors=True)
-        for d in paths.history_dir.glob("run-*"):
-            shutil.rmtree(d, ignore_errors=True)
+        # Note: run-* directories are preserved to keep all seed results
+        print(
+            f"[INFO] All run-* directories preserved in {paths.history_dir} and {paths.logs_fixed_dir}"
+        )
 
         # Write summary
         (paths.history_dir / "summary.json").write_text(

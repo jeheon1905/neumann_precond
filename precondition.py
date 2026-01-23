@@ -702,6 +702,8 @@ class PreNeumann(Preconditioner):
         error_cutoff=-0.4,
         verbosityLevel=0,
         timing=False,
+        # cesaro_sum=False,
+        cesaro_sum=True,
     ):
         super().__init__("neumann", use_cuda, fp)
         self.orders = None
@@ -724,6 +726,7 @@ class PreNeumann(Preconditioner):
         self.error_cutoff = error_cutoff
         self.verbosityLevel = verbosityLevel
         self.timing = timing
+        self.cesaro_sum = cesaro_sum
 
         self.gapp = create_preconditioner("gapp", grid, use_cuda)
 
@@ -739,11 +742,127 @@ class PreNeumann(Preconditioner):
         s += f"\n* error_cutoff     : {self.error_cutoff}"
         s += f"\n* verbosityLevel   : {self.verbosityLevel}"
         s += f"\n* timing           : {self.timing}"
+        s += f"\n* cesaro_sum       : {self.cesaro_sum}"
         s += "\n=====================================================================\n"
         return str(s)
 
-
     def call(self, residue, H, eigval):
+        INV_4PI = 0.25 / np.pi
+
+        is_needed_residue_norm = (
+            self.order in ("DO", "res") or self.verbosityLevel > 0 or self.correction_scale != 0.0
+        )
+
+        with Timer.track("Neumann. residue norm", self.timing, False):
+            residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
+
+        # Modify shift values
+        if self.correction_scale != 0.0:
+            perturb = -(residue_norm.conj() * residue_norm)
+            eigval = eigval + self.correction_scale * perturb
+            eigval[abs(perturb) > self.no_shift_thr] = 0.0  # no shift to states with large residues
+
+        # keep the original residue shape
+        if residue.ndim == 1:
+            residue = residue.unsqueeze(0)
+
+        with Timer.track("Neumann. gapp (order 0)", self.timing, False):
+            preconditioned_result = self.gapp(residue).mul_(INV_4PI)
+
+        # Early return for order 0
+        if self.order == 0:
+            return preconditioned_result
+        
+        norders = torch.zeros(residue_norm.size(-1), device=residue_norm.device, dtype=torch.long)
+        # determine order when self.order == "DO"
+        if str(self.order).startswith("DO"):
+            norders.fill_(self.orders[-1])
+            for i in range(len(self.thresholds) -1, -1, -1):
+                thr = self.thresholds[i]
+                ord_val = self.orders[i]
+                norders[residue_norm.view(-1) > thr] = ord_val
+
+            # Even if orders contain duplicates or are not sorted, print the count for each range
+            if self.verbosityLevel > 0:
+                total_count = residue_norm.numel()
+                print(f"Total residual norms count = {total_count}")
+                print("Order Distribution by Range:")
+                mask = residue_norm > self.thresholds[0]
+                cnt = mask.sum().item()
+                print(f"    Range (residual norm > {self.thresholds[0]:.1e}) : Order {self.orders[0]} -> Count {cnt} ({cnt/total_count*100:.1f}%)")
+
+                for i in range(len(self.thresholds) - 1):
+                    high = self.thresholds[i]
+                    low = self.thresholds[i+1]
+                    mask = (residue_norm <= high) & (residue_norm > low)
+                    cnt = mask.sum().item()
+                    print(f"    Range ({low:.1e}<= residual norm < {high:.1e}] : Order {self.orders[i+1]} -> Count {cnt} ({cnt/total_count*100:.1f}%)")
+                mask = residue_norm <= self.thresholds[-1]
+                cnt = mask.sum().item()
+                print(f"    Range (residual norm <= {self.thresholds[-1]:.1e}) : Order {self.orders[-1]} -> Count {cnt} ({cnt/total_count*100:.1f}%)")
+
+        # determine order when self.order == "res"
+        elif str(self.order).startswith("res"):
+            max_res = float(torch.max(residue_norm))
+            selected_order = self.orders[-1]
+            for idx, thr in enumerate(self.thresholds):
+                if max_res > thr:
+                    selected_order = self.orders[idx]
+                    break
+            norders.fill_(selected_order)
+            if self.verbosityLevel > 0:
+                print(f"max residual norm = {torch.max(residue_norm)}. using order = {selected_order}")
+        else:
+            order = int(self.order)
+            norders.fill_(order)
+
+        # Neumann series expansion for order > 0
+        neumann_term = preconditioned_result.clone()
+        active_indices = torch.arange(neumann_term.size(1), device=neumann_term.device)
+
+        max_ord = int(torch.max(norders).item())
+        for n in range(1, max_ord + 1):
+            # Find which vectors in current neumann_term are still active
+            active_mask = norders[active_indices] >= n
+
+            if not active_mask.any():
+                break
+
+            with Timer.track("Neumann. prepare active", self.timing, False):
+                if active_mask.all():
+                    idx_slice = Ellipsis
+                else:
+                    neumann_term = neumann_term[:, active_mask]
+                    active_indices = active_indices[active_mask]
+                    idx_slice = active_indices
+
+            # Compute the next Neumann series and accumulate the result
+            with Timer.track("Neumann. (H - e)x", self.timing, False):
+                H_minus_eigval_vec = H @ neumann_term - eigval[:, idx_slice] * neumann_term
+
+            with Timer.track("Neumann. gapp", self.timing, False):
+                neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
+
+            with Timer.track("Neumann. accumulate", self.timing, False):
+                if self.cesaro_sum:
+                    N_values = norders[active_indices]
+                    weight = 1.0 - n / (N_values + 1.0)
+                    # if n % 2 == 1: weight = 0  # remove odd terms
+                    # if n % 2 == 0: weight = 1.0  # apply cesaro weights only to odd terms
+                    print(f"Debug: weights for order {n}: {weight}")
+                    preconditioned_result[:, idx_slice] += neumann_term * weight
+                else:
+                    preconditioned_result[:, idx_slice] += neumann_term
+
+        if self.verbosityLevel > 1:
+            diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue
+            error = torch.norm(diff, dim=0) / residue_norm
+            print(f"relative error log10 = {torch.log10(error)}")
+
+        return preconditioned_result
+
+    # def call(self, residue, H, eigval):
+    def call_old(self, residue, H, eigval):
         INV_4PI = 0.25 / np.pi
 
         is_needed_residue_norm = (
@@ -773,7 +892,7 @@ class PreNeumann(Preconditioner):
         # Neumann series expansion for order > 0
         neumann_term = preconditioned_result.clone()
         norder = torch.zeros(residue_norm.size(), device = residue_norm.device, dtype = torch.long)
-        
+
         # determine order when self.order == "DO"
         if str(self.order).startswith("DO"):
             norder.fill_(self.orders[-1])
@@ -825,16 +944,18 @@ class PreNeumann(Preconditioner):
             if not active.any():
                 break
 
-            active_neumann_term = neumann_term[:, active]
-            active_eigval = eigval[:, active]
+            with Timer.track("Neumann. extract active", self.timing, False):
+                active_neumann_term = neumann_term[:, active]
+                active_eigval = eigval[:, active]
 
             # Compute the next Neumann series and accumulate the result
             with Timer.track("Neumann. (H - e)x", self.timing, False):
                 active_H_minus_eigval_vec = H @ active_neumann_term - active_eigval * active_neumann_term
             with Timer.track("Neumann. gapp", self.timing, False):
                 active_neumann_term -= self.gapp(active_H_minus_eigval_vec).mul_(INV_4PI)
-            preconditioned_result[:,active] += active_neumann_term
-            neumann_term[:,active] = active_neumann_term
+            with Timer.track("Neumann. accumulate", self.timing, False):
+                preconditioned_result[:,active] += active_neumann_term
+                neumann_term[:,active] = active_neumann_term
 
         if self.verbosityLevel > 1:
             diff = (H @ preconditioned_result - eigval * preconditioned_result) - residue

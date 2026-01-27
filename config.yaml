@@ -48,6 +48,8 @@ sweep:
   innerorder: [0]
   pcg_neumann: [5]
   error_cutoff: [-0.4]
+  averaged_sum: [false]
+  weight: [0.5]
   spacing: [0.2]
   nbands: []  # Empty = use defaults
   virtual_factor: [1.2]

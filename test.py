@@ -112,6 +112,8 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
     innerorder = _innerorder_value(args.innerorder)
     outerorder = _outerorder_value(args.outerorder)
     error_cutoff = float(args.error_cutoff)
+    averaged_sum = bool(args.averaged_sum)
+    weight = args.weight if args.weight == "cesaro" else float(args.weight)
 
     if precond_type == "neumann":
         precond_options = {
@@ -126,6 +128,8 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                 "verbosityLevel": args.verbosity,
                 "max_order": 20,
                 "timing": True,
+                "averaged_sum": averaged_sum,
+                "weight": weight,
             },
         }
     elif precond_type == "shift-and-invert" and args.inner == "gapp":
@@ -172,7 +176,9 @@ def build_preconditioner(calc: GOSPEL, args: argparse.Namespace) -> None:
                                           "error_cutoff": error_cutoff,
                                           "verbosityLevel": args.verbosity,
                                           "max_order": 20,
-                                          "timing": True}, args.merge_iter),
+                                          "timing": True,
+                                          "averaged_sum": averaged_sum,
+                                          "weight": weight}, args.merge_iter),
                              ("shift-and-invert", {"inner_precond" : args.inner,
                                                    "no_shift_thr": 10,
                                                    "max_iter": int(args.pcg_iter),
@@ -403,6 +409,12 @@ def build_argparser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--error_cutoff", type=str, default="-0.4", help="ensure lower error"
+    )
+    p.add_argument(
+        "--averaged_sum", type=int, default=0, help="use averaged sum (0=False, 1=True)"
+    )
+    p.add_argument(
+        "--weight", type=str, default="0.5", help="weight for averaged sum (float or 'cesaro')"
     )
 
     # Discretization / bands

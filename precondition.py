@@ -702,8 +702,8 @@ class PreNeumann(Preconditioner):
         error_cutoff=-0.4,
         verbosityLevel=0,
         timing=False,
-        # cesaro_sum=False,
-        cesaro_sum=True,
+        averaged_sum=False,
+        weight=0.5,
     ):
         super().__init__("neumann", use_cuda, fp)
         self.orders = None
@@ -726,7 +726,11 @@ class PreNeumann(Preconditioner):
         self.error_cutoff = error_cutoff
         self.verbosityLevel = verbosityLevel
         self.timing = timing
-        self.cesaro_sum = cesaro_sum
+        self.averaged_sum = averaged_sum  # two-point averaging of Neumann series
+
+        if not (isinstance(weight, float) or weight == "cesaro"):
+            raise AssertionError("weight should be float or 'cesaro'")
+        self.weight = weight
 
         self.gapp = create_preconditioner("gapp", grid, use_cuda)
 
@@ -742,7 +746,8 @@ class PreNeumann(Preconditioner):
         s += f"\n* error_cutoff     : {self.error_cutoff}"
         s += f"\n* verbosityLevel   : {self.verbosityLevel}"
         s += f"\n* timing           : {self.timing}"
-        s += f"\n* cesaro_sum       : {self.cesaro_sum}"
+        s += f"\n* averaged_sum     : {self.averaged_sum}"
+        s += f"\n* weight           : {self.weight}"
         s += "\n=====================================================================\n"
         return str(s)
 
@@ -844,12 +849,19 @@ class PreNeumann(Preconditioner):
                 neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
 
             with Timer.track("Neumann. accumulate", self.timing, False):
-                if self.cesaro_sum:
+                if self.averaged_sum:
                     N_values = norders[active_indices]
-                    weight = 1.0 - n / (N_values + 1.0)
-                    # if n % 2 == 1: weight = 0  # remove odd terms
-                    # if n % 2 == 0: weight = 1.0  # apply cesaro weights only to odd terms
-                    print(f"Debug: weights for order {n}: {weight}")
+                    if self.weight == "cesaro":
+                        # Cesaro summation weight
+                        # sum = (1/(N+1)) * sum_{n=0}^{N} S_n
+                        #     = sum_{n=0}^{N} (1 - n/(N+1)) * a_n
+                        weight = 1.0 - n / (N_values + 1.0)
+                    else:
+                        # two-point averaging weight
+                        # sum = alpha * S_n + (1 - alpha) * S_{n-1}
+                        #     = S_{N-1} + alpha * a_N
+                        is_final = N_values == n
+                        weight = torch.where(is_final, self.weight, 1.0)
                     preconditioned_result[:, idx_slice] += neumann_term * weight
                 else:
                     preconditioned_result[:, idx_slice] += neumann_term

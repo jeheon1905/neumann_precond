@@ -13,7 +13,7 @@ import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Set
+from typing import Dict, Iterator, List, Optional, Sequence, Tuple, Set, Union
 
 import yaml
 
@@ -212,6 +212,8 @@ class FixedConfig:
         default_factory=lambda: {"neumann": (2,)}
     )
     error_cutoff_list: Sequence[float] = tuple(round(-0.1 * k, 1) for k in range(1, 8))
+    averaged_sum_list: Sequence[bool] = (False,)
+    weight_list: Sequence[Union[float, str]] = (0.5,)
 
     virtual_factor_list: Sequence[float] = field(default_factory=lambda: (1.2,))
     merge_neu_steps_list: Sequence[int] = field(default_factory=lambda: (5,))
@@ -308,6 +310,12 @@ class FixedConfig:
         if sweep.get("error_cutoff"):
             vals = sweep["error_cutoff"]
             cfg.error_cutoff_list = tuple(float(x) for x in vals)
+        if sweep.get("averaged_sum"):
+            vals = sweep["averaged_sum"]
+            cfg.averaged_sum_list = tuple(bool(x) for x in vals)
+        if sweep.get("weight"):
+            vals = sweep["weight"]
+            cfg.weight_list = tuple(x if x == "cesaro" else float(x) for x in vals)
         if sweep.get("virtual_factor"):
             cfg.virtual_factor_list = tuple(float(x) for x in sweep["virtual_factor"])
         if sweep.get("merge_iter"):
@@ -435,6 +443,8 @@ class Combo:
     error_cutoff: Optional[float]
     virtual_factor: Optional[float]
     merge_neu_steps: Optional[int]
+    averaged_sum: Optional[bool]
+    weight: Optional[Union[float, str]]
 
 
 def generate_combos(cfg: FixedConfig) -> Iterator[Combo]:
@@ -452,22 +462,26 @@ def generate_combos(cfg: FixedConfig) -> Iterator[Combo]:
                         if precond == "neumann":
                             for outer in cfg.outerorder_list:
                                 for ec in cfg.error_cutoff_list:
-                                    yield Combo(
-                                        sys_path,
-                                        spacing,
-                                        nbands,
-                                        scell,
-                                        pbc,
-                                        threads,
-                                        precond,
-                                        None,
-                                        outer,
-                                        None,
-                                        None,
-                                        ec,
-                                        vf,
-                                        None,
-                                    )
+                                    for avg_sum in cfg.averaged_sum_list:
+                                        for w in cfg.weight_list:
+                                            yield Combo(
+                                                sys_path,
+                                                spacing,
+                                                nbands,
+                                                scell,
+                                                pbc,
+                                                threads,
+                                                precond,
+                                                None,
+                                                outer,
+                                                None,
+                                                None,
+                                                ec,
+                                                vf,
+                                                None,
+                                                avg_sum,
+                                                w,
+                                            )
                         elif precond == "shift-and-invert":
                             for order in cfg.innerorder_list:
                                 for pcg in cfg.pcg_iter_by_inner.get("neumann", ()):
@@ -486,6 +500,8 @@ def generate_combos(cfg: FixedConfig) -> Iterator[Combo]:
                                         None,
                                         vf,
                                         None,
+                                        None,
+                                        None,
                                     )
                         elif precond == "neu_ISI":
                             for outer in cfg.outerorder_list:
@@ -493,22 +509,26 @@ def generate_combos(cfg: FixedConfig) -> Iterator[Combo]:
                                     for pcg in cfg.pcg_iter_by_inner.get("neumann", ()):
                                         for ec in cfg.error_cutoff_list:
                                             for miter in cfg.merge_neu_steps_list:
-                                                yield Combo(
-                                                    sys_path,
-                                                    spacing,
-                                                    nbands,
-                                                    scell,
-                                                    pbc,
-                                                    threads,
-                                                    precond,
-                                                    "neumann",
-                                                    outer,
-                                                    order,
-                                                    pcg,
-                                                    ec,
-                                                    vf,
-                                                    int(miter),
-                                                )
+                                                for avg_sum in cfg.averaged_sum_list:
+                                                    for w in cfg.weight_list:
+                                                        yield Combo(
+                                                            sys_path,
+                                                            spacing,
+                                                            nbands,
+                                                            scell,
+                                                            pbc,
+                                                            threads,
+                                                            precond,
+                                                            "neumann",
+                                                            outer,
+                                                            order,
+                                                            pcg,
+                                                            ec,
+                                                            vf,
+                                                            int(miter),
+                                                            avg_sum,
+                                                            w,
+                                                        )
                         else:
                             raise ValueError(f"Unknown precond {precond}")
 
@@ -633,6 +653,8 @@ def build_combo_subpath(
     phase_token: str,
     virtual_factor: Optional[float],
     merge_neu_steps: Optional[int],
+    averaged_sum: Optional[bool],
+    weight: Optional[Union[float, str]],
 ) -> Path:
     name = Path(sys_path).stem
     parts: List[str] = [slugify(name)]
@@ -658,6 +680,14 @@ def build_combo_subpath(
     add(
         f"ec={error_cutoff}",
         (precond in ("neumann", "neu_ISI") and error_cutoff is not None),
+    )
+    add(
+        f"avgsum={int(averaged_sum)}",
+        (precond in ("neumann", "neu_ISI") and averaged_sum is not None),
+    )
+    add(
+        f"weight={weight}",
+        (precond in ("neumann", "neu_ISI") and weight is not None),
     )
     add(f"scell={pair_to_str(supercell)}")
     add(f"pbc={pair_to_str(pbc)}")
@@ -704,6 +734,8 @@ def prepare_paths(cfg: FixedConfig, combo: Combo) -> RunPaths:
         phase_token="scf",
         virtual_factor=combo.virtual_factor,
         merge_neu_steps=combo.merge_neu_steps,
+        averaged_sum=combo.averaged_sum,
+        weight=combo.weight,
     )
     sub_fixed = build_combo_subpath(
         sys_path=combo.sys_path,
@@ -721,6 +753,8 @@ def prepare_paths(cfg: FixedConfig, combo: Combo) -> RunPaths:
         phase_token="fixed",
         virtual_factor=combo.virtual_factor,
         merge_neu_steps=combo.merge_neu_steps,
+        averaged_sum=combo.averaged_sum,
+        weight=combo.weight,
     )
     return RunPaths(
         base_subpath_scf=sub_scf,
@@ -855,6 +889,10 @@ def build_cmd(
             cmd.extend(["--outerorder", str(combo.outerorder)])
         if combo.error_cutoff is not None:
             cmd.extend(["--error_cutoff", str(combo.error_cutoff)])
+        if combo.averaged_sum is not None:
+            cmd.extend(["--averaged_sum", str(int(combo.averaged_sum))])
+        if combo.weight is not None:
+            cmd.extend(["--weight", str(combo.weight)])
     elif combo.precond == "neu_ISI":
         cmd.extend(["--precond", "merge"])
         miter = (
@@ -867,6 +905,10 @@ def build_cmd(
             cmd.extend(["--outerorder", str(combo.outerorder)])
         if combo.error_cutoff is not None:
             cmd.extend(["--error_cutoff", str(combo.error_cutoff)])
+        if combo.averaged_sum is not None:
+            cmd.extend(["--averaged_sum", str(int(combo.averaged_sum))])
+        if combo.weight is not None:
+            cmd.extend(["--weight", str(combo.weight)])
         cmd.extend(["--inner", "neumann"])
         if combo.innerorder is not None:
             cmd.extend(["--innerorder", str(combo.innerorder)])
@@ -1063,6 +1105,8 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
                 "error_cutoff": combo.error_cutoff,
                 "pcg_number": None,
                 "merge_iter": None,
+                "averaged_sum": combo.averaged_sum,
+                "weight": combo.weight,
             }
         )
     elif combo.precond == "shift-and-invert":
@@ -1074,6 +1118,8 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
                 "error_cutoff": None,
                 "pcg_number": combo.pcg_iter,
                 "merge_iter": None,
+                "averaged_sum": None,
+                "weight": None,
             }
         )
     elif combo.precond == "neu_ISI":
@@ -1085,6 +1131,8 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
                 "error_cutoff": combo.error_cutoff,
                 "pcg_number": combo.pcg_iter,
                 "merge_iter": combo.merge_neu_steps,
+                "averaged_sum": combo.averaged_sum,
+                "weight": combo.weight,
             }
         )
     else:
@@ -1096,6 +1144,8 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
                 "error_cutoff": None,
                 "pcg_number": None,
                 "merge_iter": None,
+                "averaged_sum": None,
+                "weight": None,
             }
         )
 
@@ -1366,6 +1416,8 @@ def main():
         "innerorder",
         "pcg",
         "ec",
+        "avgsum",
+        "weight",
         "scell",
         "pbc",
         "nbands",
@@ -1398,6 +1450,8 @@ def main():
         put("innerorder", c.innerorder)
         put("pcg", c.pcg_iter)
         put("ec", c.error_cutoff if c.precond in ("neumann", "neu_ISI") else None)
+        put("avgsum", c.averaged_sum if c.precond in ("neumann", "neu_ISI") else None)
+        put("weight", c.weight if c.precond in ("neumann", "neu_ISI") else None)
         put("scell", c.supercell)
         put("pbc", c.pbc)
         put("nbands", c.nbands if c.nbands is not None else "auto")

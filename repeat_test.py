@@ -681,14 +681,10 @@ def build_combo_subpath(
         f"ec={error_cutoff}",
         (precond in ("neumann", "neu_ISI") and error_cutoff is not None),
     )
-    add(
-        f"avgsum={int(averaged_sum)}",
-        (precond in ("neumann", "neu_ISI") and averaged_sum is not None),
-    )
-    add(
-        f"weight={weight}",
-        (precond in ("neumann", "neu_ISI") and weight is not None),
-    )
+    if precond in ("neumann", "neu_ISI") and averaged_sum is not None:
+        add(f"avgsum={int(averaged_sum)}")
+    if precond in ("neumann", "neu_ISI") and weight is not None:
+        add(f"weight={weight}")
     add(f"scell={pair_to_str(supercell)}")
     add(f"pbc={pair_to_str(pbc)}")
     add(f"nbands={eff_nbands if eff_nbands is not None else 'auto'}")

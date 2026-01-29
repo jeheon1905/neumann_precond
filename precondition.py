@@ -702,7 +702,7 @@ class PreNeumann(Preconditioner):
         error_cutoff=-0.4,
         verbosityLevel=0,
         timing=False,
-        averaged_sum=False,
+        averaged_sum=True,
         weight=0.5,
     ):
         super().__init__("neumann", use_cuda, fp)

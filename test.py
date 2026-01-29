@@ -411,7 +411,7 @@ def build_argparser() -> argparse.ArgumentParser:
         "--error_cutoff", type=str, default="-0.4", help="ensure lower error"
     )
     p.add_argument(
-        "--averaged_sum", type=int, default=0, help="use averaged sum (0=False, 1=True)"
+        "--averaged_sum", type=int, default=1, help="use averaged sum (0=False, 1=True)"
     )
     p.add_argument(
         "--weight", type=str, default="0.5", help="weight for averaged sum (float or 'cesaro')"

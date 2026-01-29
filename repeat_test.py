@@ -212,7 +212,7 @@ class FixedConfig:
         default_factory=lambda: {"neumann": (2,)}
     )
     error_cutoff_list: Sequence[float] = tuple(round(-0.1 * k, 1) for k in range(1, 8))
-    averaged_sum_list: Sequence[bool] = (False,)
+    averaged_sum_list: Sequence[bool] = (True,)
     weight_list: Sequence[Union[float, str]] = (0.5,)
 
     virtual_factor_list: Sequence[float] = field(default_factory=lambda: (1.2,))

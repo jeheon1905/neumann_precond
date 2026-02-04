@@ -824,6 +824,7 @@ class PreNeumann(Preconditioner):
         # Neumann series expansion for order > 0
         neumann_term = preconditioned_result.clone()
         active_indices = torch.arange(neumann_term.size(1), device=neumann_term.device)
+        eigval_active = eigval.clone()
 
         max_ord = int(torch.max(norders).item())
         for n in range(1, max_ord + 1):
@@ -835,29 +836,36 @@ class PreNeumann(Preconditioner):
 
             with Timer.track("Neumann. prepare active", self.timing, False):
                 if active_mask.all():
-                    idx_slice = Ellipsis
+                    # All currently tracked vectors remain active
+                    # Use Ellipsis only when no filtering has occurred (all original vectors still active)
+                    if active_indices.size(0) == preconditioned_result.size(1):
+                        idx_slice = Ellipsis
+                    else:
+                        idx_slice = active_indices
                 else:
+                    # Filter out inactive vectors
                     neumann_term = neumann_term[:, active_mask]
+                    eigval_active = eigval_active[:, active_mask]
                     active_indices = active_indices[active_mask]
                     idx_slice = active_indices
 
             # Compute the next Neumann series and accumulate the result
             with Timer.track("Neumann. (H - e)x", self.timing, False):
-                H_minus_eigval_vec = H @ neumann_term - eigval[:, idx_slice] * neumann_term
+                H_minus_eigval_vec = H @ neumann_term - eigval_active * neumann_term
 
             with Timer.track("Neumann. gapp", self.timing, False):
                 neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
 
             with Timer.track("Neumann. accumulate", self.timing, False):
                 if self.averaged_sum:
-                    N_values = norders[active_indices]
+                    N_values = norders[idx_slice]
                     if self.weight == "cesaro":
                         # Cesaro summation weight
                         # sum = (1/(N+1)) * sum_{n=0}^{N} S_n
                         #     = sum_{n=0}^{N} (1 - n/(N+1)) * a_n
                         weight = 1.0 - n / (N_values + 1.0)
                     else:
-                        # two-point averaging weight
+                        # Two-point averaging weight
                         # sum = alpha * S_n + (1 - alpha) * S_{n-1}
                         #     = S_{N-1} + alpha * a_N
                         is_final = N_values == n

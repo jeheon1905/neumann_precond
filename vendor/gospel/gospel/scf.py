@@ -93,9 +93,11 @@ class SCF:
                 else:  # mixing.what == "density"
                     mixing.append(init_density)
 
-            # Set diagonalization tolerance
+            # Adjust diagonalization convergence tolerance
+            # For first iteration, set diag_tol to 0.1 to avoid over-diagonalization
+            # For subsequent iterations, set diag_tol proportional to density_diff
             if i_iter == 0:
-                self.diag_tol = 1.0
+                self.diag_tol = 0.1
             else:
                 self.diag_tol = min(0.1 * self.density_diff, self.diag_tol)
             print(f"Diagonalization convg_tol is set to {self.diag_tol}.")

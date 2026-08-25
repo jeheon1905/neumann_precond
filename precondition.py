@@ -734,6 +734,23 @@ class PreNeumann(Preconditioner):
 
         self.gapp = create_preconditioner("gapp", grid, use_cuda)
 
+        # --- spectral-analysis hooks (JCTC revision) ---
+        # Both are disabled (None) by default and have no effect on the
+        # production numerical path. See spectral_tools.py.
+        self.spectral_probe = None  # called once per PreNeumann.call
+        self.term_probe = None  # called for each Neumann recurrence term a_n
+
+    def apply_P(self, x):
+        """Exact code-level action of the zeroth-order GAPP operator P.
+
+        P x = (1 / 4pi) * GAPP(x)
+
+        This mirrors ``self.gapp(x).mul_(INV_4PI)`` used by the production
+        recurrence, but without the in-place mutation so that it is safe to
+        apply to analysis vectors.
+        """
+        return self.gapp(x) * (0.25 / np.pi)
+
     def __str__(self):
         s = str()
         s += "\n========================= [ Preconditioner ] ========================"
@@ -762,22 +779,44 @@ class PreNeumann(Preconditioner):
             residue_norm = residue.norm(dim=0, keepdim=True) if is_needed_residue_norm else None
 
         # Modify shift values
+        raw_eigval = None if self.spectral_probe is None else eigval.clone()
+        zero_shift_mask = None
         if self.correction_scale != 0.0:
             perturb = -(residue_norm.conj() * residue_norm)
             eigval = eigval + self.correction_scale * perturb
-            eigval[abs(perturb) > self.no_shift_thr] = 0.0  # no shift to states with large residues
+            _no_shift = abs(perturb) > self.no_shift_thr
+            eigval[_no_shift] = 0.0  # no shift to states with large residues
+            if self.spectral_probe is not None:
+                zero_shift_mask = _no_shift
 
         # keep the original residue shape
         if residue.ndim == 1:
             residue = residue.unsqueeze(0)
 
+        # One-shot spectral probe (disabled by default; no production effect).
+        if self.spectral_probe is not None:
+            self.spectral_probe(
+                residue=residue,
+                H=H,
+                raw_eigval=raw_eigval,
+                corrected_eigval=eigval,
+                residue_norm=residue_norm,
+                zero_shift_mask=zero_shift_mask,
+                apply_P=self.apply_P,
+                preconditioner=self,
+                call_index=self.num_called,
+            )
+
         with Timer.track("Neumann. gapp (order 0)", self.timing, False):
             preconditioned_result = self.gapp(residue).mul_(INV_4PI)
+
+        if self.term_probe is not None:
+            self.term_probe(n=0, term=preconditioned_result, active_indices=None)
 
         # Early return for order 0
         if self.order == 0:
             return preconditioned_result
-        
+
         norders = torch.zeros(residue_norm.size(-1), device=residue_norm.device, dtype=torch.long)
         # determine order when self.order == "DO"
         if str(self.order).startswith("DO"):
@@ -855,6 +894,9 @@ class PreNeumann(Preconditioner):
 
             with Timer.track("Neumann. gapp", self.timing, False):
                 neumann_term -= self.gapp(H_minus_eigval_vec).mul_(INV_4PI)
+
+            if self.term_probe is not None:
+                self.term_probe(n=n, term=neumann_term, active_indices=active_indices)
 
             with Timer.track("Neumann. accumulate", self.timing, False):
                 if self.averaged_sum:

@@ -493,6 +493,24 @@ def davidson(
 
             # Preconditioning
             if preconditioner is not None:
+                # Optional metadata for the JCTC spectral-analysis probe.
+                # Inert unless a spectral probe has been attached.
+                if getattr(preconditioner, "spectral_probe", None) is not None:
+                    _bidx = torch.nonzero(unlock, as_tuple=False).flatten()
+                    if _bidx.numel() != R.shape[1]:
+                        # column mapping was cut (fill_block) or column-distributed
+                        # over ranks: do not guess it.
+                        _bidx = None
+                    preconditioner._davidson_meta = {
+                        "i_iter": i_iter,
+                        "i_b": i_b,
+                        "i_scf": i_scf,
+                        "band_index": None if _bidx is None else _bidx.tolist(),
+                    }
+                    # reference (not a copy) to the current subspace U_, against
+                    # which R is orthogonalised a few lines below. Used by the
+                    # probe to build the deflation projector.
+                    preconditioner._davidson_subspace = U_
                 with Timer.track("Preconditioning", timing, verbosity):
                     if use_MP:
                         R = R.to(SP)

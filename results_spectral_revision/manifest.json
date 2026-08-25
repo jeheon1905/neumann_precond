@@ -1,0 +1,195 @@
+{
+ "task": "JCTC spectral-analysis revision (Neumann preconditioner)",
+ "status": "complete",
+ "branch": "revision-spectral-analysis",
+ "base_commit": "765711d0afc1561e55721eddca68a37cbbeeb54f",
+ "repository": "https://github.com/jeheon1905/neumann_precond",
+ "repository_note": "Local working copy is a git clone whose HEAD equals origin/main (verified with git ls-remote); tracked tree clean. Used in place instead of a second clone so that the 759 MB TM pseudopotential set and the archived baseline results stay co-located.",
+ "host": "baekdu (KIAS), CPU-only Slurm cluster; SelectTypeParameters=CR_CORE (memory not used for placement)",
+ "conda_env": "/home/jhwoo1905/miniforge3/envs/neumann_precond",
+ "environment": {
+  "python": "3.10.20",
+  "torch": "2.2.0+cpu",
+  "numpy": "1.26.4",
+  "scipy": "1.15.3",
+  "ase": "3.29.0",
+  "spglib": "2.7.0",
+  "pylibxc": "6.0.0 (built from libxc 6.0.0 source)",
+  "cuda": "not available on this cluster"
+ },
+ "documented_deviations_from_README": [
+  "PyTorch installed as the CPU build instead of the CUDA 11.8 wheel: no GPU exists on any partition.",
+  "scipy and matplotlib added: 18 vendored gospel modules import scipy; matplotlib is needed by the repository plotting scripts.",
+  "README usage example '--outerorder dynamic' fails against the current PreNeumann.__init__; sanity check run with '--outerorder 4'."
+ ],
+ "production_code_changes": {
+  "files": [
+   "precondition.py",
+   "vendor/gospel/gospel/Eigensolver/ParallelDavidson.py"
+  ],
+  "lines_added": 62,
+  "description": "Disabled-by-default probe hooks (spectral_probe, term_probe), an apply_P helper, and an inert Davidson metadata/subspace hook. All guarded by 'is not None'.",
+  "regression": "With the probe disabled, output is BITWISE IDENTICAL to the unmodified code (max|d eigval| = 0.0, max|d residual| = 0.0), re-verified after every code change including the final one."
+ },
+ "analysis_code": [
+  "spectral_tools.py",
+  "spectral_experiment.py",
+  "spectral_summarize.py",
+  "spectral_summarize_states.py",
+  "spectral_summarize_deflated.py",
+  "spectral_order_analysis.py",
+  "tests/test_spectral_tools.py"
+ ],
+ "gates": {
+  "Gate A (installation sanity)": "passed",
+  "Gate 0 (numerical baseline)": "passed - B12 order 4 seed 2: 27 vs 27 Davidson iterations, converged bands agree to 2.7e-8 Ha",
+  "Gate 1 (operator validation)": "passed - delta_apply_P = 0.0, delta_recurrence ~ 4e-16 in every production run, dense 1000x1000 cross-check"
+ },
+ "slurm_jobs": {
+  "completed": 50,
+  "failed_this_session": 4,
+  "cancelled": 2,
+  "failures": [
+   "326536, 326537: debug partition rejects this account (immediate FAILED, signal 53). Switched to 'normal'.",
+   "326976, 327004: MAPbI3 out-of-memory. Cause: SelectTypeParameters=CR_CORE means --mem is ignored for placement, so two large jobs shared node b79. Fixed by reducing the probe footprint (see below) and rerun successfully.",
+   "NOT from this session: 327452, 327453, 327455 (fc.sh, wrap)."
+  ],
+  "probe_memory_fix": "The probe originally cloned whole recurrence-term blocks (~35 GB for MAPbI3). Rewritten to store only the selected columns (~0.2 GB); verified to give identical results."
+ },
+ "no_new_timing_benchmarks": true,
+ "key_deliverables": {
+  "report": "results_spectral_revision/report.md (sections 1-22)",
+  "reviewer_response": "results_spectral_revision/reviewer_response_draft.md",
+  "condition_numbers": "results_spectral_revision/order_analysis/condition_number_summary.md",
+  "existing_benchmark_extract": "results_spectral_revision/reference/existing_order_dependence.md",
+  "figures": 12,
+  "raw_json": 34,
+  "csv": 4
+ },
+ "retracted_during_the_work": [
+  "Section 8.5: the near-equality of lambda_max across the 0-D systems was first attributed to the GAPP t_sample; the actual cause is the indefiniteness of M (section 12).",
+  "Section 9: the projected-spectrum result was first read as refuting the 'irrelevant unstable modes' hypothesis; rho_proj cannot measure modal weight, so no conclusion is drawn from it.",
+  "Section 10: eta_N was first used as the figure of merit and its minimum as the optimal order; eta measures the error of a linear solve Davidson does not want, and the growth occurs along directions Davidson deflates.",
+  "Section 20.3b: rho and (kappa-1)/(kappa+1) were conflated; they coincide only when alpha=1 is the optimal Richardson scaling, which holds only at N=0 for the 0-D systems."
+ ],
+ "sections": {},
+ "rigorous_bounds_campaign": {
+  "purpose": "replace the corrupted condition-number analysis of report §20.2b and certify convergence",
+  "defect": "Krylov basis leaked into span(X), the null space of Pi P_N M Pi; see report Appendix N",
+  "fix": "spectral_tools.arnoldi/lanczos gained project=; the projector is applied AFTER Gram-Schmidt, immediately before normalisation",
+  "jobs": {
+   "svd (kappa, homo+lowest, N=0,2,5,8)": "330624-330627",
+   "jd  (Pi P_N Pi M Pi, homo)": "331606-331609",
+   "rho (certificate, homo+lowest, n=1..20)": "333978-333981"
+  },
+  "measurements": {
+   "kappa": 32,
+   "jd_comparison": 16,
+   "rho_certificate": 8
+  },
+  "validation": {
+   "P_N vs production PreNeumann": "0.00e+00 (bit-for-bit)",
+   "P_N M vs production": "2-6e-15",
+   "adjoint identity": "<=1e-14",
+   "lanczos orthogonality": "1.3-2.0e-14",
+   "independent job sets on the same quantity": "0.000 %",
+   "dense cross-check (Si, n=1000)": "Arnoldi, Lanczos and dense agree to 5 significant figures"
+  },
+  "headline": {
+   "kappa improves in": "32/32 combinations, 2.7-17x from N=0 to N=8",
+   "best kappa": "1.240 (MAPbI3 lowest, N=8)",
+   "iters ~ kappa^p": "p = 0.91 (range 0.85-1.00) for N <= 5; fails for N >= 8",
+   "rho certified < 1": "HOMO 4/4 (<= 0.981) and MAPbI3 lowest (<= 0.810)",
+   "rho > 1": "lowest state of B12, water_128, C60_4 (1.07-1.14) -- damping, not deflation, handles it",
+   "chebyshev": "Damped-NP within 1.2-4.0x of the optimal same-degree polynomial, with no spectral bounds required",
+   "jacobi-davidson": "implemented and JD forms agree to 4.8 % (13/16 within 1 %)"
+  },
+  "outputs": {
+   "json": [
+    "B12_jd.json",
+    "B12_rho.json",
+    "B12_svd.json",
+    "C60_4_jd.json",
+    "C60_4_rho.json",
+    "C60_4_svd.json",
+    "MAPbI3_jd.json",
+    "MAPbI3_rho.json",
+    "MAPbI3_svd.json",
+    "water_cluster_128_jd.json",
+    "water_cluster_128_rho.json",
+    "water_cluster_128_svd.json"
+   ],
+   "figure": "svd_bounds/figures/svd_bounds_summary.png",
+   "code": [
+    "spectral_tools.py (AdjointErrorPropagationOperator, neumann_operator, neumann_precond, lanczos, singular_value_bounds, project= on arnoldi/lanczos)",
+    "spectral_experiment.py (--svd_bounds, --svd_dim, --svd_arnoldi_dim, --jd_form, --rho_bound, --rho_bound_dim)",
+    "spectral_svd_analysis.py (tables, figure, from_logs fallback)"
+   ],
+   "tests": "tests/test_spectral_tools.py -- 11 tests, includes a deliberately unconverged m=5 bracket check"
+  },
+  "merged_into": "report.md 20.2c and Appendix N; staging files removed"
+ },
+ "final_campaigns": {
+  "primary_design": "capture at the first preconditioner call where every analysed state's residual norm is below 1e-3, using the Davidson Ritz value itself as the shift (--probe_resid_below 1e-3 --exact_shift); no iteration choice to justify",
+  "jobs": {
+   "kappa, 2 states, N=0,2,5,8": "330624-330627 (iteration 15, corrected shift; reproduction check)",
+   "kappa, 2 states, converged+exact shift": "356653-356656 (primary)",
+   "Jacobi-Davidson form": "331606-331609",
+   "rho certificate": "333978-333981",
+   "band scan, ~11 bands, N=0,2,5,8": "379318-379321",
+   "dense N=0..10, 3 states": "408521-408524",
+   "fill-in N=1,3,4,6,7,9,10 on every band": "12 jobs",
+   "error norm ||G_N||, NP vs DNP": "418886-418889",
+   "iteration/shift dependence, HOMO, exact shift": "477995-478003 (pc 4/10/16; 478002 OOM, resubmitted as 480378)",
+   "iteration/shift dependence, HOMO, corrected shift + undeflated kappa": "487066-487074"
+  },
+  "measurements": {
+   "condition numbers": 583,
+   "error norms": 264,
+   "rho certificate points": 56,
+   "unique (system,band) curves with N=0..10": 46
+  },
+  "headline": {
+   "convergence": "rho(Pi E Pi) <= 0.949-0.982 for HOMO/middle in all four systems and for MAPbI3/lowest; > 1 (1.07-1.14) for the lowest state of the other three",
+   "threshold": "lambda_min(Pi E Pi) crosses -1 at eps_tilde ~ -0.89 Ha in every 0-D system (-0.8863/-0.8894/-0.8915), i.e. 20-27 % of occupied bands; framed in the response as evidence that the boundary belongs to the GAPP parameterisation, not as the claim itself -- the claim is the general inequality mu_max(Pi P M Pi) < 2",
+   "conditioning": "geometric mean over 46 bands falls 7.11 (N=2) -> 3.11 (N=8), 2.3x, but kappa REVERSES beyond its minimum in all 18 iteration/shift snapshots while the archived iteration count does not; the condition-number analysis was therefore REMOVED from the reviewer response in full (report.md 23.3, 23.6) and survives only in SI Table S1",
+   "damping": "at the lowest state the undamped error norm grows 1.26-1.28 -> 2.47-4.41 while the damped one falls 0.98-1.00 -> 0.44-0.54; damped contracts in 42/44 orders, undamped in 11/44",
+   "chebyshev": "Damped-NP within 1.2-4.0x of the optimal same-degree polynomial with no spectral bounds required",
+   "jacobi-davidson": "implemented and JD forms agree to 4.8 % (13/16 within 1 %)",
+   "shift_convention": "exact vs corrected shift agree to three decimals at i_iter 12 and 18; they differ only at i_iter 6, where c|gamma|^2 is 1.7-10.9 % of the shift (report.md 23.2)",
+   "deflation_necessity": "undeflated kappa(Pbar_N M) is inconclusive at every order (sigma_min does not converge; M near-singular by design) and WORSENS with order, e.g. B12 >100 at N=2 to >242 at N=10, while the deflated one improves to N=6 (report.md 23.4)"
+  },
+  "rigour_audit": {
+   "exact_by_interlacing": "kappa >= sqrt(theta_max/theta_min); sigma_min <= sqrt(theta_min); sigma_max >= sqrt(theta_max)",
+   "numerically_certified_not_proved": "upper ends of the brackets and rho <= ||A^n||^(1/n), which rest on the Lanczos run having converged to the extremal value",
+   "convergence_evidence": "m-independence m=20-100 (8 digits), dense cross-check (5 digits), two independent campaigns (median 0.05 % over 29 points), safe degradation to 'inconclusive' when sigma_min is unconverged"
+  },
+  "outputs": {
+   "reviewer_response": "reviewer_response_draft.md (206 lines)",
+   "internal_record": "report.md (2140 lines) incl. Appendix N",
+   "figures": [
+    "fig1_spectral.png",
+    "fig2_kappa.png"
+   ],
+   "SI_tables": [
+    "S1_condition_numbers.csv",
+    "S2_error_norms.csv",
+    "S3_rho_certificates.csv"
+   ]
+  }
+ },
+ "final_response": {
+  "file": "reviewer_response_draft.md",
+  "lines": 198,
+  "figures": [
+   "figures_final/fig1_condition.png -- mu_max(Pi P M Pi) vs corrected shift, Neumann limit at 2"
+  ],
+  "removed": [
+   "fig2_kappa.png (deleted with the condition-number analysis)",
+   "R2.1 point 4 (N_kappa-min table and the E^N-leakage mechanism)",
+   "the kappa clause in R2.3, the kappa metric in R2.4, the kappa value in R2.6"
+  ],
+  "rationale": "every reviewer question is answerable from rho, the deflation fractions, the mode factor and ||G_N||; kappa was the only measured quantity contradicting the benchmark",
+  "open": "R2.4 'Other eigensolvers' awaits RMM-DIIS results from a separate session"
+ }
+}

@@ -205,3 +205,20 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# ---------------------------------------------------------------------
+# Project-specific
+# ---------------------------------------------------------------------
+
+# Bulk data exchanged with collaborators (~19 GB); kept locally only.
+20*_to_hyunbin/
+20*_from_hyunbin/
+20*_to_hyunbin.tar.gz
+
+# Output of configs/paper/*.yaml -- regenerate, do not commit.
+results_paper/
+
+# Revision working directory: holds VASP sources (rmm-diis.F,
+# david_inner.F, hamil.F -- commercial licence, not redistributable) and
+# journal correspondence containing personal data.  Local only.
+revision/

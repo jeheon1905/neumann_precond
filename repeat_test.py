@@ -1042,6 +1042,41 @@ def write_pretty_summary(dirpath: Path, row: Dict[str, object], filename: str) -
         out_path.write_text(line + "\n", encoding="utf-8")
 
 
+_i_iter_re = re.compile(r"i_iter=(\d+)")
+
+
+def count_scf_diag_iterations(
+    scf_log: Path, scf_iter_cnt: Optional[int]
+) -> Optional[int]:
+    """Cumulative Davidson iterations over an SCF run ("Total Diag. iter.").
+
+    The Timer cannot supply this: in SCF mode gospel reaches ParallelDavidson
+    through the Eigensolver class, whose ``solve_options`` carries no ``timing``
+    key, so ``davidson`` runs with ``timing=False`` and the "Diag. Iter." record
+    is never created.  The per-iteration ``i_iter=`` markers, printed by
+    ``vprint`` at ``verbosity >= 1``, are counted instead -- which is why the
+    SCF configs in configs/paper/ set ``verbosity: 1``.
+
+    Falls back to ``Projection (X.H @ AX)``.count + SCF cycles.  That label is
+    recorded even at ``timing=False`` because ParallelDavidson.py:404 passes
+    ``device`` where it means ``timing``; the identity was verified exactly on
+    all four benchmark systems, but it rests on that slip, so the marker count
+    is preferred.
+    """
+    try:
+        text = scf_log.read_text(encoding="utf-8", errors="ignore")
+    except Exception:
+        return None
+    n = len(_i_iter_re.findall(text))
+    if n:
+        return n
+    metrics = parse_timer_metrics(scf_log)
+    proj = metrics.get("Projection (X.H @ AX)", {}).get("count")
+    if proj is not None and scf_iter_cnt:
+        return int(proj) + int(scf_iter_cnt)
+    return None
+
+
 def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
     metrics = parse_timer_metrics(scf_log)
 
@@ -1151,6 +1186,7 @@ def write_scf_only_summary(combo: Combo, scf_log: Path) -> None:
         "davidson_total": dav_total,
         "scf_iter_count": scf_iter_cnt,
         "gospel_total": gospel_total,
+        "total_diag_iter": count_scf_diag_iterations(scf_log, scf_iter_cnt),
     }
     write_pretty_summary(
         CFG.DENSITY_ROOT.parent, row, filename="calculation_summary_scf.txt"
@@ -1229,6 +1265,15 @@ def write_fixed_summary(
             combo.pcg_iter if combo.precond in ("shift-and-invert", "neu_ISI") else None
         ),
         "merge_iter": (combo.merge_neu_steps if combo.precond == "neu_ISI" else None),
+        # Without these two, NP (averaged_sum=false) and Damped-NP
+        # (averaged_sum=true) produce byte-identical descriptor fields and
+        # become indistinguishable in the shared calculation_summary_fixed.txt.
+        # write_scf_only_summary already records them; this keeps the two
+        # summaries consistent.
+        "averaged_sum": (
+            combo.averaged_sum if combo.precond in ("neumann", "neu_ISI") else None
+        ),
+        "weight": (combo.weight if combo.precond in ("neumann", "neu_ISI") else None),
     }
 
     row = dict(base_row)

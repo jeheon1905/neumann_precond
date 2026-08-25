@@ -88,7 +88,11 @@ calculation:
     do_retHistory: false
     do_retHistoryScfDir: false
     dry_run: false
-    verbosity: 0
+    verbosity: 1             # REQUIRED: 'Total Diag. iter.' of Table S3 is
+                             # counted from the per-iteration `i_iter=` markers,
+                             # which vprint emits only at verbosity >= 1.  In SCF
+                             # mode davidson runs with timing=False, so verbosity
+                             # adds stdout only -- measured penalty is within noise.
     seed: [0, 1, 2]
 
 summary_fields:

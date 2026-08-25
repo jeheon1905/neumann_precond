@@ -42,11 +42,11 @@ two SCF conditions are two configs.
 | `do_retHistory` | `ParallelDavidson` appends `eigval.to("cpu")` and `residue.to("cpu")` every outer iteration; `test.py` saves them as `history.pt` | a GPU→CPU copy per iteration |
 | `verbosity` | `Timer.stop` prints `[Time: <label>]: <t> s` for every timed block | stdout per iteration |
 
-`Timer` itself is always on — `test.py` calls `davidson(..., timing=True)`
-unconditionally, and `timing`, not `verbosity`, is what gates
-`PH.synchronize()`. The aggregate **Timer Summary** is therefore printed even
-at `verbosity: 0`, which is why iteration counts and preconditioning totals are
-still available from the timing runs:
+On the fixed-Hamiltonian path `Timer` is always on — `test.py` calls
+`davidson(..., timing=True)` directly — and `timing`, not `verbosity`, is what
+gates `PH.synchronize()`. The aggregate **Timer Summary** is therefore printed
+even at `verbosity: 0`, which is why iteration counts and preconditioning
+totals are still available from the timing runs:
 
 ```
 ======================== Timer Summary ========================
@@ -62,6 +62,36 @@ deviations (Table S2) need the individual `[Time: ...]` lines, hence
 both flags off so that wall times are not inflated.
 
 `config.fixed.periter.yaml` runs order 5 only, so the extra cost is small.
+
+The SCF configs also set `verbosity: 1`, for a different reason. Table S3's
+first column, *Total Diag. iter.*, cannot come from the Timer at all: in SCF
+mode gospel reaches `ParallelDavidson` through the `Eigensolver` class, whose
+`solve_options` carries no `timing` key, so `davidson` runs with
+`timing=False` and no `Diag. Iter.` record is ever created. The count is taken
+from the per-iteration `i_iter=` markers instead, which `vprint` emits only at
+`verbosity >= 1` — a `verbosity: 0` SCF run yields **zero** markers. Because
+`timing` is false on that path, verbosity adds stdout and nothing else; the
+measured difference against matched `verbosity: 0` runs was within noise
+(37.63 vs 37.75 s, 35.62 vs 35.91 s, 60.24 vs 60.38 s).
+
+## Turning runs into the published numbers
+
+| Output | Where the numbers are |
+|---|---|
+| Figure 1, Table S1 | `<results_root>/calculation_summary_fixed.txt` |
+| Figure 3, Table S3 | `<results_root>/calculation_summary_scf.txt` |
+| Figure 2 | `history/**/median/history.pt` → `plot_convg_history.py --filepath <...> --plot residual` |
+| Figure S1, Table S2 | `extract_per_iteration_time.py` → `Figures/plot_order5_damped_isi_per_iter.py`, `Figures/stats_order5_damped_isi.py` |
+
+```bash
+python extract_per_iteration_time.py \
+    --results_root results_paper/fixed.periter \
+    --order 5 --out Figures/order5_np_damped_isi_per_iteration_time.csv
+```
+
+`extract_per_iteration_time.py` reproduces the published CSV exactly when
+pointed at the archived runs (1465 rows, zero numeric differences), so the same
+invocation against a new run yields a drop-in replacement.
 
 ## Settings taken from the paper
 

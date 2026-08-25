@@ -80,7 +80,7 @@ measured difference against matched `verbosity: 0` runs was within noise
 |---|---|
 | Figure 1, Table S1 | `<results_root>/calculation_summary_fixed.txt` |
 | Figure 3, Table S3 | `<results_root>/calculation_summary_scf.txt` |
-| Figure 2 | `history/**/median/history.pt` → `plot_convg_history.py --filepath <...> --plot residual` |
+| Figure 2 | `history/**/median/history.pt` → `plot_convg_history.py` (see below) |
 | Figure S1, Table S2 | `extract_per_iteration_time.py` → `Figures/plot_order5_damped_isi_per_iter.py`, `Figures/stats_order5_damped_isi.py` |
 
 ```bash
@@ -92,6 +92,21 @@ python extract_per_iteration_time.py \
 `extract_per_iteration_time.py` reproduces the published CSV exactly when
 pointed at the archived runs (1465 rows, zero numeric differences), so the same
 invocation against a new run yields a drop-in replacement.
+
+One panel of Figure 2 is one `history.pt`:
+
+```bash
+python plot_convg_history.py \
+    --filepath results_paper/fixed.history/history/<system>/.../median/history.pt \
+    --plot residual --convg_tol 1e-5 \
+    --num_eig <occupied states> --figsize 5 4 --save panel.png
+```
+
+Pass `--num_eig` with the number of occupied states (512 / 480 / 640 / 250 for
+(H₂O)₁₂₈ / C₆₀ tetramer / MAPbI₃ / B₁₂); the caption specifies that the residual
+norm is taken over the occupied states, and without it the virtual orbitals are
+drawn too. The default `--figsize 3.6 4.2` clips longer titles, so pass a wider
+one for anything but a short label.
 
 ## Checking the plumbing without a GPU
 

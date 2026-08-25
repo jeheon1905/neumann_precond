@@ -140,6 +140,12 @@ if __name__ == "__main__":
             [eigval[: args.num_eig] for eigval in eigvalHistory]
         )
         resHistory = torch.stack([res[: args.num_eig] for res in resHistory])
+    else:
+        # torch.save writes resHistory as a list of per-iteration tensors, and
+        # only the branch above turned it into one.  Without --num_eig it stayed
+        # a list and the .to() below raised AttributeError.  eigvalHistory is
+        # already stacked further up, so only this one needs it.
+        resHistory = torch.stack(list(resHistory))
 
     eigvalHistory = eigvalHistory.to(torch.float64)
     resHistory = resHistory.to(torch.float64)

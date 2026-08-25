@@ -1,0 +1,116 @@
+# CPU smoke test -- NOT a paper configuration.
+# Mirrors paper/config.fixed.history.yaml: checks that history.pt is written
+# and that plot_convg_history.py can consume it (Figure 2).
+experiment:
+  name: experiment
+  results_root: results_smoke/fixed.history
+  density_key_mode: geom4
+systems:
+  roots:
+  - data/systems
+  extensions:
+  - '*.cif'
+  - '*.sdf'
+  - '*.xyz'
+  selected:
+  - water.xyz
+  defaults:
+    supercell:
+    - 1
+    - 1
+    - 1
+    pbc: null
+    spacing: 0.5
+    nbands: null
+sweep:
+  preconds:
+  - shift-and-invert
+  - neumann
+  threads:
+  - 1
+  outerorder:
+  - 0
+  - 2
+  innerorder:
+  - 0
+  pcg_neumann:
+  - 5
+  error_cutoff:
+  - -0.4
+  averaged_sum:
+  - true
+  weight:
+  - 0.5
+  spacing:
+  - 0.5
+  nbands: []
+  virtual_factor:
+  - 1.2
+  merge_iter: []
+neumann:
+  res_orders:
+  - 2
+  - 6
+  - 10
+  res_thresholds:
+  - 1e-0
+  - 1e-1
+calculation:
+  mode: fixed
+  temperature: 0.0
+  scf_print_energies: false
+  scf_energy_tol: .inf
+  scf_density_tol: 0.0001
+  scf_mixing: potential
+  pp_type: TM
+  filtering: true
+  use_cuda: false
+  warmup_when_cuda: 0
+  virtual_factor: 1.2
+  diagonalization:
+    iter: null
+    tol: null
+    scf:
+      iter: 20
+      tol: null
+    fixed:
+      iter: 50
+      tol: 0.0001
+  davidson:
+    nblock: 2
+    locking: false
+    fill_block: false
+  execution:
+    runs_per_combo: 1
+    scf_runs_per_combo: 0
+    do_retHistory: true
+    do_retHistoryScfDir: false
+    dry_run: false
+    verbosity: 1
+    seed:
+    - 0
+summary_fields:
+  davidson_total:
+    candidates:
+    - davidson
+    - Davidson.diagonalize
+    - Davidson diagonalize
+    - Davidson
+    attr: total
+  diag_iter_count:
+    candidates:
+    - Diag. Iter.
+    - Diag Iter.
+    - Diag Iter
+    - SCF iter.
+    - SCF iter
+    - SCF iteration
+    attr: count
+  preconditioning_total:
+    candidates:
+    - Preconditioning
+    attr: total
+  preconditioning_count:
+    candidates:
+    - Preconditioning
+    attr: count

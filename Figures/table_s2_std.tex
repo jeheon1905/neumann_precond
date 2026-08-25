@@ -1,0 +1,59 @@
+% Table S2 — per-iteration std summary (Damped-NP order=5 vs ISI)
+% Suggested Overleaf path: "S2 Table/table_s2_std.tex"
+% Requires: booktabs, multirow, threeparttable, makecell (all already in main.tex preamble)
+\begin{table}[htbp]
+\centering
+\caption{%
+Per-iteration cost of the Damped-NP (order $=5$) and ISI preconditioners
+under \emph{fixed-Hamiltonian} diagonalization \emph{without the locking
+scheme}, summarized over the steady-state region (the first and last
+iterations are excluded because their preconditioning times are undefined:
+the first iteration has no preconditioning step and the last iteration is a
+partial/convergence step). For each benchmark system, the mean and sample
+standard deviation ($\mu \pm \sigma$, in seconds) of the diagonalization time
+and the preconditioning time are listed for both methods. The third row of
+each block reports the standard-deviation ratio
+$\sigma_{\mathrm{ISI}}/\sigma_{\text{Damped-NP}}$ for the corresponding
+quantity. Across all four systems Damped-NP maintains an essentially constant
+per-iteration cost ($\sigma \lesssim 0.006$~s for both quantities), whereas
+the variability of ISI is larger by a factor of roughly $5$--$106$; the
+largest disparity occurs for $\mathrm{MAPbI}_{3}$ (preconditioning time,
+$\sim\!106\times$) and the smallest for Vitamin~$\mathrm{B}_{12}$
+($\sim\!5\times$).%
+}
+\label{tab:s2_per_iter_std}
+\begin{threeparttable}
+\begin{tabular}{l l c c}
+\toprule
+System & Method & \makecell{Diag. time\\ $\mu \pm \sigma$ (s)}
+                & \makecell{Precond. time\\ $\mu \pm \sigma$ (s)} \\
+\midrule
+\multirow{3}{*}{$(\mathrm{H_2O})_{128}$}
+ & Damped-NP                              & $1.4621 \pm 0.0023$ & $0.9880 \pm 0.0013$ \\
+ & ISI                                    & $1.6409 \pm 0.0450$ & $1.1608 \pm 0.0439$ \\
+ & $\sigma$ ratio (ISI\,/\,Damped-NP)     & $19.4\times$        & $34.2\times$        \\
+\midrule
+\multirow{3}{*}{$\mathrm{C}_{60}$ tetramer}
+ & Damped-NP                              & $1.0687 \pm 0.0055$ & $0.7841 \pm 0.0047$ \\
+ & ISI                                    & $1.1997 \pm 0.0341$ & $0.9076 \pm 0.0328$ \\
+ & $\sigma$ ratio (ISI\,/\,Damped-NP)     & $6.2\times$         & $7.0\times$         \\
+\midrule
+\multirow{3}{*}{$\mathrm{MAPbI}_{3}$}
+ & Damped-NP                              & $1.7463 \pm 0.0034$ & $1.2467 \pm 0.0016$ \\
+ & ISI                                    & $1.8627 \pm 0.1984$ & $1.2907 \pm 0.1725$ \\
+ & $\sigma$ ratio (ISI\,/\,Damped-NP)     & $57.6\times$        & $105.9\times$       \\
+\midrule
+\multirow{3}{*}{Vitamin $\mathrm{B}_{12}$}
+ & Damped-NP                              & $0.8840 \pm 0.0052$ & $0.6653 \pm 0.0050$ \\
+ & ISI                                    & $1.0360 \pm 0.0279$ & $0.8120 \pm 0.0265$ \\
+ & $\sigma$ ratio (ISI\,/\,Damped-NP)     & $5.4\times$         & $5.3\times$         \\
+\bottomrule
+\end{tabular}
+\begin{tablenotes}[flushleft]
+\footnotesize
+\item Steady-state region: outer iterations excluding the first
+      (no preconditioning) and the last (partial/convergence step).
+      $\sigma$ is the sample standard deviation (denominator $n-1$).
+\end{tablenotes}
+\end{threeparttable}
+\end{table}

@@ -1,0 +1,113 @@
+# =====================================================================
+# Figure 1 (a,b) and Table S1
+# ---------------------------------------------------------------------
+# Fixed-Hamiltonian diagonalization timing for NP, Damped-NP and ISI.
+# averaged_sum is swept over [false, true], so a single run produces both
+# NP (avgsum=0) and Damped-NP (avgsum=1); results are kept apart by the
+# `avgsum=` component of the output path.  `preconds` includes
+# shift-and-invert, so ISI comes from the same sweep.
+#
+# Instrumentation is OFF (do_retHistory: false, verbosity: 0) so the
+# reported wall times are not inflated by per-iteration GPU->CPU copies.
+# Iteration counts and preconditioning times are still recovered from the
+# "Timer Summary" block that test.py always prints.
+#
+#   python repeat_test.py --config configs/paper/config.fixed.timing.yaml
+# =====================================================================
+
+experiment:
+  name: "experiment"
+  results_root: "results_paper/fixed.timing"
+  density_key_mode: "geom4"
+
+systems:
+  roots:
+    - "data/systems"
+  extensions:
+    - "*.cif"
+    - "*.sdf"
+    - "*.xyz"
+  selected:
+    - "MAPbI3.cif"           # 3D PBC
+    - "B12.sdf"              # Vitamin B12, isolated
+    - "water_cluster_128.xyz"
+    - "C60_4.xyz"            # C60 tetramer
+  defaults:
+    supercell: [1, 1, 1]
+    pbc: null                # auto-detect from file type
+    spacing: 0.2
+    nbands: null
+  overrides:
+    "MAPbI3.cif":
+      supercell:
+        - [2, 2, 2]
+      pbc: [1, 1, 1]
+
+sweep:
+  preconds: ["shift-and-invert", "neumann"]
+  threads: [1]
+  outerorder: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+  innerorder: [0]
+  pcg_neumann: [5]           # ISI inner PCG iterations (paper: 5)
+  error_cutoff: [-0.4]
+  averaged_sum: [false, true]   # false = NP, true = Damped-NP
+  weight: [0.5]                 # damping weight alpha = 1/2
+  spacing: [0.2]
+  nbands: []
+  virtual_factor: [1.2]      # +20 % virtual orbitals
+  merge_iter: []
+
+neumann:
+  res_orders: [2, 6, 10]
+  res_thresholds: [1e-0, 1e-1]
+
+calculation:
+  mode: "fixed"
+  temperature: 0.0           # 0 K
+  scf_print_energies: false
+  scf_energy_tol: .inf
+  scf_density_tol: 1.0e-5
+  scf_mixing: "potential"    # Pulay mixing of the potential
+  pp_type: "TM"
+  filtering: true
+  use_cuda: true
+  warmup_when_cuda: 1
+  virtual_factor: 1.2
+
+  diagonalization:
+    iter: null
+    tol: null
+    scf:
+      iter: 21
+      tol: null
+    fixed:
+      iter: 1000
+      tol: 1.0e-5            # residual norm of occupied orbitals < 1e-5
+
+  davidson:
+    nblock: 2
+    locking: false
+    fill_block: false
+
+  execution:
+    runs_per_combo: 3        # median of three independent runs
+    scf_runs_per_combo: 0
+    do_retHistory: false     # OFF: timing run
+    do_retHistoryScfDir: false
+    dry_run: false
+    verbosity: 0             # OFF: suppress per-iteration prints
+    seed: [0, 1, 2]
+
+summary_fields:
+  davidson_total:
+    candidates: ["davidson", "Davidson.diagonalize", "Davidson diagonalize", "Davidson"]
+    attr: "total"
+  diag_iter_count:
+    candidates: ["Diag. Iter.", "Diag Iter.", "Diag Iter", "SCF iter.", "SCF iter", "SCF iteration"]
+    attr: "count"
+  preconditioning_total:
+    candidates: ["Preconditioning"]
+    attr: "total"
+  preconditioning_count:
+    candidates: ["Preconditioning"]
+    attr: "count"

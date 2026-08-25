@@ -115,15 +115,24 @@ def rows_for(method: str, system: str, log: Path) -> list[dict]:
     diag, prec = series(log)
     if not diag:
         return []
-    if len(prec) not in (len(diag), len(diag) - 2):
-        print(f"  [WARN] {system}/{method}: {len(diag)} Diag. Iter. lines but "
-              f"{len(prec)} Preconditioning lines; padding by position")
+    n = len(diag)
+    # Normal case: preconditioning runs on iterations 2 .. n-1, so there are
+    # n - 2 entries and the first and last index are blank.  If the counts are
+    # equal instead, every iteration preconditioned and the mapping is 1:1 --
+    # offsetting by two there would silently drop the last two values.
+    offset = 2 if len(prec) == n - 2 else (1 if len(prec) == n else None)
+    if offset is None:
+        print(f"  [WARN] {system}/{method}: {n} Diag. Iter. lines but "
+              f"{len(prec)} Preconditioning lines; aligning from the second "
+              f"iteration and leaving the remainder blank")
+        offset = 2
     out = []
     for i, d in enumerate(diag, start=1):
-        # preconditioning runs on iterations 2 .. n-1
         p = ""
-        if 2 <= i <= len(diag) - 1:
-            k = i - 2
+        lo = offset
+        hi = n if offset == 1 else n - 1
+        if lo <= i <= hi:
+            k = i - offset
             if k < len(prec):
                 p = prec[k]
         out.append({

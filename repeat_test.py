@@ -1042,7 +1042,7 @@ def write_pretty_summary(dirpath: Path, row: Dict[str, object], filename: str) -
         out_path.write_text(line + "\n", encoding="utf-8")
 
 
-_i_iter_re = re.compile(r"i_iter=(\d+)")
+_i_iter_re = re.compile(r"\bi_iter=(\d+)")
 
 
 def count_scf_diag_iterations(

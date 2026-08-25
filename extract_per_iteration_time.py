@@ -49,6 +49,22 @@ SYSTEM_LABELS = {
 SYSTEM_ORDER = ["water_cluster_128", "C60_4", "MAPbI3", "B12"]
 
 
+def discover_systems(root: Path) -> list[str]:
+    """System directories actually present, paper systems first.
+
+    The four benchmark systems are listed in SYSTEM_ORDER so their panels keep
+    the published order; anything else found under the results tree (a smoke
+    run, a new benchmark) is appended alphabetically rather than dropped.
+    """
+    found: set[str] = set()
+    for sub in ("history", "logs"):
+        d = root / sub
+        if d.is_dir():
+            found.update(p.name for p in d.iterdir() if p.is_dir())
+    known = [s for s in SYSTEM_ORDER if s in found]
+    return known + sorted(found - set(known))
+
+
 def series(log: Path) -> tuple[list[str], list[str]]:
     """Return the timings verbatim, as printed, so the CSV is byte-reproducible."""
     text = log.read_text(encoding="utf-8", errors="ignore")
@@ -138,8 +154,12 @@ def main() -> None:
     if args.label_np:
         methods.insert(0, ("NP", "neumann", args.order, 0))
 
+    systems = discover_systems(args.results_root)
+    if not systems:
+        raise SystemExit(f"no system directories under {args.results_root}/(history|logs)")
+
     rows: list[dict] = []
-    for system in SYSTEM_ORDER:
+    for system in systems:
         for method, precond, order, avgsum in methods:
             log = pick_log(args.results_root, system,
                            precond=precond, order=order, avgsum=avgsum)

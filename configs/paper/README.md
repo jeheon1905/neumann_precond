@@ -93,6 +93,17 @@ python extract_per_iteration_time.py \
 pointed at the archived runs (1465 rows, zero numeric differences), so the same
 invocation against a new run yields a drop-in replacement.
 
+## Checking the plumbing without a GPU
+
+`configs/smoke/` holds three miniature versions of these configs that run on a
+CPU in about ten minutes.  They produce no publishable number; they verify that
+a change still yields the values the figures and tables are built from.  See
+`configs/smoke/README.md`.
+
+Note that `calculation_summary_{fixed,scf}.txt` are append-only: delete
+`results_paper/` before re-running a config, or the new rows are added
+alongside the old ones.
+
 ## Settings taken from the paper
 
 | Quantity | Value | Where |

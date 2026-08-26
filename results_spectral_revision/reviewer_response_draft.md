@@ -260,12 +260,27 @@ practical form of the complementarity above.
 
 ## R2.5 — The corrected shift
 
-`ε̃ = ε − c‖γ‖²` with c = 0.1. Using B12, where converged reference eigenvalues are available,
-we measured the smallest c that keeps the shift below the target eigenvalue across six orders
-of magnitude in ‖γ‖²: **c_min = 0.058–0.072**, so c = 0.1 carries a 1.4–1.7× margin.
-Performance is insensitive within that margin; below c_min the shift crosses the eigenvalue
-and the preconditioner amplifies rather than corrects. The zero-shift fallback (‖γ‖² > 10)
-never triggers in the benchmark runs.
+The corrected shift is not new here: it is the strategy introduced with the ISI
+preconditioner and carried over unchanged, and the reasoning is the same. A Ritz value is
+variational, so `ε` sits above the eigenvalue being targeted, and shifting by it directly
+would over-correct. Subtracting a small multiple of `‖γ‖²` guards against that, and the choice
+of `‖γ‖²` follows the quadratic convergence of a Ritz value in its own residual.
+
+The coefficient is bounded on both sides and is, within those bounds, empirical. It must be
+large enough that `ε̃` stays below the target eigenvalue, and small enough that the shift does
+not overshoot far below it, where it would no longer approximate the eigenvalue and the
+preconditioner would lose accuracy. c = 0.1 sits just above the lower bound. In the
+calculations reported here it did what it is meant to do: on B12, the one system for which
+converged reference eigenvalues were available, the smallest admissible coefficient
+`(ε − ε_true)/‖γ‖²` is 0.0715 / 0.0710 / 0.0583 at three snapshots spanning six orders of
+magnitude in `‖γ‖²`, so c = 0.1 kept the shift below — and close to — the target eigenvalue
+throughout.
+
+Performance is not sensitive to the value. The correction accelerates convergence rather than
+enabling it: the scheme remains stable when the raw Ritz value is used as the shift, and the
+shift the correction applies is at most 3e-3 Ha, which at the measured `dρ/dε̃ ≈ −0.25` moves
+the convergence rate by less than 1e-3. The zero-shift fallback (`‖γ‖² > 10`) never triggers in
+the benchmark runs.
 
 ---
 

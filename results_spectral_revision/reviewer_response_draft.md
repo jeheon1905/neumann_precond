@@ -148,7 +148,10 @@ in practice. On B12, sweeping the weight at fixed order gives
 | 9 | 19 | **19** | 24 |
 | 10 | 19 | **19** | 19 |
 
-Davidson iterations to a residual norm of 1e-5, one seed. Across the practical range the three
+Davidson iterations to a residual norm of 1e-5, seed 0, CPU. This is a separate sweep from the
+archived GPU benchmark quoted in R2.1 (which gives 27, 23, 21, 20, 19, 19, 19 at α = 1/2, the
+median of seeds 0–2); the two differ by at most one iteration, from floating-point reduction
+order, and must not be mixed within one SI table. Across the practical range the three
 weights agree to within two iterations at every order but N = 9, where α = 0.7 — the weight
 furthest from the annihilator — loses five; ½ is never the worst of the three. [The α = 0.1 and
 α = 0.9 columns are in progress. Where they exist they degrade sharply: at N = 4, 252 and 31

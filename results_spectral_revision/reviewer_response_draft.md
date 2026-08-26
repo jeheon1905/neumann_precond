@@ -284,10 +284,11 @@ zero-shift fallback (`‖γ‖² > 10`) never triggers in the benchmark runs.
 
 ## R2.6 — Order 0 and linear cost
 
-At N = 0 the damped operator reduces to `½ΠPMΠ`, i.e. a single GAPP application, and
-`P̄_0 M = I − E` by construction. Each additional order costs exactly one Hamiltonian plus one
-GAPP application on the residual block, so the cost is exactly linear in N. Both statements
-follow from the closed form and need no measurement.
+We agree that this should not require the reader to consult the earlier work, and have made it
+explicit in the revised manuscript where the expansion orders are first introduced. At order 0
+the recurrence returns `a₀ = Pγ` before any Hamiltonian is applied, so order 0 *is* GAPP rather
+than merely equivalent to it; each further order applies `H` once and `P` once to the residual
+block and nothing else, so the cost is exactly linear in the order.
 
 ---
 

@@ -119,6 +119,31 @@ Note that `calculation_summary_{fixed,scf}.txt` are append-only: delete
 `results_paper/` before re-running a config, or the new rows are added
 alongside the old ones.
 
+## The damping-weight ablation
+
+`config.fixed.alpha_ablation.yaml` answers the reviewer's question about
+alternative weighting factors.  `weight` is a sweep axis, so one run covers
+α ∈ {0.3 … 0.7}, and the value lands in both the output path (`weight=0.5`) and
+`calculation_summary_fixed.txt`.  That matters: an earlier attempt in 2026-01
+recorded α only in the directory name — the `--weight` CLI did not exist yet —
+so which run used which α cannot be recovered from those artifacts.
+
+The claim being tested is not that ½ wins at a given order.  The damped mode
+factor `|1 − α(1−λ)|·|λ|ᴺ` stays below 1 only up to
+
+| system | α = 0.3 | 0.4 | 0.5 | 0.6 | 0.7 |
+|---|---:|---:|---:|---:|---:|
+| B12 | 8.0 | 15.1 | 21.0 | 9.9 | 5.5 |
+| water_128 | 10.3 | 19.1 | 31.0 | 14.0 | 7.8 |
+| C60_4 | 13.8 | 25.0 | 46.7 | 19.9 | 11.2 |
+| MAPbI3 | ∞ | ∞ | ∞ | ∞ | ∞ |
+
+so ½, the admissible value nearest the exact annihilator `1/(1−λ_dom)`, holds
+contraction over the widest order range.  The sweep runs to N = 12 so the
+predicted loss of contraction for 0.7 and 0.3 falls inside it and can be
+confirmed or refuted.  One seed only: iteration counts are deterministic given
+the seed and no timing is reported from this run.
+
 ## Settings taken from the paper
 
 | Quantity | Value | Where |

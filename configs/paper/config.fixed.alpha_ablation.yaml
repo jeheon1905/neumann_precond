@@ -1,0 +1,166 @@
+# =====================================================================
+# R2.2 ablation -- the damping weight alpha
+# ---------------------------------------------------------------------
+# Answers the reviewer's "were alternative weighting factors considered?".
+# `weight` is a sweep axis and the value is recorded in the output path
+# (weight=0.3 ... weight=0.7) and in calculation_summary_fixed.txt, so
+# unlike the 2026-01 attempt each run states which alpha it used.
+#
+# The point is not that 1/2 wins at any single order -- it does not.  The
+# mode factor |1 - alpha(1-lambda)| * |lambda|^N stays below 1 only up to
+#
+#   system      alpha=0.3   0.4    0.5    0.6    0.7
+#   B12               8.0  15.1   21.0    9.9    5.5
+#   water_128        10.3  19.1   31.0   14.0    7.8
+#   C60_4            13.8  25.0   46.7   19.9   11.2
+#   MAPbI3            inf   inf    inf    inf    inf   (|lambda_dom| < 1)
+#
+# so alpha = 1/2, closest to the exact annihilator 1/(1-lambda_dom) =
+# 0.468-0.482, holds contraction over the widest order range.  Orders run
+# to 12 so the predicted loss of contraction for 0.7 (N ~ 6-11) and 0.3
+# (N ~ 8-14) falls inside the sweep and can be confirmed or refuted.
+#
+# One seed: iteration counts are deterministic given the seed, and no
+# timing is reported from this run.
+#
+#   python repeat_test.py --config configs/paper/config.fixed.alpha_ablation.yaml
+# =====================================================================
+
+experiment:
+  name: experiment
+  results_root: results_paper/fixed.alpha_ablation
+  density_key_mode: geom4
+systems:
+  roots:
+  - data/systems
+  extensions:
+  - '*.cif'
+  - '*.sdf'
+  - '*.xyz'
+  selected:
+  - MAPbI3.cif
+  - B12.sdf
+  - water_cluster_128.xyz
+  - C60_4.xyz
+  defaults:
+    supercell:
+    - 1
+    - 1
+    - 1
+    pbc: null
+    spacing: 0.2
+    nbands: null
+  overrides:
+    MAPbI3.cif:
+      supercell:
+      - - 2
+        - 2
+        - 2
+      pbc:
+      - 1
+      - 1
+      - 1
+sweep:
+  preconds:
+  - shift-and-invert
+  - neumann
+  threads:
+  - 1
+  outerorder:
+  - 0
+  - 1
+  - 2
+  - 3
+  - 4
+  - 5
+  - 6
+  - 8
+  - 10
+  - 12
+  innerorder:
+  - 0
+  pcg_neumann:
+  - 5
+  error_cutoff:
+  - -0.4
+  averaged_sum:
+  - true
+  weight:
+  - 0.3
+  - 0.4
+  - 0.5
+  - 0.6
+  - 0.7
+  spacing:
+  - 0.2
+  nbands: []
+  virtual_factor:
+  - 1.2
+  merge_iter: []
+neumann:
+  res_orders:
+  - 2
+  - 6
+  - 10
+  res_thresholds:
+  - 1e-0
+  - 1e-1
+calculation:
+  mode: fixed
+  temperature: 0.0
+  scf_print_energies: false
+  scf_energy_tol: .inf
+  scf_density_tol: 1.0e-05
+  scf_mixing: potential
+  pp_type: TM
+  filtering: true
+  use_cuda: true
+  warmup_when_cuda: 1
+  virtual_factor: 1.2
+  diagonalization:
+    iter: null
+    tol: null
+    scf:
+      iter: 21
+      tol: null
+    fixed:
+      iter: 1000
+      tol: 1.0e-05
+  davidson:
+    nblock: 2
+    locking: false
+    fill_block: false
+  execution:
+    runs_per_combo: 1
+    scf_runs_per_combo: 0
+    do_retHistory: false
+    do_retHistoryScfDir: false
+    dry_run: false
+    verbosity: 0
+    seed:
+    - 0
+summary_fields:
+  davidson_total:
+    candidates:
+    - davidson
+    - Davidson.diagonalize
+    - Davidson diagonalize
+    - Davidson
+    attr: total
+  diag_iter_count:
+    candidates:
+    - Diag. Iter.
+    - Diag Iter.
+    - Diag Iter
+    - SCF iter.
+    - SCF iter
+    - SCF iteration
+    attr: count
+  preconditioning_total:
+    candidates:
+    - Preconditioning
+    attr: total
+  preconditioning_count:
+    candidates:
+    - Preconditioning
+    attr: count

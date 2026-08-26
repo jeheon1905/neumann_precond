@@ -149,9 +149,10 @@ in practice. On B12, sweeping the weight at fixed order gives
 | 10 | 19 | **19** | 19 |
 
 Davidson iterations to a residual norm of 1e-5, one seed. Across the practical range the three
-weights are within one iteration of each other, and ½ is never the worst; the only departure is
-α = 0.7 at N = 9, where the weight furthest from the annihilator loses ground. [Extending the
-sweep to α = 0.1 and 0.9 is in progress and will be added.]
+weights agree to within two iterations at every order but N = 9, where α = 0.7 — the weight
+furthest from the annihilator — loses five; ½ is never the worst of the three. [The α = 0.1 and
+α = 0.9 columns are in progress. Where they exist they degrade sharply: at N = 4, 252 and 31
+iterations against 27 at ½; at N = 5, 30 for α = 0.1 against 24.]
 
 **What the damping actually buys.** Mode-wise, the undamped factor `λ^{N+1}` grows with order
 wherever `|λ_dom| > 1`, while the damped factor replaces one power of `λ_dom` by
@@ -184,7 +185,7 @@ particular value ½ within it.
 `q_N` of degree N+1: the Neumann preconditioner **is** a polynomial preconditioner and damping
 is a change of its coefficients. Against the optimal shifted-Chebyshev polynomial of the same
 degree, evaluated on the measured spectrum of `ΠPMΠ`, Damped-NP is within a factor **1.2–4.0**
-(most cases 1.6–2.5) — while requiring **no spectral bounds at all**. Those bounds are the real
+overall, and 1.4–2.5 at the orders actually used — while requiring **no spectral bounds at all**. Those bounds are the real
 cost: the measured interval varies with state and iteration ([0.069, 1.82] for B12/HOMO against
 [0.191, 1.50] for MAPbI3/lowest), so Chebyshev would need a per-state estimate and degrades
 when it is wrong.
@@ -218,7 +219,7 @@ system has `λ_min > −1` and the distinction below disappears:
 MAPbI3 is the only system whose offending mode lies above −1, so `|λ|^{N+1}` decays: the
 oscillation is weak and there is nothing to diverge. Damping is correspondingly unhelpful
 there, and for a reason worth stating precisely. It still contracts the negative mode — by
-0.50, against 0.03–0.07 in the other three — but MAPbI3 is the one system whose rate is set by
+0.50, against 0.03–0.06 in the other three — but MAPbI3 is the one system whose rate is set by
 the *positive* mode, and on that mode the damped factor `½(1+λ)λᴺ` exceeds the undamped
 `λ^{N+1}` by **1.12×**: damping enlarges the very term that governs convergence. That is why
 Damped-NP costs MAPbI3 a few iterations at low order, which is what the benchmark shows. The

@@ -26,23 +26,42 @@ to three decimals). Full tables are in the SI.
 
 ## R2.1 — Convergence condition and validity of the expansion
 
-> We thank the reviewer for this suggestion. Carrying it out was more informative than we
-> anticipated: the convergence condition **as usually stated cannot be satisfied** by any
-> positive-definite `X` for a shifted interior eigenvalue problem, while the condition that is
-> actually relevant inside Block Davidson **is** satisfied over most of the occupied manifold,
-> and we can now say exactly where.
+> We thank the reviewer for this suggestion; carrying it out was more informative than we
+> anticipated. We report the spectral radius of the deflated operator `ΠEΠ` rather than of `E`
+> itself, and the reason is the substance of the answer rather than a matter of presentation:
+> `ρ(E) > 1` for any state but the lowest, but the eigenvectors responsible are the occupied
+> states lying below the shift — exactly the vectors Block Davidson has already found and
+> orthogonalises against. Measured on the operator the solver actually applies, the condition
+> **is** satisfied over most of the occupied manifold, and we can now say exactly where the
+> rest lies and why it is the case the ½ damping was introduced for.
 
-**1. ρ(E) > 1 is structural, not a deficiency of P.** `P` is SPD, so `PM` is similar to the
-symmetric `P^{1/2}MP^{1/2}`, which is congruent to `M`; by Sylvester's law of inertia the
-number of negative eigenvalues of `PM` equals the number of states below `ε̃`, independently of
-the quality of `P`. For any state but the lowest, `M` is indefinite by construction, so some
-`λ(E) > 1`. Measured: **ρ(E) = 1.00–1.14 at the lowest state and 1.46–1.83 at the HOMO**. For
-B12 the count of states below `ε̃` is 0 / 131 / 248 / 295 for the lowest / middle / slowest /
-HOMO state, in exact agreement with the inertia argument.
+**1. Where `ρ(E) > 1` comes from.** Writing `λ(E) = 1 − μ(PM)`, the series converges when every
+`μ(PM)` lies in `(0, 2)`, so the question is whether `PM` can be made positive definite. It
+cannot. `P` is SPD, so `P^{-1/2}(PM)P^{1/2} = P^{1/2}MP^{1/2}`: `PM` is *similar* to that
+symmetric matrix and therefore shares its eigenvalues, and that matrix is in turn *congruent*
+to `M` (it is `SᵀMS` with `S = P^{1/2}`), so by Sylvester's law of inertia the two have the
+same number of negative eigenvalues. Chaining the two,
 
-**2. The operator that acts is the deflated one.** Block Davidson orthogonalises the
-preconditioned block against its subspace `X`, so what acts is `ΠEΠ`, `Π = I − XXᴴ`. We
-measured how much of each divergent eigenvector survives that projection:
+    #{ negative eigenvalues of PM } = #{ negative eigenvalues of M } = #{ states below eps_tilde } .
+
+`P` can rescale these eigenvalues freely but cannot change their signs, and the count is
+therefore independent of how good the preconditioner is. For any state but the lowest, `M` is
+indefinite by construction and some `λ(E) > 1` follows. Measured: **ρ(E) = 1.00–1.14 at the
+lowest state and 1.46–1.83 at the HOMO**; for B12 the count of states below `ε̃` is
+0 / 131 / 248 / 295 for the lowest / middle / slowest / HOMO state, in exact agreement.
+
+**2. Those eigenvectors are the ones Davidson removes.** The identity above also names them:
+the eigenvectors that push `ρ(E)` above 1 are the occupied states lying below the shift, and
+those are precisely the vectors the solver has already converged and keeps in its subspace
+`X`. Block Davidson orthogonalises the preconditioned residual against `X` before using it, so
+the operator that acts on the error is not `E` but `ΠEΠ` with `Π = I − XXᴴ`. Deflation is
+therefore what the algorithm already does, not a device introduced for this analysis: the
+polynomial we analyse reproduces the production `PreNeumann` output bit for bit, and the
+projector mirrors the orthogonalisation the solver performs on it. The alternative reading
+does not survive contact with the data — undeflated, the series does not converge at all at
+these states (`ρ(E) = 1.46–1.83` at the HOMO), yet the expansion demonstrably accelerates the
+solver, so `E` cannot be the operator that governs it. We therefore measured how much of each
+divergent eigenvector survives the projection:
 
 | origin of divergence | λ | ‖Πv‖/‖v‖ | removed |
 |---|---:|---:|---:|
@@ -92,14 +111,58 @@ deflated error `‖Π E^{N+1} a₀‖` falls steeply over the first few orders a
 
 ## R2.2 — Theoretical justification of the damping
 
-**Is ½ heuristic?** No. The damped mode factor is `q_N(λ) = ½(1+λ)λᴺ`; a general weight α gives
-`(1−α+αλ)λᴺ`, which annihilates a mode exactly when `α = 1/(1−λ)`. For **λ = −1** — the
+**Where ½ came from, and why it survives scrutiny.** The weight was not fitted. Damped-NP
+averages the preconditioned vectors of the two highest consecutive orders, and ½ is simply the
+plain average — the cheapest choice available, requiring no spectral information. The analysis
+the reviewer asks for shows that this choice is not arbitrary.
+
+Averaging orders N−1 and N with a general weight α gives `P̄M = I − Eᴺ((1−α)I + αE)`, so each
+mode of `E` is multiplied by
+
+    q_N(lambda) = (1 - alpha + alpha*lambda) * lambda^N ,
+
+which reduces to `λ^{N+1}` at α = 1 and to `½(1+λ)λᴺ` at α = ½. The leading factor vanishes
+when `α = 1/(1−λ)`, so a given mode can be annihilated outright. Setting **λ = −1** — the
 boundary `μ = 2` of the convergence region, i.e. exactly where the expansion starts to fail —
-this is **α = ½**. The measured optimum per system is 0.468 / 0.476 / 0.482, matching
-`1/(1−λ_dom)` to three decimals; ½ is 2–7 % above it and requires no knowledge of `λ_dom`.
+gives **α = ½**. The plain average is therefore the weight that annihilates the mode at the
+edge of convergence, which is the mode that survives deflation (R2.1 point 2). Measured per
+system, the exact annihilator `1/(1−λ_dom)` is 0.468 / 0.476 / 0.482; ½ sits 2–7 % above it
+and, unlike the exact value, needs no knowledge of `λ_dom`.
 
 **Alternative weights.** Requiring the offending mode to remain contracting for all N ≤ 20
-gives an admissible window **α ∈ [0.43, 0.51]**, which contains ½ for every system.
+gives an admissible window **α ∈ [0.43, 0.51]**, which contains ½ for every system. The
+statement ½ supports is not that it wins at any single order — it does not — but that it holds
+contraction over the widest range of orders, because it is the admissible value nearest the
+exact annihilator. Writing the mode factor as `|1 − α(1−λ_dom)|·|λ_dom|ᴺ`, the largest order at
+which it still contracts is
+
+| system | α = 0.3 | 0.4 | **0.5** | 0.6 | 0.7 |
+|---|---:|---:|---:|---:|---:|
+| B12 | 8.0 | 15.1 | **21.0** | 9.9 | 5.5 |
+| water_128 | 10.3 | 19.1 | **31.0** | 14.0 | 7.8 |
+| C60_4 | 13.8 | 25.0 | **46.7** | 19.9 | 11.2 |
+| MAPbI3 | ∞ | ∞ | ∞ | ∞ | ∞ |
+
+so α = 0.7 loses contraction just above the practical range while ½ retains it to N ≈ 21–47,
+and MAPbI3 is unaffected at any weight because `|λ_dom| < 1` there. [Ablation over
+α ∈ {0.3 … 0.7} at orders 0–12 to be inserted.]
+
+**Relation to Richardson damping and weighted Neumann expansions.** Both connections the
+reviewer raises are exact, and in both our scheme sits at the simple end of the family.
+Truncating the Neumann series at order N is identical to running N+1 steps of preconditioned
+Richardson iteration with relaxation ω = 1 from `x₀ = 0`, since `E = I − PM` is precisely the
+Richardson error operator at ω = 1. Richardson damping tunes ω, which changes the recurrence
+itself and multiplies every mode by `(1−ωμ)^{N+1}`; our weighting leaves the recurrence at
+ω = 1 and changes only how the partial sums are combined, giving `(1−αμ)(1−μ)ᴺ`. Expanding the
+average shows the same thing from the other side,
+
+    (1-alpha) p_{N-1} + alpha p_N  =  sum_{k<N} E^k  +  alpha E^N ,
+
+i.e. a weighted Neumann expansion with `w_k = 1` for `k < N` and `w_N = α` — the minimal case,
+in which only the final term is reweighted; Cesàro summation is the same family with a full
+weight profile. We make no claim that the minimal choice outperforms these alternatives. It is
+the one that requires no spectral input, and the analysis above is what recommends the
+particular value ½ within it.
 
 **What the damping actually buys.** Mode-wise, the undamped factor `λ^{N+1}` grows with order
 wherever `|λ_dom| > 1`, while the damped factor carries the prefactor `|½(1+λ_dom)|` = 0.037–0.068,

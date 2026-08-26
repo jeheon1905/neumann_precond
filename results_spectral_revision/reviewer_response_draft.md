@@ -277,10 +277,8 @@ magnitude in `‖γ‖²`, so c = 0.1 kept the shift below — and close to — 
 throughout.
 
 Performance is not sensitive to the value. The correction accelerates convergence rather than
-enabling it: the scheme remains stable when the raw Ritz value is used as the shift, and the
-shift the correction applies is at most 3e-3 Ha, which at the measured `dρ/dε̃ ≈ −0.25` moves
-the convergence rate by less than 1e-3. The zero-shift fallback (`‖γ‖² > 10`) never triggers in
-the benchmark runs.
+enabling it — the scheme remains stable when the raw Ritz value is used as the shift. The
+zero-shift fallback (`‖γ‖² > 10`) never triggers in the benchmark runs.
 
 ---
 

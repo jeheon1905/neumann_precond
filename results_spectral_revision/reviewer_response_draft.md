@@ -15,12 +15,14 @@ be — `ΠEΠ` is non-symmetric, and unlike `E` it is not similar to a symmetric
 Because Arnoldi on a non-symmetric operator carries no error bound, each `ρ` was independently
 bracketed through `ρ ≤ ‖Aⁿ‖^{1/n}` up to n = 20, with `‖Aⁿ‖` obtained by Lanczos on the
 symmetric operator `(Aⁿ)ᵀ(Aⁿ)`; the simple case n = 1 is useless here because `‖ΠEΠ‖` itself
-exceeds 1 in seven of the eight state/system combinations (1.02–1.28). These certified bounds
-lie above the corresponding Arnoldi estimates in all eight cases, by 0.1–6.0 %. **Statements
-that the expansion converges rest on the certified bound; the Arnoldi values are used to
-explain the mechanism.** Re-measuring the HOMO of the three molecular systems at three Davidson
-iterations under both shift conventions changes nothing at the two later snapshots (agreement
-to three decimals). Full tables are in the SI.
+exceeds 1 in seven of the eight state/system combinations (1.02–1.28). These bounds lie above
+the corresponding Arnoldi estimates in all eight cases, by 0.1–6.0 %. **Statements that the
+expansion converges rest on the bound; the Arnoldi values are used to explain the mechanism.**
+The lower end of each bracket is exact by interlacing; the upper end rests on the Lanczos
+residual bound and is verified numerically — by m-independence, by a dense cross-check, and by
+re-measuring the HOMO of the three molecular systems at three Davidson iterations under both
+shift conventions, which changes nothing at the two later snapshots — rather than proved. Full
+tables, and the limits of the analysis, are in the SI.
 
 ---
 
@@ -289,28 +291,3 @@ explicit in the revised manuscript where the expansion orders are first introduc
 the recurrence returns `a₀ = Pγ` before any Hamiltonian is applied, so order 0 *is* GAPP rather
 than merely equivalent to it; each further order applies `H` once and `P` once to the residual
 block and nothing else, so the cost is exactly linear in the order.
-
----
-
-## Limitations disclosed in the SI
-
-1. Asymptotic convergence in N is established for the bands satisfying the condition of R2.1
-   point 3. For the remaining 20–27 % `ρ(ΠEΠ) = 1.07–1.14 > 1`; damping postpones the growth
-   beyond the practical order range rather than removing it.
-2. The analysis assumes a solver that maintains and orthogonalises against a subspace.
-3. `ρ(ΠEΠ)` governs the deflated recursion `(ΠEΠ)ⁿ`, whereas the implemented scheme runs the
-   recursion in the full space and projects once, giving `Π Eⁿ Π`. Π and E do not commute, so
-   the two differ at high order; the practical range N ≤ 10 is where they stay close, and the
-   direct `‖G_N‖` measurements of SI Table S2 rather than `ρ` alone are what certify the
-   damped scheme there. No quantitative model linking a single state's spectral data to the
-   aggregate Davidson iteration count is claimed.
-4. The manifold sample is uniform in band index, not in energy, and does not include the
-   virtual states (20 % of the Davidson block), which sit at higher ε̃ where reversals are most
-   likely; the reversal fraction is therefore a lower bound.
-5. Lower ends of the singular-value brackets behind every `ρ` certificate are exact by
-   interlacing; upper ends rely on the Lanczos residual bound, which certifies proximity to an
-   eigenvalue rather than to the extremal one. Convergence of those ends is verified
-   numerically (m-independence, dense cross-check, re-measurement at three Davidson
-   iterations) rather than proved. Likewise the real spectrum of `ΠEΠ` is verified in every
-   Ritz set computed here, not proved; the `ρ` bound does not depend on it, since it uses only
-   the symmetric singular-value machinery and holds for a complex spectrum as well.

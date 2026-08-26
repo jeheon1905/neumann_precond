@@ -89,7 +89,7 @@ whose GAPP branch differs (Figure R1). The boundary therefore transfers between 
 the parameterisation used here it leaves **73–80 % of the occupied manifold** in the
 convergent regime, and all of MAPbI3.
 
-| system | `ρ(ΠEΠ)` lowest | HOMO | certified `ρ(ΠEΠ) ≤` (HOMO) |
+| system | `ρ(ΠEΠ)` lowest | HOMO | bound on `ρ(ΠEΠ)` (HOMO) |
 |---|---:|---:|---:|
 | MAPbI3 | **0.809** | 0.927 | **0.949** |
 | C60_4 | 1.073 | 0.925 | **0.981** |
@@ -106,9 +106,8 @@ over the whole tested range N = 0…10 and saturates rather than turning over (B
 application, so the optimum is where the marginal gain stops paying for the marginal cost.
 That places it at **N ≈ 4–6**, the range used in this work, and it is the existing timing
 results that document it. What the spectral analysis adds is the reason the gain saturates:
-over the bands satisfying point 3 the modes surviving deflation have `|λ| ≈ 0.93` or below,
-so the
-deflated error `‖Π E^{N+1} a₀‖` falls steeply over the first few orders and then flattens.
+over the bands satisfying point 3 the modes surviving deflation have `|λ| ≈ 0.93` or below, so
+the deflated error `‖Π E^{N+1} a₀‖` falls steeply over the first few orders and then flattens.
 
 ---
 
@@ -133,22 +132,22 @@ system, the exact annihilator `1/(1−λ_dom)` is 0.468 / 0.476 / 0.482; ½ sits
 and, unlike the exact value, needs no knowledge of `λ_dom`.
 
 **Alternative weights.** Requiring the offending mode to remain contracting for all N ≤ 20
-gives an admissible window **α ∈ [0.43, 0.51]**, which contains ½ for every system. The
-statement ½ supports is not that it wins at any single order — it does not — but that it holds
-contraction over the widest range of orders, because it is the admissible value nearest the
-exact annihilator. Writing the mode factor as `|1 − α(1−λ_dom)|·|λ_dom|ᴺ`, the largest order at
-which it still contracts is
+gives an admissible window **α ∈ [0.43, 0.51]**, which contains ½ for every system. What ½ has
+in its favour is not that it wins at any single order — it does not — but that, being the
+admissible value nearest the exact annihilator, it leaves the widest margin before the
+offending mode stops contracting. We ran the weight as an ablation to check that this matters
+in practice: [insert the measured iteration counts for α ∈ {0.1 … 0.9} on B12 at orders
+4–10].
 
-| system | α = 0.3 | 0.4 | **0.5** | 0.6 | 0.7 |
-|---|---:|---:|---:|---:|---:|
-| B12 | 8.0 | 15.1 | **21.0** | 9.9 | 5.5 |
-| water_128 | 10.3 | 19.1 | **31.0** | 14.0 | 7.8 |
-| C60_4 | 13.8 | 25.0 | **46.7** | 19.9 | 11.2 |
-| MAPbI3 | ∞ | ∞ | ∞ | ∞ | ∞ |
-
-so α = 0.7 loses contraction just above the practical range while ½ retains it to N ≈ 21–47,
-and MAPbI3 is unaffected at any weight because `|λ_dom| < 1` there. [Ablation over
-α ∈ {0.3 … 0.7} at orders 0–12 to be inserted.]
+**What the damping actually buys.** Mode-wise, the undamped factor `λ^{N+1}` grows with order
+wherever `|λ_dom| > 1`, while the damped factor replaces one power of `λ_dom` by
+`½(1+λ_dom)` = 0.037–0.068 — a **17–29× suppression** of exactly the mode that diverges. A
+direct measurement of the error-operator norm on the deflated subspace confirms this without
+any eigenvalue assumption:
+at the lowest state of the three molecular systems the undamped norm grows from 1.26–1.28 at
+N = 0 to 2.47–4.41 at N = 10, while the damped one falls to 0.44–0.54 (SI Table S2). Away
+from the bottom of the manifold, where the condition of point 3 already holds, the two schemes
+agree to within a few per cent.
 
 **Relation to Richardson damping and weighted Neumann expansions.** Both connections the
 reviewer raises are exact, and in both our scheme sits at the simple end of the family.
@@ -161,20 +160,11 @@ average shows the same thing from the other side,
 
     (1-alpha) p_{N-1} + alpha p_N  =  sum_{k<N} E^k  +  alpha E^N ,
 
-i.e. a weighted Neumann expansion with `w_k = 1` for `k < N` and `w_N = α` — the minimal case,
-in which only the final term is reweighted; Cesàro summation is the same family with a full
-weight profile. We make no claim that the minimal choice outperforms these alternatives. It is
+i.e. a weighted Neumann expansion with `w_k = 1` for `k < N` and `w_N = α` — the minimal
+case, in which only the final term is reweighted; Cesàro summation is the same family with a
+full weight profile. We make no claim that the minimal choice outperforms these alternatives. It is
 the one that requires no spectral input, and the analysis above is what recommends the
 particular value ½ within it.
-
-**What the damping actually buys.** Mode-wise, the undamped factor `λ^{N+1}` grows with order
-wherever `|λ_dom| > 1`, while the damped factor carries the prefactor `|½(1+λ_dom)|` = 0.037–0.068,
-a **15–27× suppression** of exactly the mode that diverges. A direct measurement of the
-error-operator norm on the deflated subspace confirms this without any eigenvalue assumption:
-at the lowest state of the three molecular systems the undamped norm grows from 1.26–1.28 at
-N = 0 to 2.47–4.41 at N = 10, while the damped one falls to 0.44–0.54 (SI Table S2). Away
-from the bottom of the manifold, where the condition of point 3 already holds, the two schemes
-agree to within a few per cent.
 
 **Relation to polynomial preconditioning and Chebyshev filtering.** `P̄_N M = I − q_N(λ)` with
 `q_N` of degree N+1: the Neumann preconditioner **is** a polynomial preconditioner and damping

@@ -226,30 +226,23 @@ the three molecular systems and **0 %** in MAPbI3.
 
 ## R2.4 — Relation to other eigensolver strategies
 
-**Jacobi–Davidson.** JD is the natural point of comparison, because it is the standard
-framework in which a preconditioner enters an eigensolver: at each outer step it forms a
-correction equation, `(I − uuᵀ)(A − θI)(I − uuᵀ) t = −r`, and solves it inexactly. Damped-NP is
-not an alternative to that framework. It is a preconditioner, and the correction equation is
-exactly where a preconditioner is applied, so the two sit at different levels; the meaningful
-comparison is between the inner solve JD performs and what Damped-NP puts in its place. (The
-exact correction we use as a reference elsewhere in this response is that equation, solved by
-PCG.)
+**Jacobi–Davidson.** JD is the standard frame in which a preconditioner enters an
+eigensolver: each outer step forms a correction equation and solves it inexactly. Damped-NP is
+not an alternative to that frame but a preconditioner — the thing such an equation is solved
+with — so the two sit at different levels, and what can be compared is JD's inner Krylov solve
+against the fixed-degree polynomial we put in its place. The inner solve adapts its work to
+the problem but needs global inner products and a stopping test at every step; the
+polynomial's work is fixed by the order alone and needs neither. We should be plain that this
+is no rate advantage: solving that correction equation by PCG reaches 1e-8 in 44–64
+applications, whereas a series at the measured `ρ ≈ 0.93` would need ≈ 230. What it buys is a
+deterministic per-iteration cost without global communication, which is what makes the scheme
+cheap on GPUs and at scale.
 
-JD's inner Krylov solve adapts its work to the problem, at the price of global inner products
-and a stopping test at every outer step. Damped-NP substitutes a polynomial of fixed degree:
-the work is set by the order alone and does not depend on the residual, with no reductions and
-no convergence test. This is **not** a rate advantage, and we say so — with the same
-preconditioner, PCG reaches 1e-8 in 44–64 applications, whereas a series at the measured rate
-`ρ ≈ 0.93` would need ≈ 230. What it buys is a deterministic per-iteration cost and the
-absence of global communication, which is what makes the scheme cheap on GPUs and at scale.
-
-**Complementarity.** Damped-NP is a preconditioner, not an eigensolver, and nothing in its
-construction is specific to Block Davidson. It consumes only the residual and the current Ritz
-value, maintains no subspace of its own, runs no inner solve and applies no convergence test,
-so it can be attached wherever those two quantities are available — which is every step of
-LOBPCG, RMM-DIIS or Chebyshev-filtered subspace iteration. The one structural requirement is
-the one identified in R2.1: the solver must orthogonalise against the states it has already
-converged, since that is what removes the divergent eigenvectors of `E`.
+**Complementarity.** Nothing in the construction is specific to Block Davidson: it consumes
+only the residual and the current Ritz value, so it attaches wherever those exist — LOBPCG,
+RMM-DIIS, Chebyshev-filtered subspace iteration. The one structural requirement is the one
+identified in R2.1, that the solver orthogonalise against the states it has already converged,
+since that is what removes the divergent eigenvectors of `E`.
 
 **Beyond Block Davidson.** That requirement is met more widely than it may appear. RMM-DIIS
 optimises each band independently and grows no subspace, but it cannot be run without a

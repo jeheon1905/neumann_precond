@@ -79,7 +79,8 @@ sources removed, what survives is the classical Neumann requirement on the remai
 
 i.e. **the preconditioner must not over-correct by more than a factor two on any direction the
 solver actually generates**. This is a statement about `P`, not about the material: it is
-violated by a single vacuum/grid mode of the GAPP kernel. The measurements bear that out —
+violated by a single mode of the GAPP kernel, one that carries almost no weight in the
+occupied subspace and so is not reachable by deflation. The measurements bear that out —
 across three chemically unrelated molecular systems the condition fails below the *same* shift
 to within 0.6 % (−0.886, −0.889, −0.892 Ha), and it is never violated in the periodic system,
 whose GAPP branch differs (Figure R1). The boundary therefore transfers between systems; for
@@ -186,11 +187,20 @@ when it is wrong.
 
 ## R2.3 — Oscillatory behaviour and the MAPbI3 exception
 
-The reviewer's conjecture that this relates to the spectrum of `I − X⁻¹M` is correct, and the
-mechanism is a single mode. Undamped, the mode factor is `λ^{N+1}`: for **λ < 0 the sign
+The reviewer's conjecture is correct, and the operator named is the one analysed throughout
+this response: `X⁻¹` is the applied preconditioner, which is the zeroth-order GAPP operator
+`P`, so `I − X⁻¹M = I − PM = E`. Note that `E` is built from `P` alone and carries no
+dependence on the expansion order — the order enters only as the polynomial applied to it,
+which is why one spectrum explains the behaviour at every order.
+
+The mechanism is a single mode. Undamped, the mode factor is `λ^{N+1}`: for **λ < 0 the sign
 alternates with N** — the odd–even oscillation of Figure 1 — and for **|λ| > 1 the magnitude
-also grows**, so the expansion oscillates *and* degrades with order. Deflation cannot help:
-this is a vacuum/grid mode, of which only 0–0.4 % is removed by Π.
+also grows**, so the expansion oscillates *and* degrades with order. Deflation cannot reach
+this mode: it carries almost no weight in the occupied subspace, so `Π` removes only 0–0.4 %
+of it.
+
+Measured at the **lowest state**, where the oscillation is strongest — at the HOMO every
+system has `λ_min > −1` and the distinction below disappears:
 
 | system | λ_min(ΠEΠ) | λ_max(ΠEΠ) | ρ(ΠEΠ) set by | undamped behaviour |
 |---|---:|---:|---|---|
@@ -200,13 +210,17 @@ this is a vacuum/grid mode, of which only 0–0.4 % is removed by Π.
 | **MAPbI3** | −0.4995 | **+0.8091** | positive mode | oscillates weakly, **converges** |
 
 MAPbI3 is the only system whose offending mode lies above −1, so `|λ|^{N+1}` decays: the
-oscillation is weak and there is nothing to diverge. Consistently its damping factor is 0.25
-rather than 0.037–0.068, so damping suppresses a *useful* term and costs a few iterations at low
-order — which is what the benchmark shows. The same exception appears independently in its
-operator norm (‖ΠEΠ‖ = 0.87, the only one below 1) and its certificate (the only lowest state
-with `ρ < 1`). Across the occupied manifold `λ_min` varies smoothly with the shift
-(`dλ_min/dε̃ ≈ 0.50`); the fraction of bands affected is 20–27 % in the three molecular
-systems and **0 %** in MAPbI3.
+oscillation is weak and there is nothing to diverge. Damping is correspondingly unhelpful
+there, and for a reason worth stating precisely. It still contracts the negative mode — by
+0.50, against 0.03–0.07 in the other three — but MAPbI3 is the one system whose rate is set by
+the *positive* mode, and on that mode the damped factor `½(1+λ)λᴺ` exceeds the undamped
+`λ^{N+1}` by **1.12×**: damping enlarges the very term that governs convergence. That is why
+Damped-NP costs MAPbI3 a few iterations at low order, which is what the benchmark shows. The
+same exception appears independently in its operator norm (‖ΠEΠ‖ = 0.87 at the lowest state,
+the only one below 1) and in its certificate (the only lowest state with `ρ < 1`). Across the
+occupied manifold `λ_min` varies smoothly with the shift (`dλ_min/dε̃ ≈ 0.50`); the fraction
+of bands with `λ_min < −1`, i.e. those failing the condition of point 3 above, is 20–27 % in
+the three molecular systems and **0 %** in MAPbI3.
 
 ---
 

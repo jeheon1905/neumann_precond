@@ -223,3 +223,10 @@ results_spectral_revision/jobs/*.txt
 # david_inner.F, hamil.F -- commercial licence, not redistributable) and
 # journal correspondence with personal data.  Local only.
 revision/
+
+# Response letter to the reviewers.  Quotes each report verbatim and carries
+# the manuscript ID, and journal reports are confidential; this repository is
+# public.  The analysis behind it is tracked in reviewer_response_draft.md,
+# which paraphrases rather than quotes.  Local only.
+results_spectral_revision/response_letter.md
+results_spectral_revision/response_letter.ko.md

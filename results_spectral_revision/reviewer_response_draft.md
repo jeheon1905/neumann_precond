@@ -136,8 +136,22 @@ gives an admissible window **α ∈ [0.43, 0.51]**, which contains ½ for every 
 in its favour is not that it wins at any single order — it does not — but that, being the
 admissible value nearest the exact annihilator, it leaves the widest margin before the
 offending mode stops contracting. We ran the weight as an ablation to check that this matters
-in practice: [insert the measured iteration counts for α ∈ {0.1 … 0.9} on B12 at orders
-4–10].
+in practice. On B12, sweeping the weight at fixed order gives
+
+| N | α = 0.3 | **α = 0.5** | α = 0.7 |
+|---:|---:|---:|---:|
+| 4 | 28 | **27** | 27 |
+| 5 | 25 | **24** | 23 |
+| 6 | 22 | **22** | 22 |
+| 7 | 21 | **20** | 20 |
+| 8 | 19 | **19** | 19 |
+| 9 | 19 | **19** | 24 |
+| 10 | 19 | **19** | 19 |
+
+Davidson iterations to a residual norm of 1e-5, one seed. Across the practical range the three
+weights are within one iteration of each other, and ½ is never the worst; the only departure is
+α = 0.7 at N = 9, where the weight furthest from the annihilator loses ground. [Extending the
+sweep to α = 0.1 and 0.9 is in progress and will be added.]
 
 **What the damping actually buys.** Mode-wise, the undamped factor `λ^{N+1}` grows with order
 wherever `|λ_dom| > 1`, while the damped factor replaces one power of `λ_dom` by

@@ -146,7 +146,7 @@ direct measurement of the error-operator norm on the deflated subspace confirms 
 any eigenvalue assumption:
 at the lowest state of the three molecular systems the undamped norm grows from 1.26–1.28 at
 N = 0 to 2.47–4.41 at N = 10, while the damped one falls to 0.44–0.54 (SI Table S2). Away
-from the bottom of the manifold, where the condition of point 3 already holds, the two schemes
+from the bottom of the manifold, where the condition of R2.1 point 3 already holds, the two schemes
 agree to within a few per cent.
 
 **Relation to Richardson damping and weighted Neumann expansions.** Both connections the
@@ -211,7 +211,7 @@ Damped-NP costs MAPbI3 a few iterations at low order, which is what the benchmar
 same exception appears independently in its operator norm (‖ΠEΠ‖ = 0.87 at the lowest state,
 the only one below 1) and in its certificate (the only lowest state with `ρ < 1`). Across the
 occupied manifold `λ_min` varies smoothly with the shift (`dλ_min/dε̃ ≈ 0.50`); the fraction
-of bands with `λ_min < −1`, i.e. those failing the condition of point 3 above, is 20–27 % in
+of bands with `λ_min < −1`, i.e. those failing the condition of R2.1 point 3, is 20–27 % in
 the three molecular systems and **0 %** in MAPbI3.
 
 ---
@@ -224,8 +224,8 @@ not an alternative to that frame but a preconditioner — the thing such an equa
 with — so the two sit at different levels, and what can be compared is JD's inner Krylov solve
 against the fixed-degree polynomial we put in its place. The inner solve adapts its work to
 the problem but needs global inner products and a stopping test at every step; the
-polynomial's work is fixed by the order alone and needs neither. We should be plain that this
-is no rate advantage: solving that correction equation by PCG reaches 1e-8 in 44–64
+polynomial's work is fixed by the order alone and needs neither. This is no rate advantage,
+and we say so plainly: solving that correction equation by PCG reaches 1e-8 in 44–64
 applications, whereas a series at the measured `ρ ≈ 0.93` would need ≈ 230. What it buys is a
 deterministic per-iteration cost without global communication, which is what makes the scheme
 cheap on GPUs and at scale.

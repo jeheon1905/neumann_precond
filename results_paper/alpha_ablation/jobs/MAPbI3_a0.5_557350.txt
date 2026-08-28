@@ -1,0 +1,3 @@
+host: b64  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: MAPbI3  alpha: 0.5
+########## MAPbI3 alpha=0.5 order=4 ##########
+slurmstepd-b64: error: *** JOB 557350 ON b64 CANCELLED AT 2026-08-26T12:10:12 ***

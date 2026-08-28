@@ -1,0 +1,23 @@
+host: b56  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: B12  alpha: 0.1
+########## B12 alpha=0.1 order=4 ##########
+davidson                                 |   20603.5260 |     1
+Diag. Iter.                              |   20603.1974 |   252
+Preconditioning                          |   11264.8933 |   250
+########## B12 alpha=0.1 order=4 DONE 20660 s ##########
+########## B12 alpha=0.1 order=5 ##########
+davidson                                 |    2596.3809 |     1
+Diag. Iter.                              |    2596.0241 |    30
+Preconditioning                          |    1535.3039 |    28
+########## B12 alpha=0.1 order=5 DONE 2650 s ##########
+########## B12 alpha=0.1 order=6 ##########
+davidson                                 |   28583.8570 |     1
+Diag. Iter.                              |   28583.5011 |   284
+Preconditioning                          |   18075.7676 |   282
+########## B12 alpha=0.1 order=6 DONE 28637 s ##########
+########## B12 alpha=0.1 order=7 ##########
+davidson                                 |    2685.1683 |     1
+Diag. Iter.                              |    2684.8509 |    26
+Preconditioning                          |    1768.2473 |    24
+########## B12 alpha=0.1 order=7 DONE 2737 s ##########
+########## B12 alpha=0.1 order=8 ##########
+slurmstepd-b56: error: *** JOB 560358 ON b56 CANCELLED AT 2026-08-27T14:23:38 ***

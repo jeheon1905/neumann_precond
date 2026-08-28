@@ -1,0 +1,6 @@
+host: b68  commit: 9b8ba45e164dcb8019b41b619b2fc13b68942de7  system: B12  alpha: 0.9  order: 10
+########## B12 alpha=0.9 order=10 ##########
+davidson                                 |    2917.4214 |     1
+Diag. Iter.                              |    2917.1137 |    23
+Preconditioning                          |    2123.0942 |    21
+########## B12 alpha=0.9 order=10 DONE 2970 s ##########

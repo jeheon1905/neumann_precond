@@ -1,0 +1,3 @@
+host: b65  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: MAPbI3  alpha: 0.7
+########## MAPbI3 alpha=0.7 order=4 ##########
+slurmstepd-b65: error: *** JOB 557351 ON b65 CANCELLED AT 2026-08-26T12:10:12 ***

@@ -1,0 +1,36 @@
+host: b76  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: B12  alpha: 0.7
+########## B12 alpha=0.7 order=4 ##########
+davidson                                 |    2072.2454 |     1
+Diag. Iter.                              |    2071.9603 |    27
+Preconditioning                          |    1127.8233 |    25
+########## B12 alpha=0.7 order=4 DONE 2125 s ##########
+########## B12 alpha=0.7 order=5 ##########
+davidson                                 |    1934.9470 |     1
+Diag. Iter.                              |    1934.6419 |    23
+Preconditioning                          |    1143.4270 |    21
+########## B12 alpha=0.7 order=5 DONE 1988 s ##########
+########## B12 alpha=0.7 order=6 ##########
+davidson                                 |    2039.0921 |     1
+Diag. Iter.                              |    2038.7673 |    22
+Preconditioning                          |    1278.6703 |    20
+########## B12 alpha=0.7 order=6 DONE 2091 s ##########
+########## B12 alpha=0.7 order=7 ##########
+davidson                                 |    2008.6682 |     1
+Diag. Iter.                              |    2008.3492 |    20
+Preconditioning                          |    1321.7930 |    18
+########## B12 alpha=0.7 order=7 DONE 2061 s ##########
+########## B12 alpha=0.7 order=8 ##########
+davidson                                 |    2061.8819 |     1
+Diag. Iter.                              |    2061.5410 |    19
+Preconditioning                          |    1412.7793 |    17
+########## B12 alpha=0.7 order=8 DONE 2115 s ##########
+########## B12 alpha=0.7 order=9 ##########
+davidson                                 |    2871.2218 |     1
+Diag. Iter.                              |    2870.8576 |    24
+Preconditioning                          |    2036.9415 |    22
+########## B12 alpha=0.7 order=9 DONE 2923 s ##########
+########## B12 alpha=0.7 order=10 ##########
+davidson                                 |    2384.6659 |     1
+Diag. Iter.                              |    2384.3267 |    19
+Preconditioning                          |    1733.5863 |    17
+########## B12 alpha=0.7 order=10 DONE 2437 s ##########

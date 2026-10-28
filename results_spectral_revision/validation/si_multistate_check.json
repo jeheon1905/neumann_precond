@@ -1,0 +1,667 @@
+{
+  "tag": "si_multistate_check",
+  "datetime": "2026-08-18T16:53:39.728614",
+  "commit": "765711d0afc1561e55721eddca68a37cbbeeb54f",
+  "host": "baekdu",
+  "command": "spectral_experiment.py --filepath data/systems/Si_diamond.cif --spacing 0.6 --supercell 1 1 1 --pbc 1 1 1 --phase fixed --pp_type NNLP --precond neumann --outerorder 4 --diag_iter 20 --diag_tol 1e-6 --nblock 2 --warmup 0 --threads 4 --seed 1 --probe_call 3 --state_rules lowest middle homo slowest --virtual_factor 1.2 --krylov_dims 20 --arnoldi_seeds 0 --eta_max_order 5 --outdir results_spectral_revision/validation --tag si_multistate_check",
+  "cwd": "/home/jhwoo1905/Projects/neumann_precond",
+  "args": {
+    "filepath": "data/systems/Si_diamond.cif",
+    "precond": "neumann",
+    "inner": null,
+    "innerorder": "0",
+    "outerorder": "4",
+    "pcg_iter": "5",
+    "error_cutoff": "-0.4",
+    "averaged_sum": 1,
+    "weight": "0.5",
+    "spacing": 0.6,
+    "nbands": null,
+    "supercell": "[1, 1, 1]",
+    "pbc": "[1, 1, 1]",
+    "phase": "fixed",
+    "density_filename": null,
+    "temperature": 1160.45,
+    "scf_print_energies": false,
+    "scf_maxiter": 100,
+    "scf_energy_tol": 1e-06,
+    "scf_density_tol": 1e-05,
+    "scf_mixing": "density",
+    "virtual_factor": 1.2,
+    "upf_files": null,
+    "pp_type": "NNLP",
+    "filtering": false,
+    "threads": 4,
+    "use_cuda": false,
+    "warmup": 0,
+    "diag_iter": 20,
+    "diag_tol": 1e-06,
+    "nblock": 2,
+    "locking": false,
+    "fill_block": false,
+    "verbosity": 1,
+    "seed": 1,
+    "retHistory": null,
+    "retHistoryScfDir": null,
+    "merge_iter": 5,
+    "probe_call": 3,
+    "state_rules": "['lowest', 'middle', 'homo', 'slowest']",
+    "state_rule": "slowest",
+    "krylov_dims": "[20]",
+    "arnoldi_seeds": "[0]",
+    "outdir": "results_spectral_revision/validation",
+    "tag": "si_multistate_check",
+    "projected": false,
+    "projected_dims": null,
+    "skip_global": false,
+    "eta_max_order": 5,
+    "dense": false,
+    "dense_max_ngpts": 4000
+  },
+  "environment": {
+    "python": "3.10.20",
+    "torch": "2.2.0+cpu",
+    "numpy": "1.26.4",
+    "device": "cpu",
+    "threads": 4
+  },
+  "system": "Si_diamond.cif",
+  "ngpts": 1000,
+  "n_active": 19,
+  "n_occupied": 16,
+  "preconditioner_call": 3,
+  "davidson_meta": {
+    "i_iter": 5,
+    "i_b": 1,
+    "i_scf": 0,
+    "band_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18
+    ]
+  },
+  "memory_estimate_bytes": 200000,
+  "states": [
+    {
+      "state_rule": "lowest",
+      "active_index": 0,
+      "state_index": 0,
+      "residual_norm": 0.011041737956170984,
+      "raw_epsilon": -0.3629759193952165,
+      "corrected_epsilon": -0.3629881113929258,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.616850396598913e-15,
+        "delta_recurrence": {
+          "0": 0.0,
+          "1": 0.0,
+          "2": 0.0,
+          "3": 0.0
+        }
+      },
+      "global_spectrum": [
+        {
+          "label": "lowest/global_seed0",
+          "krylov_dim_requested": 20,
+          "krylov_dim_built": 20,
+          "breakdown": false,
+          "ortho_error": 6.661338147750939e-16,
+          "summary": {
+            "n_ritz": 20,
+            "rho": 1.0000326456664719,
+            "max_abs_imag": 0.0,
+            "numerically_real": true,
+            "idx_largest_magnitude": 0,
+            "idx_most_negative": 13,
+            "idx_most_positive": 0,
+            "lambda_min_real": -0.26772216134129156,
+            "lambda_max_real": 1.0000326456664719
+          },
+          "targets": {
+            "largest_magnitude": {
+              "eigenvalue_real": 1.0000326456664719,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.0000326456664719,
+              "damping_factor": 1.000016322833236,
+              "arnoldi_residual_estimate": 0.00026890856088466705,
+              "ritz_residual": 0.00026890856088467323
+            },
+            "most_negative": {
+              "eigenvalue_real": -0.26772216134129156,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 0.26772216134129156,
+              "damping_factor": 0.3661389193293542,
+              "arnoldi_residual_estimate": 0.0023742163728450653,
+              "ritz_residual": 0.002374216372845106
+            },
+            "most_positive": {
+              "eigenvalue_real": 1.0000326456664719,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.0000326456664719,
+              "damping_factor": 1.000016322833236,
+              "arnoldi_residual_estimate": 0.00026890856088466705,
+              "ritz_residual": 0.00026890856088467323
+            }
+          },
+          "ritz_values_real": [
+            1.0000326456664719,
+            0.926368955977703,
+            0.9145968511367425,
+            0.8179764549384695,
+            0.7682638596841547,
+            0.7196833163696416,
+            0.6017096108528747,
+            0.5316770442010391,
+            0.4274246271867929,
+            0.346733711197102,
+            0.26473499639779574,
+            0.19210137973132102,
+            0.09788336434538925,
+            -0.26772216134129156,
+            -0.25146449460660547,
+            -0.19622900478489924,
+            0.031843600670406765,
+            -0.1473278994754665,
+            -0.0935099536203442,
+            -0.039222634477393235
+          ],
+          "ritz_values_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "seconds": 0.055744171142578125,
+          "seed": 0
+        }
+      ],
+      "eta": {
+        "a_norms": [
+          0.004098850507113044,
+          0.0017389946910298369,
+          0.0011169907239020338,
+          0.0007973925150804947,
+          0.000589986163770557,
+          0.000443550691887029,
+          0.0003372444782575958
+        ],
+        "eta_NP": [
+          0.4242639949937253,
+          0.27251316484063903,
+          0.19454052146979245,
+          0.14393941978286587,
+          0.10821343474647395,
+          0.08227781854262557
+        ],
+        "eta_DNP": [
+          0.6810480336071292,
+          0.3441866535489407,
+          0.2327532015371965,
+          0.16902440188514456,
+          0.12598009770625737,
+          0.09518511316411088
+        ],
+        "max_order": 5
+      },
+      "matvecs": 36
+    },
+    {
+      "state_rule": "middle",
+      "active_index": 8,
+      "state_index": 8,
+      "residual_norm": 0.05064138804980625,
+      "raw_epsilon": -0.008427389309027065,
+      "corrected_epsilon": -0.00868384432738817,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.1415636952801814e-15,
+        "delta_recurrence": {
+          "0": 0.0,
+          "1": 0.0,
+          "2": 0.0,
+          "3": 0.0
+        }
+      },
+      "global_spectrum": [
+        {
+          "label": "middle/global_seed0",
+          "krylov_dim_requested": 20,
+          "krylov_dim_built": 20,
+          "breakdown": false,
+          "ortho_error": 6.661338147750939e-16,
+          "summary": {
+            "n_ritz": 20,
+            "rho": 1.195384923341368,
+            "max_abs_imag": 0.0,
+            "numerically_real": true,
+            "idx_largest_magnitude": 0,
+            "idx_most_negative": 10,
+            "idx_most_positive": 0,
+            "lambda_min_real": -0.1716313886776743,
+            "lambda_max_real": 1.195384923341368
+          },
+          "targets": {
+            "largest_magnitude": {
+              "eigenvalue_real": 1.195384923341368,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.195384923341368,
+              "damping_factor": 1.097692461670684,
+              "arnoldi_residual_estimate": 0.0002621888332040052,
+              "ritz_residual": 0.0002621888332039794
+            },
+            "most_negative": {
+              "eigenvalue_real": -0.1716313886776743,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 0.1716313886776743,
+              "damping_factor": 0.4141843056611628,
+              "arnoldi_residual_estimate": 0.002545200914927025,
+              "ritz_residual": 0.0025452009149270595
+            },
+            "most_positive": {
+              "eigenvalue_real": 1.195384923341368,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.195384923341368,
+              "damping_factor": 1.097692461670684,
+              "arnoldi_residual_estimate": 0.0002621888332040052,
+              "ritz_residual": 0.0002621888332039794
+            }
+          },
+          "ritz_values_real": [
+            1.195384923341368,
+            1.1142894632281883,
+            1.1025364269027427,
+            0.9997101401238709,
+            0.9421229939668759,
+            0.893697447723121,
+            0.7641599401004096,
+            0.703301006608237,
+            0.5804520748734726,
+            0.47679492865051204,
+            -0.1716313886776743,
+            -0.1562177654002146,
+            -0.09603433246829651,
+            0.39929839643988163,
+            0.3109239982065378,
+            -0.035125382853935704,
+            0.01473198216061708,
+            0.22990560329078782,
+            0.08060075944274848,
+            0.1502476308617156
+          ],
+          "ritz_values_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "seconds": 0.057599782943725586,
+          "seed": 0
+        }
+      ],
+      "eta": {
+        "a_norms": [
+          0.017494516424286243,
+          0.00912801540284364,
+          0.006754599073345852,
+          0.005582874685444384,
+          0.004810859469360255,
+          0.004237528010384293,
+          0.0037900809215074597
+        ],
+        "eta_NP": [
+          0.5217643735594739,
+          0.38609807264915197,
+          0.31912140639075476,
+          0.2749924234934395,
+          0.24222035680287057,
+          0.2166439374252147
+        ],
+        "eta_DNP": [
+          0.7363843362140651,
+          0.4491197593332306,
+          0.3513220969675355,
+          0.29655695629339157,
+          0.25832840101590293,
+          0.22923994223750943
+        ],
+        "max_order": 5
+      },
+      "matvecs": 36
+    },
+    {
+      "state_rule": "homo",
+      "active_index": 15,
+      "state_index": 15,
+      "residual_norm": 0.13216272171309443,
+      "raw_epsilon": 0.11380104533539562,
+      "corrected_epsilon": 0.11205434683433434,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.103649591345057e-15,
+        "delta_recurrence": {
+          "0": 0.0,
+          "1": 0.0,
+          "2": 0.0,
+          "3": 0.0
+        }
+      },
+      "global_spectrum": [
+        {
+          "label": "homo/global_seed0",
+          "krylov_dim_requested": 20,
+          "krylov_dim_built": 20,
+          "breakdown": false,
+          "ortho_error": 1.1102230246251565e-15,
+          "summary": {
+            "n_ritz": 20,
+            "rho": 1.262157340165624,
+            "max_abs_imag": 0.0,
+            "numerically_real": true,
+            "idx_largest_magnitude": 0,
+            "idx_most_negative": 6,
+            "idx_most_positive": 0,
+            "lambda_min_real": -0.1399794143416332,
+            "lambda_max_real": 1.262157340165624
+          },
+          "targets": {
+            "largest_magnitude": {
+              "eigenvalue_real": 1.262157340165624,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.262157340165624,
+              "damping_factor": 1.131078670082812,
+              "arnoldi_residual_estimate": 0.00026629730692820255,
+              "ritz_residual": 0.0002662973069282153
+            },
+            "most_negative": {
+              "eigenvalue_real": -0.1399794143416332,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 0.1399794143416332,
+              "damping_factor": 0.4300102928291834,
+              "arnoldi_residual_estimate": 0.003032431629182415,
+              "ritz_residual": 0.00303243162918237
+            },
+            "most_positive": {
+              "eigenvalue_real": 1.262157340165624,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.262157340165624,
+              "damping_factor": 1.131078670082812,
+              "arnoldi_residual_estimate": 0.00026629730692820255,
+              "ritz_residual": 0.0002662973069282153
+            }
+          },
+          "ritz_values_real": [
+            1.262157340165624,
+            1.1785564543286957,
+            1.166754164641438,
+            1.0617942083445373,
+            1.0016735033893818,
+            0.9517366559581326,
+            -0.1399794143416332,
+            -0.12618395365936474,
+            -0.06377791115065756,
+            -0.0011798489661889026,
+            0.04843149851273537,
+            0.1154671345181783,
+            0.1920077253295935,
+            0.2736629958570997,
+            0.35381443002787305,
+            0.44636434516556184,
+            0.5311643810624098,
+            0.6341150418359142,
+            0.8194367365916825,
+            0.7575060237971446
+          ],
+          "ritz_values_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "seconds": 0.05418825149536133,
+          "seed": 0
+        }
+      ],
+      "eta": {
+        "a_norms": [
+          0.044960876327602005,
+          0.02558685424255955,
+          0.0210741272415703,
+          0.019545682809954373,
+          0.018943460345876035,
+          0.01877708258500191,
+          0.018894250787741367
+        ],
+        "eta_NP": [
+          0.569091537632052,
+          0.46872145213576827,
+          0.43472646457193387,
+          0.4213320978854325,
+          0.41763159703972313,
+          0.42023760057679227
+        ],
+        "eta_DNP": [
+          0.7584352497066023,
+          0.5129661412967659,
+          0.44995688050573945,
+          0.42727894745542444,
+          0.41902927978398147,
+          0.4185996902870925
+        ],
+        "max_order": 5
+      },
+      "matvecs": 36
+    },
+    {
+      "state_rule": "slowest",
+      "active_index": 12,
+      "state_index": 12,
+      "residual_norm": 0.21366748345647954,
+      "raw_epsilon": 0.04834810921216648,
+      "corrected_epsilon": 0.04378272986350398,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.1537566062786278e-15,
+        "delta_recurrence": {
+          "0": 0.0,
+          "1": 0.0,
+          "2": 0.0,
+          "3": 0.0
+        }
+      },
+      "global_spectrum": [
+        {
+          "label": "slowest/global_seed0",
+          "krylov_dim_requested": 20,
+          "krylov_dim_built": 20,
+          "breakdown": false,
+          "ortho_error": 8.881784197001252e-16,
+          "summary": {
+            "n_ritz": 20,
+            "rho": 1.2243896266714338,
+            "max_abs_imag": 0.0,
+            "numerically_real": true,
+            "idx_largest_magnitude": 0,
+            "idx_most_negative": 10,
+            "idx_most_positive": 0,
+            "lambda_min_real": -0.15780864793076177,
+            "lambda_max_real": 1.2243896266714338
+          },
+          "targets": {
+            "largest_magnitude": {
+              "eigenvalue_real": 1.2243896266714338,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.2243896266714338,
+              "damping_factor": 1.112194813335717,
+              "arnoldi_residual_estimate": 0.0002634950499108797,
+              "ritz_residual": 0.0002634950499108903
+            },
+            "most_negative": {
+              "eigenvalue_real": -0.15780864793076177,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 0.15780864793076177,
+              "damping_factor": 0.4210956760346191,
+              "arnoldi_residual_estimate": 0.0027718612449234943,
+              "ritz_residual": 0.0027718612449234826
+            },
+            "most_positive": {
+              "eigenvalue_real": 1.2243896266714338,
+              "eigenvalue_imag": 0.0,
+              "magnitude": 1.2243896266714338,
+              "damping_factor": 1.112194813335717,
+              "arnoldi_residual_estimate": 0.0002634950499108797,
+              "ritz_residual": 0.0002634950499108903
+            }
+          },
+          "ritz_values_real": [
+            1.2243896266714338,
+            1.1422065289666368,
+            1.1304327358310893,
+            1.026678156676803,
+            0.9679618556215319,
+            0.9190299644534203,
+            0.7881922987399594,
+            0.727073283691627,
+            0.6035733895265849,
+            0.49897783230936066,
+            -0.15780864793076177,
+            -0.14343555616946285,
+            -0.08188938782343037,
+            0.42043594928931904,
+            0.32968062578222546,
+            -0.01999491644277438,
+            0.029611799218317497,
+            0.24993128396366504,
+            0.09639141063138686,
+            0.16901687788552433
+          ],
+          "ritz_values_imag": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+          ],
+          "seconds": 0.05390334129333496,
+          "seed": 0
+        }
+      ],
+      "eta": {
+        "a_norms": [
+          0.07171364131152984,
+          0.04233685452083652,
+          0.03629435316326088,
+          0.03456686497325861,
+          0.03401650198431511,
+          0.033953573304525315,
+          0.03417051019823567
+        ],
+        "eta_NP": [
+          0.5903598499052894,
+          0.5061011057240181,
+          0.4820124085332296,
+          0.47433795526495004,
+          0.4734604558291533,
+          0.47648549945743546
+        ],
+        "eta_DNP": [
+          0.767601206033771,
+          0.5421297126158692,
+          0.4924721996416981,
+          0.47758947978477845,
+          0.4735931491258004,
+          0.4747749012744006
+        ],
+        "max_order": 5
+      },
+      "matvecs": 36
+    }
+  ],
+  "total_seconds": 0.7206344604492188
+}

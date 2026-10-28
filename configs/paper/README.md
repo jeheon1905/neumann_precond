@@ -1,8 +1,9 @@
 # Reproducing the paper's figures and tables
 
-Five configuration files reproduce every measured figure and table in
+Five configuration files reproduce the Block Davidson figures and tables in
 *"Efficient Preconditioning for Iterative Diagonalization via Neumann Series
-Expansion of the Inverse of a Shifted Hamiltonian"*.
+Expansion of the Inverse of a Shifted Hamiltonian"*; the damping-weight sweep
+has a configuration of its own (below).
 
 Run each with
 
@@ -121,8 +122,7 @@ alongside the old ones.
 
 ## The damping-weight ablation
 
-`config.fixed.alpha_ablation.yaml` answers the reviewer's question about
-alternative weighting factors.  `weight` is a sweep axis, so one run covers
+`config.fixed.alpha_ablation.yaml` tests alternative damping weights.  `weight` is a sweep axis, so one run covers
 α ∈ {0.3 … 0.7}, and the value lands in both the output path (`weight=0.5`) and
 `calculation_summary_fixed.txt`.  That matters: an earlier attempt in 2026-01
 recorded α only in the directory name — the `--weight` CLI did not exist yet —

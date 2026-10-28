@@ -1,8 +1,33 @@
-# Preconditioner development using Neumann expansion
+# Neumann preconditioner for real-space iterative diagonalization
 
-This repository provides implementations and examples for developing preconditioners based on the Neumann series expansion, applied to iterative diagonalization problems in electronic structure calculations.
+This repository contains the implementation, input files and analysis scripts of
 
-## Environment setting
+> H. Ji, J. Woo, and S. Choi, *Efficient Preconditioning for Iterative Diagonalization via
+> Neumann Series Expansion of the Inverse of a Shifted Hamiltonian*.
+
+The Neumann preconditioner (NP) approximates $(H - \tilde{\epsilon} I)^{-1}$ by a truncated
+Neumann series built on the Gaussian-approximated Poisson preconditioner (GAPP); order 0 is
+GAPP itself. Damped-NP averages the last two orders, which stabilizes the convergence over
+the orders examined. Both are implemented in `precondition.py` on top of the real-space DFT
+code GOSPEL (`vendor/gospel`).
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `precondition.py` | NP, Damped-NP, GAPP and ISI preconditioners |
+| `test.py`, `repeat_test.py` | single run and parameter sweep drivers |
+| `configs/paper/` | configurations that reproduce the benchmarks of the paper ([README](configs/paper/README.md)) |
+| `configs/smoke/` | miniature configurations for a quick CPU check ([README](configs/smoke/README.md)) |
+| `data/systems/` | structures of the benchmark systems |
+| `Figures/` | per-iteration timing data and scripts for Figure S1 and Table S2 ([README](Figures/README.md)) |
+| `spectral_*.py` | spectral analysis of the preconditioned operator (Supporting Information, Section S) |
+| `results_spectral_revision/` | data of the spectral analysis and the SLURM scripts that produced them |
+| `results_paper/alpha_ablation/` | runs of the damping-weight sweep |
+| `tests/` | unit tests of the spectral analysis tools |
+| `vendor/gospel/` | vendored GOSPEL source with the modifications used here |
+
+## Installation
 We recommend using conda to manage dependencies.
 
 ```bash
@@ -65,7 +90,10 @@ python setup.py develop  # or: pip install -e .
 ```
 
 
-## Usage example: ...
+## Usage examples
+
+Fixed-Hamiltonian diagonalization of a silicon cell with four preconditioners:
+
 ```bash
 # 1. Neumann Preconditioner
 python test.py \
@@ -111,10 +139,39 @@ done
 ```
 
 
-## Reproduce experiments
-You can reproduce the experiments described in this repository using the provided configuration file.
+## Reproducing the paper
+
+Each configuration in `configs/paper/` is run with
 
 ```bash
-python repeat_test.py --config config.yaml
+python repeat_test.py --config configs/paper/<config>.yaml
 ```
 
+| Result | Configuration or script |
+|---|---|
+| Figure 1, Table S1 (Block Davidson) | `config.fixed.timing.yaml` |
+| Figure 2 | `config.fixed.history.yaml` |
+| Figure S1, Table S2 | `config.fixed.periter.yaml`, then `extract_per_iteration_time.py` and the scripts in `Figures/` |
+| Figure 3, Table S3 | `config.scf.nolocking.yaml`, `config.scf.locking.yaml` |
+| Damping-weight sweep | `config.fixed.alpha_ablation.yaml`; `results_paper/alpha_ablation/summarize_ablation.py` |
+| Table S10 | the SCF configurations with `scf_density_tol` set to `1.0e-6` or `1.0e-7` |
+| Spectral analysis | `spectral_experiment.py` with the job scripts in `results_spectral_revision/jobs/` |
+
+[`configs/paper/README.md`](configs/paper/README.md) explains the settings and the output
+files. Timings were measured on a single NVIDIA GH200, except the B200 columns of Table S1
+and Table S10, which were measured on a single NVIDIA B200. The RMM-DIIS eigensolver used
+for the RMM-DIIS columns of Table S1 is not part of this repository.
+
+## Spectral analysis
+
+`spectral_experiment.py` attaches a probe, disabled by default, to the production
+preconditioner and records the error propagation operator $E = I - BM$ at a chosen Davidson
+iteration, where $B$ is the GAPP operator and $M = H - \tilde{\epsilon} I$. Spectra are
+estimated by Arnoldi and operator norms by Lanczos; `results_spectral_revision/validation/`
+and `results_spectral_revision/error_norm/` hold the dense checks of these estimates, and
+`results_spectral_revision/check_gapp_spd.py` checks that $B$ is symmetric positive definite.
+The unit tests of these tools run on a CPU:
+
+```bash
+PYTHONPATH=. python tests/test_spectral_tools.py
+```

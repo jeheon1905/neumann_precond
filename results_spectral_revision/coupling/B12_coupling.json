@@ -1,0 +1,1115 @@
+{
+  "tag": "B12_coupling",
+  "datetime": "2026-10-19T18:19:00.686172",
+  "commit": "f58d7237176d99f98536420b5e83cc1f725ebeb8",
+  "host": "b12",
+  "command": "spectral_experiment.py --filepath data/systems/B12.sdf --spacing 0.2 --supercell 1 1 1 --pbc 0 0 0 --precond neumann --outerorder 4 --error_cutoff -0.4 --averaged_sum 1 --weight 0.5 --phase fixed --temperature 0.0 --scf_energy_tol inf --scf_density_tol 1e-5 --scf_mixing potential --virtual_factor 1.2 --pp_type TM --filtering --threads 8 --warmup 0 --diag_iter 1000 --diag_tol 1e-5 --nblock 2 --verbosity 1 --seed 2 --probe_resid_below 1e-3 --exact_shift --state_rules lowest middle homo --skip_global --krylov_dims 40 --coupling_norm 0 1 2 3 4 5 6 7 8 9 10 --coupling_dim 40 --outdir results_spectral_revision/coupling --tag B12_coupling",
+  "cwd": "/home/jhwoo1905/Projects/neumann_precond",
+  "args": {
+    "filepath": "data/systems/B12.sdf",
+    "precond": "neumann",
+    "inner": null,
+    "innerorder": "0",
+    "outerorder": "4",
+    "pcg_iter": "5",
+    "error_cutoff": "-0.4",
+    "averaged_sum": 1,
+    "weight": "0.5",
+    "spacing": 0.2,
+    "nbands": null,
+    "supercell": "[1, 1, 1]",
+    "pbc": "[0, 0, 0]",
+    "phase": "fixed",
+    "density_filename": null,
+    "temperature": 0.0,
+    "scf_print_energies": false,
+    "scf_maxiter": 100,
+    "scf_energy_tol": Infinity,
+    "scf_density_tol": 1e-05,
+    "scf_mixing": "potential",
+    "virtual_factor": 1.2,
+    "upf_files": null,
+    "pp_type": "TM",
+    "filtering": true,
+    "threads": 8,
+    "use_cuda": false,
+    "warmup": 0,
+    "diag_iter": 1000,
+    "diag_tol": 1e-05,
+    "nblock": 2,
+    "locking": false,
+    "fill_block": false,
+    "verbosity": 1,
+    "seed": 2,
+    "retHistory": null,
+    "retHistoryScfDir": null,
+    "merge_iter": 5,
+    "probe_call": 6,
+    "state_rules": "['lowest', 'middle', 'homo']",
+    "state_rule": "slowest",
+    "krylov_dims": "[40]",
+    "arnoldi_seeds": "[0, 1]",
+    "outdir": "results_spectral_revision/coupling",
+    "tag": "B12_coupling",
+    "projected": false,
+    "projected_dims": null,
+    "skip_global": true,
+    "deflated": false,
+    "deflated_dims": "[20, 40]",
+    "cg_tol": 1e-10,
+    "cg_maxiter": 300,
+    "deflated_recursion": 0,
+    "minimal_projector": false,
+    "weights": 0,
+    "verify_order_form": null,
+    "verify_dim": 30,
+    "svd_bounds": null,
+    "svd_dim": 80,
+    "svd_undeflated": false,
+    "error_norm": null,
+    "error_norm_dim": 30,
+    "error_norm_mdims": null,
+    "coupling_norm": "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+    "coupling_dim": 40,
+    "probe_resid_below": 0.001,
+    "exact_shift": true,
+    "rho_bound": null,
+    "rho_bound_dim": 40,
+    "jd_form": false,
+    "svd_arnoldi_dim": 0,
+    "eta_max_order": 0,
+    "dense": false,
+    "dense_max_ngpts": 4000
+  },
+  "environment": {
+    "python": "3.10.20",
+    "torch": "2.2.0+cpu",
+    "numpy": "1.26.4",
+    "device": "cpu",
+    "threads": 8
+  },
+  "system": "B12.sdf",
+  "ngpts": 1623798,
+  "n_active": 300,
+  "n_occupied": 250,
+  "preconditioner_call": 18,
+  "davidson_meta": {
+    "i_iter": 20,
+    "i_b": 1,
+    "i_scf": 0,
+    "band_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299
+    ]
+  },
+  "memory_estimate_bytes": 584567280,
+  "states": [
+    {
+      "state_rule": "lowest",
+      "active_index": 0,
+      "state_index": 0,
+      "residual_norm": 2.589419571497825e-06,
+      "raw_epsilon": -1.160095617217147,
+      "corrected_epsilon": -1.160095617217147,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.7035434057513467e-15,
+        "delta_recurrence": {
+          "0": 1.0090893240770402e-12,
+          "1": 3.460213071419857e-13,
+          "2": 2.96371034430991e-13,
+          "3": 2.9089146665474845e-13
+        }
+      },
+      "coupling_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.997085293106274,
+              "norm_hi": 0.9974054156287508,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.9970852931062739,
+              "norm_hi": 0.9974054156287507,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 3.892592943470845e-17,
+              "norm_hi": 3.892592943470845e-17,
+              "m": 1
+            }
+          },
+          {
+            "N": 1,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.999495774501356,
+              "norm_hi": 0.9994980244995297,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.9976297636135733,
+              "norm_hi": 0.9976324607705631,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.08479717685661177,
+              "norm_hi": 0.08479717685661177,
+              "m": 40
+            }
+          },
+          {
+            "N": 2,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.9581847955206357,
+              "norm_hi": 0.958184874301698,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.9512055609078484,
+              "norm_hi": 0.9512056576461512,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.18670780056433786,
+              "norm_hi": 0.18670780056433786,
+              "m": 40
+            }
+          },
+          {
+            "N": 3,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.9012647259944512,
+              "norm_hi": 0.901264736111517,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.8870492054743256,
+              "norm_hi": 0.8870492135062955,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.2164064141128171,
+              "norm_hi": 0.2164064141128171,
+              "m": 40
+            }
+          },
+          {
+            "N": 4,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.8410726769742436,
+              "norm_hi": 0.8410726798507219,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.8184419243116183,
+              "norm_hi": 0.8184419254345625,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.22770031608214025,
+              "norm_hi": 0.22770031608882663,
+              "m": 40
+            }
+          },
+          {
+            "N": 5,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.782567727403665,
+              "norm_hi": 0.7825677290161062,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.7510767780198366,
+              "norm_hi": 0.7510767782918998,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.23701600717381144,
+              "norm_hi": 0.23703017634222998,
+              "m": 40
+            }
+          },
+          {
+            "N": 6,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.7274512106565969,
+              "norm_hi": 0.7274512119103523,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.6872597856423602,
+              "norm_hi": 0.6872597857305767,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.24709726854645533,
+              "norm_hi": 0.24710725990946433,
+              "m": 40
+            }
+          },
+          {
+            "N": 7,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.6761372068637438,
+              "norm_hi": 0.6761372077074431,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.6278303565569654,
+              "norm_hi": 0.6278303565865739,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.25119880156692076,
+              "norm_hi": 0.2512040231130341,
+              "m": 40
+            }
+          },
+          {
+            "N": 8,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.6285627340721954,
+              "norm_hi": 0.6285627347280386,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.5730015167462245,
+              "norm_hi": 0.5730015167613733,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.2509888883572739,
+              "norm_hi": 0.25100335626128556,
+              "m": 40
+            }
+          },
+          {
+            "N": 9,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.5844981810713463,
+              "norm_hi": 0.5844981820333774,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.5226932189397131,
+              "norm_hi": 0.5226932189728551,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.24766613437700064,
+              "norm_hi": 0.2476976148475756,
+              "m": 40
+            }
+          },
+          {
+            "N": 10,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.5436759102372557,
+              "norm_hi": 0.5436759116912178,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.4766935811838163,
+              "norm_hi": 0.4766935814317833,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.24209925679268662,
+              "norm_hi": 0.2422174234222819,
+              "m": 40
+            }
+          }
+        ],
+        "m": 40,
+        "weight": 0.5
+      },
+      "matvecs": 10489
+    },
+    {
+      "state_rule": "middle",
+      "active_index": 125,
+      "state_index": 125,
+      "residual_norm": 1.3310354948059571e-05,
+      "raw_epsilon": -0.5798475264231674,
+      "corrected_epsilon": -0.5798475264231674,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.6707322009526555e-15,
+        "delta_recurrence": {
+          "0": 3.5671469287398805e-11,
+          "1": 2.183289574889723e-11,
+          "2": 1.4013883629816809e-11,
+          "3": 1.1474670874872454e-11
+        }
+      },
+      "coupling_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.0247785809903718,
+              "norm_hi": 1.024995692868847,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0247785809903718,
+              "norm_hi": 1.024995692868847,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 3.1445400496791276e-17,
+              "norm_hi": 3.1445400496791276e-17,
+              "m": 1
+            }
+          },
+          {
+            "N": 1,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.0838775105465783,
+              "norm_hi": 1.0838791268771835,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0838242874504278,
+              "norm_hi": 1.083825923388421,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.022569733016680863,
+              "norm_hi": 0.022569733016680863,
+              "m": 40
+            }
+          },
+          {
+            "N": 2,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.102733991430488,
+              "norm_hi": 1.1027340127316745,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.1026927894488106,
+              "norm_hi": 1.1026928103686506,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.06146563033399857,
+              "norm_hi": 0.06146563033427339,
+              "m": 40
+            }
+          },
+          {
+            "N": 3,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.090917502640001,
+              "norm_hi": 1.0909175035340914,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0910740424339782,
+              "norm_hi": 1.0910740432094077,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.11043574392725718,
+              "norm_hi": 0.11043574394427187,
+              "m": 40
+            }
+          },
+          {
+            "N": 4,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.058328115639931,
+              "norm_hi": 1.0583281157054165,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0589766528656426,
+              "norm_hi": 1.058976652952425,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.18774023466869172,
+              "norm_hi": 0.18774023466887113,
+              "m": 40
+            }
+          },
+          {
+            "N": 5,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.012891869624952,
+              "norm_hi": 1.0128918696297209,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0143181227612166,
+              "norm_hi": 1.0143181227685616,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.29453244170948456,
+              "norm_hi": 0.29453244170948595,
+              "m": 40
+            }
+          },
+          {
+            "N": 6,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.9602266962491206,
+              "norm_hi": 0.9602266962502549,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.9625723267870135,
+              "norm_hi": 0.962572326787725,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.44153883943288263,
+              "norm_hi": 0.44153883943288263,
+              "m": 40
+            }
+          },
+          {
+            "N": 7,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.904461075548373,
+              "norm_hi": 0.9044610755486068,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.9073892631651302,
+              "norm_hi": 0.9073892631652297,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.6443995979140087,
+              "norm_hi": 0.6443995979140087,
+              "m": 40
+            }
+          },
+          {
+            "N": 8,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 0.8623396076971218,
+              "norm_hi": 0.8623396083406158,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.851165039463187,
+              "norm_hi": 0.8511650394632018,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.9252759984936691,
+              "norm_hi": 0.9252759984936691,
+              "m": 40
+            }
+          },
+          {
+            "N": 9,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.1953892264138857,
+              "norm_hi": 1.1953892264138857,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.7954554985666464,
+              "norm_hi": 0.7954554985666488,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 1.315492511840599,
+              "norm_hi": 1.315492511840599,
+              "m": 40
+            }
+          },
+          {
+            "N": 10,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.735875322763253,
+              "norm_hi": 1.735875322763253,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 0.7412558980323649,
+              "norm_hi": 0.7412558980323652,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 1.859653120486857,
+              "norm_hi": 1.859653120486857,
+              "m": 40
+            }
+          }
+        ],
+        "m": 40,
+        "weight": 0.5
+      },
+      "matvecs": 10489
+    },
+    {
+      "state_rule": "homo",
+      "active_index": 249,
+      "state_index": 249,
+      "residual_norm": 0.0005880224107884728,
+      "raw_epsilon": -0.33941093099902186,
+      "corrected_epsilon": -0.33941093099902186,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.6492128224807736e-15,
+        "delta_recurrence": {
+          "0": 5.148259665485231e-08,
+          "1": 3.2378381802163626e-08,
+          "2": 2.4928187377753322e-08,
+          "3": 2.15174484867146e-08
+        }
+      },
+      "coupling_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.04294371052995,
+              "norm_hi": 1.0436536566736976,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.04294371052995,
+              "norm_hi": 1.0436536566736976,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 3.346553960842636e-17,
+              "norm_hi": 3.346553960842636e-17,
+              "m": 1
+            }
+          },
+          {
+            "N": 1,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.1401870462558368,
+              "norm_hi": 1.1402042927537483,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.1404470445797676,
+              "norm_hi": 1.1404621717190215,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.021202113270741767,
+              "norm_hi": 0.021202115275228535,
+              "m": 40
+            }
+          },
+          {
+            "N": 2,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.2025668784355177,
+              "norm_hi": 1.2025670602613276,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.2043648946019647,
+              "norm_hi": 1.2043650089670315,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.08034857599251784,
+              "norm_hi": 0.08034857607220137,
+              "m": 40
+            }
+          },
+          {
+            "N": 3,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.2348237116534768,
+              "norm_hi": 1.2348237201949759,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.2390850100490087,
+              "norm_hi": 1.239085012517675,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.1803191501659115,
+              "norm_hi": 0.18031915017183425,
+              "m": 40
+            }
+          },
+          {
+            "N": 4,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.2422701455551566,
+              "norm_hi": 1.2422701469282802,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.24974412453563,
+              "norm_hi": 1.2497441250329477,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.3391092232252129,
+              "norm_hi": 0.33910922322552106,
+              "m": 40
+            }
+          },
+          {
+            "N": 5,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.2312478933439228,
+              "norm_hi": 1.2312478935244329,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.241983520821758,
+              "norm_hi": 1.2419835208838814,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.587364127979393,
+              "norm_hi": 0.5873641279794429,
+              "m": 40
+            }
+          },
+          {
+            "N": 6,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.2089923496430461,
+              "norm_hi": 1.2089923497100084,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.2205015806532955,
+              "norm_hi": 1.220501580661114,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 0.9748108839942856,
+              "norm_hi": 0.9748108839942873,
+              "m": 40
+            }
+          },
+          {
+            "N": 7,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 1.3921975390423267,
+              "norm_hi": 1.39219753905434,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.1890304786890051,
+              "norm_hi": 1.1890304786898613,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 1.5805846688283047,
+              "norm_hi": 1.580584668828305,
+              "m": 40
+            }
+          },
+          {
+            "N": 8,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 2.3134937947789944,
+              "norm_hi": 2.313493794778995,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.1504799638952021,
+              "norm_hi": 1.150479963895373,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 2.5300132073390778,
+              "norm_hi": 2.5300132073390778,
+              "m": 40
+            }
+          },
+          {
+            "N": 9,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 3.806829256288374,
+              "norm_hi": 3.806829256288374,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.1070995700829789,
+              "norm_hi": 1.1070995700830144,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 4.0215096865982565,
+              "norm_hi": 4.0215096865982565,
+              "m": 40
+            }
+          },
+          {
+            "N": 10,
+            "weight": 0.5,
+            "implemented": {
+              "norm_lo": 6.1667846162706885,
+              "norm_hi": 6.1667846162706885,
+              "m": 40
+            },
+            "deflated_form": {
+              "norm_lo": 1.0606200528717464,
+              "norm_hi": 1.060620052871753,
+              "m": 40
+            },
+            "coupling": {
+              "norm_lo": 6.370170492816293,
+              "norm_hi": 6.370170492816293,
+              "m": 40
+            }
+          }
+        ],
+        "m": 40,
+        "weight": 0.5
+      },
+      "matvecs": 10489
+    }
+  ],
+  "total_seconds": 33150.51770448685
+}

@@ -1,0 +1,897 @@
+{
+  "tag": "B12_errnorm_m_scan",
+  "datetime": "2026-10-19T18:12:28.498329",
+  "commit": "f58d7237176d99f98536420b5e83cc1f725ebeb8",
+  "host": "b10",
+  "command": "spectral_experiment.py --filepath data/systems/B12.sdf --spacing 0.2 --supercell 1 1 1 --pbc 0 0 0 --precond neumann --outerorder 4 --error_cutoff -0.4 --averaged_sum 1 --weight 0.5 --phase fixed --temperature 0.0 --scf_energy_tol inf --scf_density_tol 1e-5 --scf_mixing potential --virtual_factor 1.2 --pp_type TM --filtering --threads 8 --warmup 0 --diag_iter 1000 --diag_tol 1e-5 --nblock 2 --verbosity 1 --seed 2 --probe_resid_below 1e-3 --exact_shift --state_rules lowest homo --skip_global --krylov_dims 40 --error_norm 0 2 5 10 --error_norm_dim 30 --error_norm_mdims 30 60 100 --outdir results_spectral_revision/error_norm --tag B12_errnorm_m_scan",
+  "cwd": "/home/jhwoo1905/Projects/neumann_precond",
+  "args": {
+    "filepath": "data/systems/B12.sdf",
+    "precond": "neumann",
+    "inner": null,
+    "innerorder": "0",
+    "outerorder": "4",
+    "pcg_iter": "5",
+    "error_cutoff": "-0.4",
+    "averaged_sum": 1,
+    "weight": "0.5",
+    "spacing": 0.2,
+    "nbands": null,
+    "supercell": "[1, 1, 1]",
+    "pbc": "[0, 0, 0]",
+    "phase": "fixed",
+    "density_filename": null,
+    "temperature": 0.0,
+    "scf_print_energies": false,
+    "scf_maxiter": 100,
+    "scf_energy_tol": Infinity,
+    "scf_density_tol": 1e-05,
+    "scf_mixing": "potential",
+    "virtual_factor": 1.2,
+    "upf_files": null,
+    "pp_type": "TM",
+    "filtering": true,
+    "threads": 8,
+    "use_cuda": false,
+    "warmup": 0,
+    "diag_iter": 1000,
+    "diag_tol": 1e-05,
+    "nblock": 2,
+    "locking": false,
+    "fill_block": false,
+    "verbosity": 1,
+    "seed": 2,
+    "retHistory": null,
+    "retHistoryScfDir": null,
+    "merge_iter": 5,
+    "probe_call": 6,
+    "state_rules": "['lowest', 'homo']",
+    "state_rule": "slowest",
+    "krylov_dims": "[40]",
+    "arnoldi_seeds": "[0, 1]",
+    "outdir": "results_spectral_revision/error_norm",
+    "tag": "B12_errnorm_m_scan",
+    "projected": false,
+    "projected_dims": null,
+    "skip_global": true,
+    "deflated": false,
+    "deflated_dims": "[20, 40]",
+    "cg_tol": 1e-10,
+    "cg_maxiter": 300,
+    "deflated_recursion": 0,
+    "minimal_projector": false,
+    "weights": 0,
+    "verify_order_form": null,
+    "verify_dim": 30,
+    "svd_bounds": null,
+    "svd_dim": 80,
+    "svd_undeflated": false,
+    "error_norm": "[0, 2, 5, 10]",
+    "error_norm_dim": 30,
+    "error_norm_mdims": "[30, 60, 100]",
+    "probe_resid_below": 0.001,
+    "exact_shift": true,
+    "rho_bound": null,
+    "rho_bound_dim": 40,
+    "jd_form": false,
+    "svd_arnoldi_dim": 0,
+    "eta_max_order": 0,
+    "dense": false,
+    "dense_max_ngpts": 4000
+  },
+  "environment": {
+    "python": "3.10.20",
+    "torch": "2.2.0+cpu",
+    "numpy": "1.26.4",
+    "device": "cpu",
+    "threads": 8
+  },
+  "system": "B12.sdf",
+  "ngpts": 1623798,
+  "n_active": 300,
+  "n_occupied": 250,
+  "preconditioner_call": 18,
+  "davidson_meta": {
+    "i_iter": 20,
+    "i_b": 1,
+    "i_scf": 0,
+    "band_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299
+    ]
+  },
+  "memory_estimate_bytes": 584567280,
+  "states": [
+    {
+      "state_rule": "lowest",
+      "active_index": 0,
+      "state_index": 0,
+      "residual_norm": 2.589419571497825e-06,
+      "raw_epsilon": -1.160095617217147,
+      "corrected_epsilon": -1.160095617217147,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.7035434057513467e-15,
+        "delta_recurrence": {
+          "0": 1.0090893240770402e-12,
+          "1": 3.460213071419857e-13,
+          "2": 2.96371034430991e-13,
+          "3": 2.9089146665474845e-13
+        }
+      },
+      "error_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "undamped": {
+              "norm_lo": 1.277678992622628,
+              "norm_hi": 1.2777932221699075,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.277678992622628,
+                  "norm_hi": 1.2777932221699075,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.2777070454869361,
+                  "norm_hi": 1.2780063502449919,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.2777171139349002,
+                  "norm_hi": 1.2780506439183237,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 0.9945459252354507,
+              "norm_hi": 1.004013172573403,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 0.9945459252354507,
+                  "norm_hi": 1.004013172573403,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 0.9970877046411192,
+                  "norm_hi": 0.9971398253968559,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 0.9970877613345307,
+                  "norm_hi": 0.9970877714142165,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 2,
+            "undamped": {
+              "norm_lo": 1.5665204675786852,
+              "norm_hi": 1.5665204944866578,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.5665204675786852,
+                  "norm_hi": 1.5665204944866578,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.5665204675786901,
+                  "norm_hi": 1.5665204675786901,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.5665204675786901,
+                  "norm_hi": 1.5665204675786901,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 0.958184778650171,
+              "norm_hi": 0.9582263504027821,
+              "contracts": true,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 0.958184778650171,
+                  "norm_hi": 0.9582263504027821,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 0.9581847955206956,
+                  "norm_hi": 0.9581847955339808,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 0.9581847955206955,
+                  "norm_hi": 0.9581847955206955,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 5,
+            "undamped": {
+              "norm_lo": 2.313000526831402,
+              "norm_hi": 2.313000526831404,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 2.313000526831402,
+                  "norm_hi": 2.313000526831404,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 2.313000526831402,
+                  "norm_hi": 2.313000526831402,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 2.3130005268314013,
+                  "norm_hi": 2.3130005268314013,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 0.7825677273857622,
+              "norm_hi": 0.78256913216897,
+              "contracts": true,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 0.7825677273857622,
+                  "norm_hi": 0.78256913216897,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 0.7825677274036655,
+                  "norm_hi": 0.7825677274036683,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 0.7825677274036655,
+                  "norm_hi": 0.7825677274036655,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 10,
+            "undamped": {
+              "norm_lo": 4.41061088675028,
+              "norm_hi": 4.41061088675028,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 4.41061088675028,
+                  "norm_hi": 4.41061088675028,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 4.41061088675028,
+                  "norm_hi": 4.41061088675028,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 4.410610886750279,
+                  "norm_hi": 4.410610886750279,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 0.5436759102313591,
+              "norm_hi": 0.543676633127453,
+              "contracts": true,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 0.5436759102313591,
+                  "norm_hi": 0.543676633127453,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 0.5436759102372555,
+                  "norm_hi": 0.5436759102372556,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 0.5436759102372555,
+                  "norm_hi": 0.5436759102372555,
+                  "breakdown": false
+                }
+              ]
+            }
+          }
+        ],
+        "m": 30
+      },
+      "matvecs": 9247
+    },
+    {
+      "state_rule": "homo",
+      "active_index": 249,
+      "state_index": 249,
+      "residual_norm": 0.0005880224107884728,
+      "raw_epsilon": -0.33941093099902186,
+      "corrected_epsilon": -0.33941093099902186,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.6492128224807736e-15,
+        "delta_recurrence": {
+          "0": 5.148259665485231e-08,
+          "1": 3.2378381802163626e-08,
+          "2": 2.4928187377753322e-08,
+          "3": 2.15174484867146e-08
+        }
+      },
+      "error_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "undamped": {
+              "norm_lo": 1.117039398271455,
+              "norm_hi": 1.1176951123554808,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.117039398271455,
+                  "norm_hi": 1.1176951123554808,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.1170441366073882,
+                  "norm_hi": 1.117044150044316,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.1170441366073898,
+                  "norm_hi": 1.1170441366073907,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 1.0426385072685813,
+              "norm_hi": 1.0458537518047184,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.0426385072685813,
+                  "norm_hi": 1.0458537518047184,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.042958920327118,
+                  "norm_hi": 1.0429891812673953,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.042958937788357,
+                  "norm_hi": 1.0429589482910837,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 2,
+            "undamped": {
+              "norm_lo": 1.2277133935007722,
+              "norm_hi": 1.2277212062481415,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.2277133935007722,
+                  "norm_hi": 1.2277212062481415,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.227713393899005,
+                  "norm_hi": 1.2277133938998201,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.227713393899005,
+                  "norm_hi": 1.227713393899005,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 1.202566875893846,
+              "norm_hi": 1.2025841259033667,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.202566875893846,
+                  "norm_hi": 1.2025841259033667,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.2025668784357442,
+                  "norm_hi": 1.2025668784464676,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.202566878435744,
+                  "norm_hi": 1.202566878435744,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 5,
+            "undamped": {
+              "norm_lo": 1.2228818957519048,
+              "norm_hi": 1.2228820651864667,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.2228818957519048,
+                  "norm_hi": 1.2228820651864667,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.2228818957520557,
+                  "norm_hi": 1.2228818957520557,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.2228818957520557,
+                  "norm_hi": 1.2228818957520557,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 1.2312478933434654,
+              "norm_hi": 1.2312481822976071,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 1.2312478933434654,
+                  "norm_hi": 1.2312481822976071,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 1.2312478933439257,
+                  "norm_hi": 1.2312478933439257,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 1.2312478933439257,
+                  "norm_hi": 1.2312478933439257,
+                  "breakdown": false
+                }
+              ]
+            }
+          },
+          {
+            "N": 10,
+            "undamped": {
+              "norm_lo": 7.613543792354081,
+              "norm_hi": 7.613543793388859,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 7.613543792354081,
+                  "norm_hi": 7.613543793388859,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 7.613543792354081,
+                  "norm_hi": 7.613543792354081,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 7.613543792354081,
+                  "norm_hi": 7.613543792354081,
+                  "breakdown": false
+                }
+              ]
+            },
+            "damped": {
+              "norm_lo": 6.166784616270675,
+              "norm_hi": 6.166784617261479,
+              "contracts": false,
+              "m": 30,
+              "m_scan": [
+                {
+                  "m": 30,
+                  "norm_lo": 6.166784616270675,
+                  "norm_hi": 6.166784617261479,
+                  "breakdown": false
+                },
+                {
+                  "m": 60,
+                  "norm_lo": 6.166784616270675,
+                  "norm_hi": 6.166784616270675,
+                  "breakdown": false
+                },
+                {
+                  "m": 100,
+                  "norm_lo": 6.166784616270674,
+                  "norm_hi": 6.166784616270674,
+                  "breakdown": false
+                }
+              ]
+            }
+          }
+        ],
+        "m": 30
+      },
+      "matvecs": 9247
+    }
+  ],
+  "total_seconds": 19871.717314481735
+}

@@ -1,0 +1,3 @@
+host: b66  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: water_cluster_128  alpha: 0.3
+########## water_cluster_128 alpha=0.3 order=4 ##########
+slurmstepd-b66: error: *** JOB 557352 ON b66 CANCELLED AT 2026-08-26T12:10:12 ***

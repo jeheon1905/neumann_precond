@@ -1,7 +1,7 @@
 # =====================================================================
-# R2.2 ablation -- the damping weight alpha
+# Ablation of the damping weight alpha
 # ---------------------------------------------------------------------
-# Answers the reviewer's "were alternative weighting factors considered?".
+# Tests alternative weighting factors.
 # `weight` is a sweep axis and the value is recorded in the output path
 # (weight=0.3 ... weight=0.7) and in calculation_summary_fixed.txt, so
 # unlike the 2026-01 attempt each run states which alpha it used.

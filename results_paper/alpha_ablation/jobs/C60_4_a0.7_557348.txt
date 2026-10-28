@@ -1,0 +1,3 @@
+host: b62  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: C60_4  alpha: 0.7
+########## C60_4 alpha=0.7 order=4 ##########
+slurmstepd-b62: error: *** JOB 557348 ON b62 CANCELLED AT 2026-08-26T12:10:12 ***

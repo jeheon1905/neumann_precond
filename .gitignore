@@ -223,3 +223,13 @@ results_smoke/
 # david_inner.F, hamil.F -- commercial licence, not redistributable) and
 # journal correspondence containing personal data.  Local only.
 revision/
+
+# SLURM stdout of the spectral-analysis runs; the job scripts are tracked.
+results_spectral_revision/jobs/*.txt
+results_spectral_revision/logs/
+
+# Journal correspondence and manuscript sources.  Local only.
+revision2/
+results_spectral_revision/*.md
+results_spectral_revision/manifest.json
+results_spectral_revision/reference/

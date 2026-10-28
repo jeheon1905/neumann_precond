@@ -1,0 +1,23 @@
+host: b62  commit: e303b48d0e475238c580a9cd677d981e56eb3481  system: B12  alpha: 0.9
+########## B12 alpha=0.9 order=4 ##########
+davidson                                 |    2420.7463 |     1
+Diag. Iter.                              |    2420.3970 |    31
+Preconditioning                          |    1313.2030 |    29
+########## B12 alpha=0.9 order=4 DONE 2474 s ##########
+########## B12 alpha=0.9 order=5 ##########
+davidson                                 |   26939.8757 |     1
+Diag. Iter.                              |   26939.5225 |   296
+Preconditioning                          |   16032.5003 |   294
+########## B12 alpha=0.9 order=5 DONE 26993 s ##########
+########## B12 alpha=0.9 order=6 ##########
+davidson                                 |    2552.5534 |     1
+Diag. Iter.                              |    2552.1788 |    27
+Preconditioning                          |    1601.8415 |    25
+########## B12 alpha=0.9 order=6 DONE 2605 s ##########
+########## B12 alpha=0.9 order=7 ##########
+davidson                                 |   40778.1234 |     1
+Diag. Iter.                              |   40777.8152 |   371
+Preconditioning                          |   27073.4078 |   369
+########## B12 alpha=0.9 order=7 DONE 40831 s ##########
+########## B12 alpha=0.9 order=8 ##########
+slurmstepd-b62: error: *** JOB 560359 ON b62 CANCELLED AT 2026-08-27T14:23:38 ***

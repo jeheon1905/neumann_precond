@@ -1,0 +1,976 @@
+{
+  "tag": "B12_errnorm",
+  "datetime": "2026-08-23T18:25:19.842136",
+  "commit": "765711d0afc1561e55721eddca68a37cbbeeb54f",
+  "host": "b03",
+  "command": "spectral_experiment.py --filepath data/systems/B12.sdf --spacing 0.2 --supercell 1 1 1 --pbc 0 0 0 --precond neumann --outerorder 4 --error_cutoff -0.4 --averaged_sum 1 --weight 0.5 --phase fixed --temperature 0.0 --scf_energy_tol inf --scf_density_tol 1e-5 --scf_mixing potential --virtual_factor 1.2 --pp_type TM --filtering --threads 8 --warmup 0 --diag_iter 1000 --diag_tol 1e-5 --nblock 2 --verbosity 1 --seed 2 --probe_resid_below 1e-3 --exact_shift --state_rules lowest middle homo --skip_global --krylov_dims 40 --error_norm 0 1 2 3 4 5 6 7 8 9 10 --error_norm_dim 30 --outdir results_spectral_revision/error_norm --tag B12_errnorm",
+  "cwd": "/home/jhwoo1905/Projects/neumann_precond",
+  "args": {
+    "filepath": "data/systems/B12.sdf",
+    "precond": "neumann",
+    "inner": null,
+    "innerorder": "0",
+    "outerorder": "4",
+    "pcg_iter": "5",
+    "error_cutoff": "-0.4",
+    "averaged_sum": 1,
+    "weight": "0.5",
+    "spacing": 0.2,
+    "nbands": null,
+    "supercell": "[1, 1, 1]",
+    "pbc": "[0, 0, 0]",
+    "phase": "fixed",
+    "density_filename": null,
+    "temperature": 0.0,
+    "scf_print_energies": false,
+    "scf_maxiter": 100,
+    "scf_energy_tol": Infinity,
+    "scf_density_tol": 1e-05,
+    "scf_mixing": "potential",
+    "virtual_factor": 1.2,
+    "upf_files": null,
+    "pp_type": "TM",
+    "filtering": true,
+    "threads": 8,
+    "use_cuda": false,
+    "warmup": 0,
+    "diag_iter": 1000,
+    "diag_tol": 1e-05,
+    "nblock": 2,
+    "locking": false,
+    "fill_block": false,
+    "verbosity": 1,
+    "seed": 2,
+    "retHistory": null,
+    "retHistoryScfDir": null,
+    "merge_iter": 5,
+    "probe_call": 6,
+    "state_rules": "['lowest', 'middle', 'homo']",
+    "state_rule": "slowest",
+    "krylov_dims": "[40]",
+    "arnoldi_seeds": "[0, 1]",
+    "outdir": "results_spectral_revision/error_norm",
+    "tag": "B12_errnorm",
+    "projected": false,
+    "projected_dims": null,
+    "skip_global": true,
+    "deflated": false,
+    "deflated_dims": "[20, 40]",
+    "cg_tol": 1e-10,
+    "cg_maxiter": 300,
+    "deflated_recursion": 0,
+    "minimal_projector": false,
+    "weights": 0,
+    "verify_order_form": null,
+    "verify_dim": 30,
+    "svd_bounds": null,
+    "svd_dim": 80,
+    "error_norm": "[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]",
+    "error_norm_dim": 30,
+    "probe_resid_below": 0.001,
+    "exact_shift": true,
+    "rho_bound": null,
+    "rho_bound_dim": 40,
+    "jd_form": false,
+    "svd_arnoldi_dim": 0,
+    "eta_max_order": 0,
+    "dense": false,
+    "dense_max_ngpts": 4000
+  },
+  "environment": {
+    "python": "3.10.20",
+    "torch": "2.2.0+cpu",
+    "numpy": "1.26.4",
+    "device": "cpu",
+    "threads": 8
+  },
+  "system": "B12.sdf",
+  "ngpts": 1623798,
+  "n_active": 300,
+  "n_occupied": 250,
+  "preconditioner_call": 18,
+  "davidson_meta": {
+    "i_iter": 20,
+    "i_b": 1,
+    "i_scf": 0,
+    "band_index": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      92,
+      93,
+      94,
+      95,
+      96,
+      97,
+      98,
+      99,
+      100,
+      101,
+      102,
+      103,
+      104,
+      105,
+      106,
+      107,
+      108,
+      109,
+      110,
+      111,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      131,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150,
+      151,
+      152,
+      153,
+      154,
+      155,
+      156,
+      157,
+      158,
+      159,
+      160,
+      161,
+      162,
+      163,
+      164,
+      165,
+      166,
+      167,
+      168,
+      169,
+      170,
+      171,
+      172,
+      173,
+      174,
+      175,
+      176,
+      177,
+      178,
+      179,
+      180,
+      181,
+      182,
+      183,
+      184,
+      185,
+      186,
+      187,
+      188,
+      189,
+      190,
+      191,
+      192,
+      193,
+      194,
+      195,
+      196,
+      197,
+      198,
+      199,
+      200,
+      201,
+      202,
+      203,
+      204,
+      205,
+      206,
+      207,
+      208,
+      209,
+      210,
+      211,
+      212,
+      213,
+      214,
+      215,
+      216,
+      217,
+      218,
+      219,
+      220,
+      221,
+      222,
+      223,
+      224,
+      225,
+      226,
+      227,
+      228,
+      229,
+      230,
+      231,
+      232,
+      233,
+      234,
+      235,
+      236,
+      237,
+      238,
+      239,
+      240,
+      241,
+      242,
+      243,
+      244,
+      245,
+      246,
+      247,
+      248,
+      249,
+      250,
+      251,
+      252,
+      253,
+      254,
+      255,
+      256,
+      257,
+      258,
+      259,
+      260,
+      261,
+      262,
+      263,
+      264,
+      265,
+      266,
+      267,
+      268,
+      269,
+      270,
+      271,
+      272,
+      273,
+      274,
+      275,
+      276,
+      277,
+      278,
+      279,
+      280,
+      281,
+      282,
+      283,
+      284,
+      285,
+      286,
+      287,
+      288,
+      289,
+      290,
+      291,
+      292,
+      293,
+      294,
+      295,
+      296,
+      297,
+      298,
+      299
+    ]
+  },
+  "memory_estimate_bytes": 584567280,
+  "states": [
+    {
+      "state_rule": "lowest",
+      "active_index": 0,
+      "state_index": 0,
+      "residual_norm": 2.589419571497825e-06,
+      "raw_epsilon": -1.160095617217147,
+      "corrected_epsilon": -1.160095617217147,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.7035434057513467e-15,
+        "delta_recurrence": {
+          "0": 1.0090893240770402e-12,
+          "1": 3.460213071419857e-13,
+          "2": 2.96371034430991e-13,
+          "3": 2.9089146665474845e-13
+        }
+      },
+      "error_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "undamped": {
+              "norm_lo": 1.277678992622628,
+              "norm_hi": 1.2777932221699075,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.9945459252354507,
+              "norm_hi": 1.004013172573403,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 1,
+            "undamped": {
+              "norm_lo": 1.3690833144993624,
+              "norm_hi": 1.3690834255896105,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.9994127727067634,
+              "norm_hi": 1.0020876312106697,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 2,
+            "undamped": {
+              "norm_lo": 1.5665204675786852,
+              "norm_hi": 1.5665204944866578,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.958184778650171,
+              "norm_hi": 0.9582263504027821,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 3,
+            "undamped": {
+              "norm_lo": 1.7854132988200389,
+              "norm_hi": 1.7854132988266358,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.901264725845874,
+              "norm_hi": 0.901268703809292,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 4,
+            "undamped": {
+              "norm_lo": 2.0325437222917495,
+              "norm_hi": 2.0325437222919054,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.8410726769217522,
+              "norm_hi": 0.8410750664701004,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 5,
+            "undamped": {
+              "norm_lo": 2.313000526831402,
+              "norm_hi": 2.313000526831404,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.7825677273857622,
+              "norm_hi": 0.78256913216897,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 6,
+            "undamped": {
+              "norm_lo": 2.631774011237774,
+              "norm_hi": 2.631774011237774,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.727451210649663,
+              "norm_hi": 0.7274520612840399,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 7,
+            "undamped": {
+              "norm_lo": 2.9944821766950076,
+              "norm_hi": 2.9944821766950076,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.6761372068602972,
+              "norm_hi": 0.6761377722292414,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 8,
+            "undamped": {
+              "norm_lo": 3.407021927054661,
+              "norm_hi": 3.407021927054661,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.6285627340697221,
+              "norm_hi": 0.6285632357197618,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 9,
+            "undamped": {
+              "norm_lo": 3.8765363355190896,
+              "norm_hi": 3.8765363355190896,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.5844981810670006,
+              "norm_hi": 0.5844988505721236,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 10,
+            "undamped": {
+              "norm_lo": 4.41061088675028,
+              "norm_hi": 4.41061088675028,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.5436759102313591,
+              "norm_hi": 0.543676633127453,
+              "contracts": true,
+              "m": 30
+            }
+          }
+        ],
+        "m": 30
+      },
+      "matvecs": 3967
+    },
+    {
+      "state_rule": "middle",
+      "active_index": 125,
+      "state_index": 125,
+      "residual_norm": 1.3310354948059571e-05,
+      "raw_epsilon": -0.5798475264231674,
+      "corrected_epsilon": -0.5798475264231674,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.6707322009526555e-15,
+        "delta_recurrence": {
+          "0": 3.5671469287398805e-11,
+          "1": 2.183289574889723e-11,
+          "2": 1.4013883629816809e-11,
+          "3": 1.1474670874872454e-11
+        }
+      },
+      "error_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "undamped": {
+              "norm_lo": 1.1157530243142093,
+              "norm_hi": 1.1158130298364606,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.024537502155003,
+              "norm_hi": 1.0283155879857646,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 1,
+            "undamped": {
+              "norm_lo": 1.105309124844245,
+              "norm_hi": 1.1053681309554666,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.083877240171361,
+              "norm_hi": 1.0840393625615112,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 2,
+            "undamped": {
+              "norm_lo": 1.1047505820188732,
+              "norm_hi": 1.104753393568112,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.1027339900710376,
+              "norm_hi": 1.1027471189218316,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 3,
+            "undamped": {
+              "norm_lo": 1.079584357875479,
+              "norm_hi": 1.0795845411998062,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.0909175026368627,
+              "norm_hi": 1.0909181963856565,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 4,
+            "undamped": {
+              "norm_lo": 1.038598545626376,
+              "norm_hi": 1.0385986046073803,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.0583281156398467,
+              "norm_hi": 1.058328224203521,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 5,
+            "undamped": {
+              "norm_lo": 0.9882277194193609,
+              "norm_hi": 0.9882277302236544,
+              "contracts": true,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.0128918696249491,
+              "norm_hi": 1.0128918950724235,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 6,
+            "undamped": {
+              "norm_lo": 0.9330519455569046,
+              "norm_hi": 0.933051948856774,
+              "contracts": true,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.960226696249119,
+              "norm_hi": 0.9602267018568353,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 7,
+            "undamped": {
+              "norm_lo": 0.8769343978746653,
+              "norm_hi": 0.8769344003302778,
+              "contracts": true,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.9044610755483729,
+              "norm_hi": 0.9044610780405294,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 8,
+            "undamped": {
+              "norm_lo": 0.9827794903107299,
+              "norm_hi": 0.982779494626738,
+              "contracts": true,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 0.8623396076933787,
+              "norm_hi": 0.8623403621935462,
+              "contracts": true,
+              "m": 30
+            }
+          },
+          {
+            "N": 9,
+            "undamped": {
+              "norm_lo": 1.4199628794905512,
+              "norm_hi": 1.4199628796589698,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.1953892264138843,
+              "norm_hi": 1.1953892274097946,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 10,
+            "undamped": {
+              "norm_lo": 2.0564905055708693,
+              "norm_hi": 2.05649050557319,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.735875322763258,
+              "norm_hi": 1.7358753227864205,
+              "contracts": false,
+              "m": 30
+            }
+          }
+        ],
+        "m": 30
+      },
+      "matvecs": 3967
+    },
+    {
+      "state_rule": "homo",
+      "active_index": 249,
+      "state_index": 249,
+      "residual_norm": 0.0005880224107884728,
+      "raw_epsilon": -0.33941093099902186,
+      "corrected_epsilon": -0.33941093099902186,
+      "zero_shift_fallback": false,
+      "dtype": "torch.float64",
+      "validation": {
+        "delta_apply_P": 0.0,
+        "delta_linearity": 1.6492128224807736e-15,
+        "delta_recurrence": {
+          "0": 5.148259665485231e-08,
+          "1": 3.2378381802163626e-08,
+          "2": 2.4928187377753322e-08,
+          "3": 2.15174484867146e-08
+        }
+      },
+      "error_norm": {
+        "orders": [
+          {
+            "N": 0,
+            "undamped": {
+              "norm_lo": 1.117039398271455,
+              "norm_hi": 1.1176951123554808,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.0426385072685813,
+              "norm_hi": 1.0458537518047184,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 1,
+            "undamped": {
+              "norm_lo": 1.1829360527704569,
+              "norm_hi": 1.1830014067626977,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.1401846296463856,
+              "norm_hi": 1.1406606882428423,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 2,
+            "undamped": {
+              "norm_lo": 1.2277133935007722,
+              "norm_hi": 1.2277212062481415,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.202566875893846,
+              "norm_hi": 1.2025841259033667,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 3,
+            "undamped": {
+              "norm_lo": 1.2452372667982725,
+              "norm_hi": 1.245239192415914,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.2348237115562535,
+              "norm_hi": 1.2348277071605775,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 4,
+            "undamped": {
+              "norm_lo": 1.2415628105919578,
+              "norm_hi": 1.2415633016046483,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.2422701455496534,
+              "norm_hi": 1.24227125143671,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 5,
+            "undamped": {
+              "norm_lo": 1.2228818957519048,
+              "norm_hi": 1.2228820651864667,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.2312478933434654,
+              "norm_hi": 1.2312481822976071,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 6,
+            "undamped": {
+              "norm_lo": 1.2008006161568021,
+              "norm_hi": 1.2008008672468928,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.2089923496430066,
+              "norm_hi": 1.2089924303941058,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 7,
+            "undamped": {
+              "norm_lo": 1.7438368178906964,
+              "norm_hi": 1.7438368446233636,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 1.392197539042255,
+              "norm_hi": 1.3921976596125212,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 8,
+            "undamped": {
+              "norm_lo": 2.8943255111652375,
+              "norm_hi": 2.894325526013836,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 2.313493794778994,
+              "norm_hi": 2.3134938307705353,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 9,
+            "undamped": {
+              "norm_lo": 4.7251398386786505,
+              "norm_hi": 4.725139840242673,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 3.806829256288346,
+              "norm_hi": 3.806829262746782,
+              "contracts": false,
+              "m": 30
+            }
+          },
+          {
+            "N": 10,
+            "undamped": {
+              "norm_lo": 7.613543792354081,
+              "norm_hi": 7.613543793388859,
+              "contracts": false,
+              "m": 30
+            },
+            "damped": {
+              "norm_lo": 6.166784616270675,
+              "norm_hi": 6.166784617261479,
+              "contracts": false,
+              "m": 30
+            }
+          }
+        ],
+        "m": 30
+      },
+      "matvecs": 3967
+    }
+  ],
+  "total_seconds": 14949.839771032333
+}

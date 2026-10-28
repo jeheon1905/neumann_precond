@@ -1,0 +1,28 @@
+[
+ {
+  "case": "isolated H2O, 6 A box",
+  "pbc": [
+   0,
+   0,
+   0
+  ],
+  "ngpts": 1000,
+  "relative_asymmetry": 0.0,
+  "eig_min": 0.003593071432713144,
+  "eig_max": 0.7925256116304802,
+  "constant_mode_rayleigh": 0.7180019986603081
+ },
+ {
+  "case": "periodic Si diamond",
+  "pbc": [
+   1,
+   1,
+   1
+  ],
+  "ngpts": 1000,
+  "relative_asymmetry": 0.0,
+  "eig_min": 0.008076029583141867,
+  "eig_max": 0.5666882524705388,
+  "constant_mode_rayleigh": 0.5666882524705386
+ }
+]

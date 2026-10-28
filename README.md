@@ -159,8 +159,7 @@ python repeat_test.py --config configs/paper/<config>.yaml
 
 [`configs/paper/README.md`](configs/paper/README.md) explains the settings and the output
 files. Timings were measured on a single NVIDIA GH200, except the B200 columns of Table S1
-and Table S10, which were measured on a single NVIDIA B200. The RMM-DIIS eigensolver used
-for the RMM-DIIS columns of Table S1 is not part of this repository.
+and Table S10, which were measured on a single NVIDIA B200.
 
 ## Spectral analysis
 
